@@ -33,8 +33,32 @@ Open DSKY hardware. However, I derived many routines from these sources:
 ## Files
 
 ## Dependencies
+### Arduino
+This section describes the third party libraries needed to compile
+the sketch for Arduino.
+
++ Wire - standard arduino library
++ EEPROM - standard arduino library for reading/writing the 2K eeprom memory.
++ Adafruit NeoPixel - library used to illuminate the neo pixels
++ LedControl - library used to talk to LEDs
++ TinyGPS++ - library to read the GPS device and parse its output.
++ DFPlayerMini_Fast - library to play audio clips
+
+### Linux
+This section describes the notable libraries needed to compile
+the curses simulator on linux/macos/windows.
+
++ **ncurses** - this is a library for drawing simple text based user interfaces. It
+		is widely available, and comes installed by default on most linux distros.
+
++ **sigalarm** - this is capability of most unixes. It is included on all linux operating
+			systems. Special porting may be needed for Windows or Macos.
+
 
 ## Compiling for Arduino Nano
+I use the Arduino Command Line Interface. I run this under linux on a Raspberry Pi.
+The included ```Makefile``` shows the commands needed to compile the sketch and
+upload to your Open DSKY kit.
 
 ## Compiling for Linux
 
@@ -75,6 +99,13 @@ The file ```./logfile.txt``` is produced which can be used for debugging purpose
 ### persistent data
 The file ```./persist.txt``` contains a simulated EEPROM storage and simulated RTC clock RAM.
 This allows the **curses simulator** to retain information between running the program.
+
+## DSKY Usage
+This section describes the general usage of the DSKY. The interface was modeled
+by my experimentation with a faithful DSKY simulator (See http:www.XXXXXXXXX).
+
+## VERBs, NOUNs, and PROGRAMs
+This section documents the avalable VERB/NOUN combinations and the PROGRAM's.
 
 ## Green Plexiglass Modification
 This section describes my modification to the Open DSKY. I decided
