@@ -19,7 +19,9 @@ Open DSKY hardware. However, I derived many routines from these sources:
 + Scott Pav's github project.
 
 + The functionality offered was inspired by the functionality offered by
-		the Apollo 50th project which came pre-installed with the Open DSKY kit.
+		the **Apollo 50th Anniversary** project which came pre-installed with the Open DSKY kit.
+
++ The audio clips provided here are taken from the **Apollo 50th Anniversary** project SD card.
 
 
 ## Features
@@ -29,7 +31,6 @@ Open DSKY hardware. However, I derived many routines from these sources:
 + Ability to enter values using the keypad instead of +/- keys.
 
 ## Files
-
 
 ## Dependencies
 
@@ -49,6 +50,31 @@ This section documents all the assembly instructions.
 The program ``assembler.py`` is a simple one pass assembler written in python.
 You will need python to recompile the assembly. This github repository
 however contains a pre-compiled version of the assembly.
+
+## Running the curses simulator
+The **curses simulator** is a text based 'ncurses' application. You run
+the program from any text terminal and you will see a simple text screen
+that represents the DSKY display and DSKY keyboard.
+
+### Keys
+The keys map to you keyboard thusly. Only lower case keys are accepted.
++ '0' ... '9' - Digits
++ '+'	- Plus
++ '-'	- Minus
++ 'v'	- VERB
++ 'n'	- NOUN
++ 'p'	- PRO (Proceed)
++ 'c'	- CLR (Clear)
++ 'k'	- KEY REL (Key Release)
++ 'e' or 'Enter' - ENTR (Enter)
++ 'r'	- RSET (Reset)
+
+### log file
+The file ```./logfile.txt``` is produced which can be used for debugging purposes.
+
+### persistent data
+The file ```./persist.txt``` contains a simulated EEPROM storage and simulated RTC clock RAM.
+This allows the **curses simulator** to retain information between running the program.
 
 ## Green Plexiglass Modification
 This section describes my modification to the Open DSKY. I decided
