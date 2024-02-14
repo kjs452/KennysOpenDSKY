@@ -12,7 +12,7 @@ will be referred to as the **curses simulator**.
 The **curses simulator** allows for testing and deugging the complete software
 without having to upload to the arduino nano.
 
-![alt text](images/v1636.jpg "")
+![alt text](images/v16n36.jpg "")
 
 ## Acknowledgments
 This is an original implementation of code needed to drive the
