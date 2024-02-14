@@ -92,6 +92,7 @@ The keys map to you keyboard thusly. Only lower case keys are accepted.
 + 'k'	- KEY REL (Key Release)
 + 'e' or 'Enter' - ENTR (Enter)
 + 'r'	- RSET (Reset)
++ 'q'	- Quit the DSKY simulator
 
 ### log file
 The file ```./logfile.txt``` is produced which can be used for debugging purposes.
@@ -112,6 +113,8 @@ This section describes my modification to the Open DSKY. I decided
 I didn't like how fuzzy the LED digits were. I decided to use a green
 plexi-glass window to make the LED region nicer to look at and avoid
 the fuzzyness and dimness of the original kit.
+
+![alt text](images/ncurses2.jpg "")
 
 ## Review of the Open DSKY Kit
 This section contains my thoughts on the Open DSKY kit.
