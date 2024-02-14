@@ -12,6 +12,8 @@ will be referred to as the **curses simulator**.
 The **curses simulator** allows for testing and deugging the complete software
 without having to upload to the arduino nano.
 
+![alt text](images/v1636.jpg "")
+
 ## Acknowledgments
 This is an original implementation of code needed to drive the
 Open DSKY hardware. However, I derived many routines from these sources:
@@ -80,6 +82,8 @@ The **curses simulator** is a text based 'ncurses' application. You run
 the program from any text terminal and you will see a simple text screen
 that represents the DSKY display and DSKY keyboard.
 
+![alt text](images/ncurses2.jpg "")
+
 ### Keys
 The keys map to you keyboard thusly. Only lower case keys are accepted.
 + '0' ... '9' - Digits
@@ -114,7 +118,7 @@ I didn't like how fuzzy the LED digits were. I decided to use a green
 plexi-glass window to make the LED region nicer to look at and avoid
 the fuzzyness and dimness of the original kit.
 
-![alt text](images/ncurses2.jpg "")
+![alt text](images/v69.jpg "")
 
 ## Review of the Open DSKY Kit
 This section contains my thoughts on the Open DSKY kit.
