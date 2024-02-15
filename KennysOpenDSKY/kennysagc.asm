@@ -13,6 +13,8 @@ DEFINE	RTC_S100 = 9
 DEFINE	AGCINIT = 10	// timestamp for AGC Initialization (10 and 11)
 DEFINE	TS1 = 12		// generic timestamp vairable 12 and 13.
 
+DEFINE	PROG_TMP1 = 14
+
 MAIN:
 {
 	BRANCH MAIN
@@ -39,10 +41,10 @@ VERB_37:
 Next:		PROG8_A_INDIRECT_C
 			BRANCH_A_EQ_IMM8	-1		NotFound
 			INC_C
-			ST_A_DIRECT			TMP1
+			ST_A_DIRECT			PROG_TMP1
 			PROG16_A_INDIRECT_C
 			ADD_C_IMM8			2
-			BRANCH_B_EQ_DIRECT	TMP1	Found
+			BRANCH_B_EQ_DIRECT	PROG_TMP1	Found
 			BRANCH	Next
 
 Programs:	DATA8		0x00
@@ -53,6 +55,16 @@ Programs:	DATA8		0x00
 			DATA16		PROG_02
 			DATA8		0x60
 			DATA16		PROG_60
+			DATA8		0x61
+			DATA16		PROG_61
+			DATA8		0x62
+			DATA16		PROG_62
+			DATA8		0x68
+			DATA16		PROG_68
+			DATA8		0x69
+			DATA16		PROG_69
+			DATA8		0x70
+			DATA16		PROG_70
 			DATA8		-1
 
 Found:
@@ -391,6 +403,46 @@ PROG_02:
 PROG_60:
 {
 		GOTO PROG_00
+}
+
+// P61 playback JFK i believe
+PROG_61:
+{
+	LD_A_IMM8	3
+	MP3_PLAY_A
+f:	BRANCH f
+}
+
+// P62 playback JFK We choose
+PROG_62:
+{
+	LD_A_IMM8	4
+	MP3_PLAY_A
+f:	BRANCH f
+}
+
+// P68 playback A8 Genesis
+PROG_68:
+{
+	LD_A_IMM8	5
+	MP3_PLAY_A
+f:	BRANCH f
+}
+
+// P69 playback A11 eagle has landed
+PROG_69:
+{
+	LD_A_IMM8	6
+	MP3_PLAY_A
+f:	BRANCH f
+}
+
+// P70 playback A11 we have a problem
+PROG_70:
+{
+	LD_A_IMM8	17
+	MP3_PLAY_A
+f:	BRANCH f
 }
 
 Help:

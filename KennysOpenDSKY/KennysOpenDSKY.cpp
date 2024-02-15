@@ -25,9 +25,9 @@
 //	* Basic Type definitions
 //	* Infrastructure globals
 //	* Apollo Guidance Computer data structure definitions
-//	* 'Wire' Mock
+//	* 'Wire' Mock and 'Serial' Mock
 //	* 'GPS Device' Mock
-//	* 'MP3 Player Device' Mock
+//	* 'MP3 Player Device' Mock (and Arduino version)
 //	* 'EEPROM' Mock
 //	* Global variables
 //		- Read-Only globals (constants in PROGMEM)
@@ -87,7 +87,6 @@ typedef int				int32_t;
 #include <LedControl.h>
 #include <TinyGPS++.h>
 #include <Wire.h>
-#include <DFPlayerMini_Fast.h>
 #include <stdint.h>
 #include <EEPROM.h>
 
@@ -120,6 +119,7 @@ typedef int				int32_t;
 
 #define RTC_ADDR 0x68			// I2C address of the RTC DS1307
 #define MPU_ADDR 0x69			// I2C address of the MPU-6050
+#define TRACKDB_LEN	17			// number of audio tracks on SD card
 
 //
 // These macros wrap accesses to PROG. MEMORY arrays.
@@ -1321,6 +1321,10 @@ public:
 	void begin(uint16_t baud)
 	{
 	}
+
+	void write(uint8_t *buf, uint8_t len)
+	{
+	}
 };
 
 #endif
@@ -1335,7 +1339,7 @@ public:
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: MP3 Player Device Mock
+// SECTION: MP3 Player Device Mock and Arduino
 //
 #ifdef CURSES_SIMULATOR
 
@@ -1343,8 +1347,8 @@ static const struct {
 	const char	*name;
 	int			duration;		// seconds
 } trackdb[] = {
-	"",											0,
-	"01-Silence",								2,
+	"",											0,			// not a valid track number
+	"01-Silence",								2,			// first valid track number
 	"02-Alarm w lead",							60,
 	"03-JFK I Believe - Short w lead",			14,
 	"04-JFK We Choose - Short w lead",			10,
@@ -1360,88 +1364,105 @@ static const struct {
 	"14-JFK We Choose - Long w lead",			28,
 	"15-A8 Genesis Long w lead",				60+54,
 	"16-A17 Orange Soil - Short w lead",		34,
-	"17-A13 problem - Long w lead",				18,
+	"17-A13 problem - Long w lead",				18,			// last valid track number
 };
 
-const int trackdb_len = sizeof(trackdb)/sizeof(trackdb[0]);
+static int mp3_remaining;
+static int mp3_track;
 
 //
-// MP3 Player class
+// Mock pinMode() routine
 //
-class DFPlayerMini_Fast
+#define INPUT 0
+#define OUTPUT 1
+void pinMode(uint8_t pin, uint8_t mode)
 {
-public:
-	void begin(Stream& s)
-	{
-		track = -1;
-		remaining = 0;
-		cwin_update();
-	}
+}
 
-	void wakeUp()
-	{
-	}
+//
+// Mock delay() routine
+//
+static void delay(uint16_t ms)
+{
+}
 
-	void sleep()
-	{
-	}
+//
+// print out mp3 playing status
+//
+void mp3_update_curses()
+{
+	char buf[100];
 
-	void volume(uint8_t v)
-	{
+	wmove(c_win, 23, 0);
+	if( mp3_track == 0 ) {
+		waddstr(c_win, "              --No Audio--               ");
+	} else {
+		snprintf(buf, sizeof(buf), " %-36.36s %03d", trackdb[mp3_track].name, mp3_remaining);
+		waddstr(c_win, buf);
 	}
+}
 
-	void play(uint8_t track_number)
+//
+// Call this every second to update the CURSES SIMULATOR audio text
+//
+static void mp3_increment_1s()
+{
+	if( mp3_track > 0 )
 	{
-		if( track_number >= trackdb_len )
+		mp3_remaining--;
+		if( mp3_remaining < 0 )
 		{
-			fprintf(logfp, "Invalid track number %d\n", track_number);
-			return;
+			mp3_track = 0;
 		}
-		track = track_number;
-		remaining = trackdb[track].duration;
-		cwin_update();
+		mp3_update_curses();
 	}
+}
 
-	void increment_1s()
+static void mp3_play(uint8_t track_number)
+{
+	if( track_number > TRACKDB_LEN )
 	{
-		if( track >= 0 )
-		{
-			remaining--;
-			if( remaining < 0 )
-			{
-				track = -1;
-			}
-			cwin_update();
-		}
+		fprintf(logfp, "Invalid track number %d\n", track_number);
+		return;
 	}
-
-	void stop()
-	{
-		track = -1;
-		cwin_update();
-	}
-private:
-	//
-	// print out mp3 playing status
-	//
-	void cwin_update()
-	{
-		char buf[100];
-
-		wmove(c_win, 23, 0);
-		if( track == -1 ) {
-			waddstr(c_win, "              --No Audio--               ");
-		} else {
-			snprintf(buf, sizeof(buf), " %-36.36s %03d", trackdb[track].name, remaining);
-			waddstr(c_win, buf);
-		}
-	}
-
-	int track;			// -1 no track
-	int remaining;		// # of seconds remaining to play
-
-};
+	fprintf(logfp, "Playing track number %d\n", track_number);
+	mp3_track = track_number;
+	mp3_remaining = trackdb[mp3_track].duration;
+	mp3_update_curses();
+}
 #endif
+
+static uint8_t audioTrack;
+
+//
+// Play audio track 'jfk'
+//
+static
+void jfk(uint8_t jfk)
+{
+	while( audioTrack != jfk ) {
+		pinMode(9, OUTPUT);
+		delay(100);
+		pinMode(9, INPUT);
+		delay(100);
+		audioTrack++;
+		if( audioTrack > TRACKDB_LEN ) {
+            audioTrack = 1;
+        }
+    }
+
+#ifdef CURSES_SIMULATOR
+	mp3_play(audioTrack);
+#endif
+
+	pinMode(9, OUTPUT);
+	delay(100);
+	pinMode(9, INPUT);
+	audioTrack++;
+	if( audioTrack > TRACKDB_LEN ) {
+		audioTrack = 1;
+    }
+}
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1617,7 +1638,7 @@ const uint16_t accdbm[12] PROGMEM = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 27
 // SUB-SECTION: Read-Write global variables (stored in RAM ~ 2K)
 //
 static APOLLO_GUIDANCE_COMPUTER Agc;
-static DFPlayerMini_Fast myMP3;
+
 
 #ifdef CURSES_SIMULATOR
 
@@ -1921,6 +1942,7 @@ void dsky_init(DSKY *dsky)
 	dsky->lstatus = 0;
 	dsky->rstatus = 0;
 	dsky->vnpc = VNPC_VERB | VNPC_NOUN | VNPC_PROG;
+	dsky->blink = 0;
 }
 
 static
@@ -3327,9 +3349,11 @@ void agc_execute_cpu(uint8_t c)
 		break;
 
 	case MP3_PLAY_A:
+		jfk(cpu->regs[0] & 0xff);
 		break;
 
 	case MP3_STOP:
+		jfk(1);
 		break;
 
 	case EEPROM_WRITE_A_CDIRECT:
@@ -4368,7 +4392,7 @@ void apollo_guidance_computer()
 			Agc.flags &= ~AGC_TIMER4;
 
 #ifdef CURSES_SIMULATOR
-			myMP3.increment_1s();
+			mp3_increment_1s();
 			Wire.tick();
 #endif
 		}
@@ -4500,7 +4524,6 @@ static
 void setup()
 {
 	Serial.begin(9600);
-	myMP3.begin(Serial);
 
 	Wire.begin();
 	Wire.beginTransmission(MPU_ADDR);
@@ -4508,7 +4531,10 @@ void setup()
 	Wire.write(0);	   // set to zero (wakes up the MPU-6050)
 	Wire.endTransmission(true);
 
+	audioTrack = 1;
+
 #ifdef CURSES_SIMULATOR
+	mp3_update_curses();
 #else
 	pinMode(A0, INPUT);
 	pinMode(A1, INPUT);
