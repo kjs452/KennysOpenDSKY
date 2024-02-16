@@ -1,6 +1,8 @@
 # KennysOpenDSKY
 Kenny's Open DSKY Software
 
+![alt text](images/panorama_dsky.jpg "")
+
 ## Description
 This project contains C/C++ source code for the Arduino nano which
 will control the Open DSKY kickstarter kit.
@@ -310,9 +312,7 @@ Using my laser printer I printed out `screen_stuff.pdf` and used scissors to cut
 black region plus verb/noun/prog text. This I carefully positioned over the verb/noun/prog
 lights.
 
-![alt text](images/screen_stuff.pdf "")
-
-I also cut out the block of plus symbols. These I overlayed over the plus 7-segment LEDs.
+I also cut out the block of **plus** symbols. These I overlayed over the plus 7-segment LEDs.
 
 I used a small piece of scotch tape to hold these overlays in place while I assembled the
 display and bezel. Best results are achieved if the black ink covers anything inside that
