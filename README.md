@@ -300,10 +300,54 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 
 ## Verb-Nouns
 | VERB-NOUN | Description                                        |
-|------ ----|----------------------------------------------------|
-| V06 N17   |                                                    |
-| V16 N36   |                                                    |
-
+|-----------|----------------------------------------------------|
+|V06 N17    | Display IMU linear accel values                    |
+|V06 N18    | Display IMU gyro accel values                      |
+|V16 N19    | Display RTC Date/Time and IMU temp                 |
+|V06 N31    | Display time from AGC Init                         |
+|V06 N32    | display time to perigee                            |
+|V06 N36    | Display RTC time                                   |
+|V06 N37    | display RTC date                                   |
+|V06 N65    | display met                                        |
+|V06 N38    | Display GPS time                                   |
+|V06 N39    | Display GPS date                                   |
+|V16 N17    | Monitor IMU linear accel values                    |
+|V16 N18    | Monitor IMU Gyro accel values                      |
+|V16 N19    | Monitor RTC Date/Time and IMU temp                 |
+|V16 N31    | Monitor time from agc init                         |
+|V16 N34    | Monitor/Stop Time From event                       |
+|V16 N35    | Monitor/Stop timer count to event                  |
+|V16 N36    | Monitor RTC Time                                   |
+|V16 N37    | Monitor RTC Date                                   |
+|V16 N38    | Monitor GPS time                                   |
+|V16 N39    | Monitor GPS date                                   |
+|V16 N43    | Monitor GPS coordinates                            |
+|V16 N44    | Monitor Orbital Parameters                         |
+|V16 N65    | Monitor MET                                        |
+|V16 N68    | A11 Lunar Landing simulation                       |
+|V16 N87    | Monitor IMU linear accel values (with random 1202 alarms)  |
+|V16 N98    | Play selected audio clip R1=clip, R2=index adj factor      |
+|V21 N98    | select number of audio clip                        |
+|V22 N98    | Enter index adj factor                             |
+|V25 N34    | Set/Start timer count from event                   |
+|V25 N35    | Set/Start timer count to event                     |
+|V25 N36    | Set RTC Clock Manually                             |
+|V25 N37    | Set RTC Date Manually                              |
+|V26 N36    | Set RTC Clock from GPS                             |
+|V26 N37    | Set RTC Date from GPS                              |
+|V35        | Lamp test                                          |
+|V36        | Fresh Start                                        |
+|V37 N00    | P00 enter idle mode (run major mode, instead of N00 use Nxx)  |
+|V37 N01    | P01 A11 Launch Simulation                          |
+|V37 N06    | P06 Simulates putting AGC into standby mode        |
+|V37 N11    | P11 Monitor IMU ACcel values                       |
+|V37 N61    | P61 playback JFK i believe                         |
+|V37 N62    | P62 playback JFK We choose                         |
+|V37 N68    | P68 playback A8 Genesis                            |
+|V37 N69    | P69 playback A11 eagle has landed                  |
+|V37 N70    | P70 playback A11 we have a problem                 |
+|V69        | Force restart                                      |
+|V82        | Monitor Orbital parameters                         |
 
 ## Programs
 | PROG | Description                                                |
