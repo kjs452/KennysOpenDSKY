@@ -6,7 +6,7 @@ This project contains C/C++ source code for the Arduino nano which
 will control the Open DSKY kickstarter kit.
 
 This project also contains source code for Linux/Windows/Macos which
-runs as ```ncurses``` text-based simulator of the arduino software. This
+runs as `ncurses` text-based simulator of the arduino software. This
 will be referred to as the **curses simulator**.
 
 The **curses simulator** allows for testing and deugging the complete software
@@ -19,7 +19,7 @@ This is an original implementation of code needed to drive the
 Open DSKY hardware. However, I derived many routines from these sources:
 
 + **S&T Geotronics** James Sanderson and Marc Tessier for creating the
-	Open DSKY kit.
+	Open DSKY kit. <http://www.stgeotronics.com>
 
 + **Scott Pavlovec** github project. <https://github.com/scottpav>. This
 	contained the reference implementation which I used to talk to the hardware.
@@ -33,11 +33,11 @@ Open DSKY hardware. However, I derived many routines from these sources:
 
 + The audio clips provided here are taken from the **Apollo 50th Anniversary** project SD card.
 
-+ This website which has information about the virtual apollo guidance
-	computer <http://www.ibiblio.org/apollo/>.
++ The following website has information about the virtual apollo guidance
+	computer: <http://www.ibiblio.org/apollo/>.
 
-+ An online apollo DSKY emulator <https://svtsim.com/moonjs/agc.html>. I used this interface to
-	tweak my code to better reflect how the actual DSKY worked.
++ An online apollo DSKY emulator <https://svtsim.com/moonjs/agc.html>. I used this great tool to
+	tweak my code to better reflect how an actual Apollo DSKY worked.
 
 ## Features
 + A virtual machine and byte code interpreter
@@ -46,18 +46,56 @@ Open DSKY hardware. However, I derived many routines from these sources:
 + Ability to enter values using the keypad instead of +/- keys.
 
 ## Files
+The main source code is in `KennysOpenDSKY.cpp``. 
+
++ `KennysOpenDSKY.cpp` - the main source code file C/C++.
++ `kennysagc.asm` - the assembly code for the verb/noun/prog programs.
++ `kennysagc.h` - the assembled code. produced by running `assembler.py`.
++ `KennysOpenDSKY.ino` - an empty file to satisfy the Arduino CLI sketch requirements.
++ `KennysOpenDSKY.dump` - a dump of the AVR nano assembly code for the Arduino version
++ `assembler.py` - Python 3 program which assembles the assembly code into a C header file.
++ `Makefile` - A simple makefile to compile on Linux and also compile/upload the
+		sketch using the Arduino CLI tools.
++ `dsky` - The **curses simulator** executable produced on linux
++ `dsky_debug` - The **curses simulator** executable produced on linux with debugging symbols (-g).
++ `log.txt` - a log file for debugging when running the **curses simulator**.
++ `persist.txt` - emulates the EEPROM and RTC RAM area when using the **curses simulator**.
++ `audio` - directory containing the SD card audio files for the MP3 player.
++ `images` - directory containing images
+
+
+## Memory Usage
+The current build uses the following memory on the Arduino:
+
+```text
+$ make sketch
+arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
+Sketch uses 22292 bytes (72%) of program storage space. Maximum is 30720 bytes.
+Global variables use 1288 bytes (62%) of dynamic memory, leaving 760 bytes for local variables.
+Maximum is 2048 bytes.
+
+Used library      Version Path                                                                          
+Adafruit NeoPixel 1.12.0  /M/kjs/ARDUINO/Arduino/libraries/Adafruit_NeoPixel                            
+LedControl        1.0.6   /M/kjs/ARDUINO/Arduino/libraries/LedControl                                   
+TinyGPSPlus       1.0.3   /M/kjs/ARDUINO/Arduino/libraries/TinyGPSPlus                                  
+Wire              1.0     /M/kjs/ARDUINO/.arduino15/packages/arduino/hardware/avr/1.8.6/libraries/Wire  
+EEPROM            2.0     /M/kjs/ARDUINO/.arduino15/packages/arduino/hardware/avr/1.8.6/libraries/EEPROM
+
+Used platform Version Path                                                         
+arduino:avr   1.8.6   /M/kjs/ARDUINO/.arduino15/packages/arduino/hardware/avr/1.8.6
+```
 
 ## Dependencies
 ### Arduino
 This section describes the third party libraries needed to compile
 the sketch for Arduino.
 
-+ Wire - standard arduino library
++ Wire - standard arduino library. I2C communications.
 + EEPROM - standard arduino library for reading/writing the 2K eeprom memory.
 + Adafruit NeoPixel - library used to illuminate the neo pixels
 + LedControl - library used to talk to LEDs
 + TinyGPS++ - library to read the GPS device and parse its output.
-+ DFPlayerMini_Fast - library to play audio clips
++ Arduino CLI tools for linux - I don't use the Arduino IDE. I use `arduino-cli` tool.
 
 ### Linux
 This section describes the notable libraries needed to compile
