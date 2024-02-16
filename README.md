@@ -91,12 +91,14 @@ arduino:avr   1.8.6   /M/kjs/ARDUINO/.arduino15/packages/arduino/hardware/avr/1.
 This section describes the third party libraries needed to compile
 the sketch for Arduino.
 
-+ Wire - standard arduino library. I2C communications.
-+ EEPROM - standard arduino library for reading/writing the 2K eeprom memory.
-+ Adafruit NeoPixel - library used to illuminate the neo pixels
-+ LedControl - library used to talk to LEDs
-+ TinyGPS++ - library to read the GPS device and parse its output.
-+ Arduino CLI tools for linux - I don't use the Arduino IDE. I use `arduino-cli` tool.
++ **Wire - standard arduino library. I2C communications.
++ **EEPROM** - standard arduino library for reading/writing the 2K eeprom memory.
++ **Adafruit NeoPixel** - library used to illuminate the neo pixels
++ **LedControl** - library used to talk to LEDs
++ **TinyGPS++** - library to read the GPS device and parse its output.
++ **Arduino CLI tools for linux** - I don't use the Arduino IDE. I use `arduino-cli` tool.
++ **python3** - this is needed to run `assembler.py`. The assembler is a simple text only
+		python program which should with most python installations.
 
 ### Linux
 This section describes the notable libraries needed to compile
@@ -105,8 +107,16 @@ the curses simulator on linux/macos/windows.
 + **ncurses** - this is a library for drawing simple text based user interfaces. It
 		is widely available, and comes installed by default on most linux distros.
 
-+ **sigalarm** - this is capability of most unixes. It is included on all linux operating
-			systems. Special porting may be needed for Windows or Macos.
++ **sigaction()** - this is capability of most unixes. It is included on all linux operating
+			systems. Special porting may be needed for Windows or Macos. It is used to
+			implement the 100ms timer.
+
++ **getrandom()** - this is a library function provdided by linux. It use used to provide
+			random numbers to the code for blinking the **Uplink Acty**
+			and **Comp Acty** lights.
+
++ **python3** - this is needed to run `assembler.py`. The assembler is a simple text only
+		python program which should with most python installations.
 
 
 ## Compiling for Arduino Nano
@@ -210,6 +220,5 @@ reverse engineer. Unfortunately there lacks a schematic showing how the MP3 play
 
 ## Author
 Ken Stauffer<BR>
-New York City, New York<BR>
+New York, NY.<BR>
 2/14/2024
-
