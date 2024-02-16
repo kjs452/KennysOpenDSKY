@@ -47,7 +47,7 @@
 //	SECTION 18: Sketch setup() routine
 //	SECTION 19: Sketch loop() routine
 //	SECTION 20: load/store mock RTC RAM and mock EEPROM data
-//	SECTION 21: MAIN() - calls setup
+//	SECTION 21: MAIN() - calls setup() and loop()
 //
 // NOTES:
 //	* When adding/removing VM instructions there are 4 places to edit:
@@ -4719,7 +4719,7 @@ void loop()
 // SECTION 20: load/store mock RTC RAM and mock EEPROM data
 //
 //	The file to be read/written is: "./persist.txt"
-//	If the file doesn't exist then initialize persitent storage with 0xFF bytes.
+//	If the file doesn't exist then initialize persistent storage with 0xFF bytes.
 //
 
 static
@@ -4879,9 +4879,9 @@ void write_persistent_storage()
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 21: MAIN() - calls setup
+// SECTION 21: MAIN() - calls setup() and loop()
 //
-// This is only used in the linux/macos/windows curses version.
+// This is only used in the linux/macos/windows CURSES SIMULATOR version.
 //
 int main(int argc, char *argv[])
 {
@@ -4939,8 +4939,7 @@ int main(int argc, char *argv[])
 	}
 
 	//
-	// Quit - we only reach here in the curses simulator.
-	// the user pressed 'q'
+	// we get here only if the user pressed 'q'
 	//
 
 	// store persistent storage data to disk in file ./persist.txt

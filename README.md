@@ -11,7 +11,7 @@ This project also contains source code for Linux/Windows/Macos which
 runs as `ncurses` text-based simulator of the arduino software. This
 will be referred to as the **curses simulator**.
 
-The **curses simulator** allows for testing and deugging the complete software
+The **curses simulator** allows for testing and debugging the complete software
 without having to upload to the Arduino nano.
 
 ![alt text](images/v16n36.jpg "")
@@ -46,6 +46,7 @@ Open DSKY hardware. However, I derived many routines from these sources:
 + Two threads of control: One thread is a backround task, which
 	runs major modes. The other thread is a foreground task which runs simple verbs/nouns.
 + Ability to enter values using the keypad instead of +/- keys.
++ More accurately reproduces the Apollo DSKY interface.
 
 ## Files
 The main source code is in `KennysOpenDSKY.cpp`. 
@@ -65,7 +66,6 @@ The main source code is in `KennysOpenDSKY.cpp`.
 + `audio` - directory containing the SD card audio files for the MP3 player.
 + `images` - directory containing images used for documentation purposes. Also contains a
 	`pdf` and `pages` document for use with the **Green Plexi-glass** modification.
-
 
 ## Memory Usage
 The current build uses the following memory on the Arduino:
@@ -126,7 +126,7 @@ I use the Arduino Command Line Interface. I run this under linux on a Raspberry 
 The included ```Makefile``` shows the commands needed to compile the sketch and
 upload to your Open DSKY kit.
 
-To assemble the assmbly code use:
+To assemble the assembly code use:
 ```
 	$ ./assembler.py kennysagc.asm
 ```
@@ -239,7 +239,9 @@ The behavior of this program should be identical to the behavior it
 will have when run on the Arduino Open DSKY hardware. The GPS and IMU
 devices are simulated with *fake* data. The MP3 player only shows audio
 as a text line at the bottom of the window. The audio shows how many seconds
-remain in the audio clip. But no sound will play!
+remain in the audio clip. But no sound will play! The Real Time cLock (RTC)
+is simulated but it uses the linux date and time to initialize itself. The
+real time clock can be set by the user to a different date/time in the simulator.
 
 
 ### log file
@@ -269,7 +271,53 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 	to launch the program.
 
 ## VERBs, NOUNs, and PROGRAMs
-This section documents the avalable VERB/NOUN combinations and the PROGRAM's.
+This section documents the available VERB/NOUN combinations and the PROGRAM's.
+
+## Verbs
+
+| VERB | Description                                        |
+|------|----------------------------------------------------|
+| V06  | Display Selected Value                             |
+| V16  | Monitor Selected Values                            |
+| V21  | Enter value (R1 only)                              |
+| V22  | Enter value (R2 only)                              |
+| V25  | Enter values (R1 + R2 + R3)                        |
+| V26  | Load values from external source                   |
+| V35  | LAMP TEST                                          |
+| V36  | Fresh Start                                        |
+| V37  | Execute Major PROGRAM                              |
+| V69  | Force Restart                                      |
+| V82  | Monitor Orbital Parameters                         |
+
+## Nouns
+| NOUN | Description                                        |
+|------|----------------------------------------------------|
+| N17  | IMU Linear Acceleration values (XXXX, YYYY, ZZZZ)  |
+| N18  | IMU Gyro acceleration values (ROLL, PITCH, YAW)    |
+| N19  | RTC DATE, TIME, IMU TEMP                           |
+| N31  | Time from AGC initialization                       |
+| N32  | Time from Perigee                                  |
+
+## Verb-Nouns
+| VERB-NOUN | Description                                        |
+|------ ----|----------------------------------------------------|
+| V06 N17   |                                                    |
+| V16 N36   |                                                    |
+
+
+## Programs
+| PROG | Description                                                |
+|------|------------------------------------------------------------|
+| P00  | Poo                                                        |
+| P01  | Apollo 11 Launch Simulation                                |
+| P06  | Simulate putting AGC into standby mode                     |
+| P11  | Display IMU linear acceleration values (same as V16 N18)   |
+| P61  | play short version of JFK "I believe"                      |
+| P62  | play short version of JFK "we choose"                      |
+| P68  | play short version of Apollo 8 genesis clip                |
+| P69  | play Apollo 11 the eagle has landed clip                   |
+| P70  | play short version of Apollo 13 "problem" clip             |
+
 
 ## Green Plexi-glass Modification
 This section describes my modification to the Open DSKY. I decided
@@ -331,7 +379,7 @@ from the back in order to ensure the front cover fits snuggly onto the cicruit b
 I didn't like the "sticker" which you use to cover over the beautiful LED's, so I
 customized my device.
 
-The electronics and provided circuit board were excellend. All the parts were well labeled.
+The electronics and provided circuit board were excellent. All the parts were well labeled.
 It makes for a greate arduino platform to play with many different devices: GPS, IMU, MP3 player
 and Real Time Clock.
 
