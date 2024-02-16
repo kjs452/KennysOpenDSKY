@@ -22,24 +22,29 @@
 //
 // This program is broken into these sections:
 //
-//	* Basic Type definitions
-//	* Infrastructure globals
-//	* Apollo Guidance Computer data structure definitions
-//	* 'Wire' Mock and 'Serial' Mock
-//	* 'GPS Device' Mock
-//	* 'MP3 Player Device' Mock (and Arduino version)
-//	* 'EEPROM' Mock
-//	* Global variables
-//		- Read-Only globals (constants in PROGMEM)
-//		- Read-Write globals (variables in RAM)
-//	* Random() Mock Routine
-//	* Curses routines
-//	* Apollo Guidance Computer - runs the whole thing
-//	* Signal Handler
-//	* setup()
-//	* loop()
-//	* load/store mock RTC RAM and mock EEPROM data
-//	* main()		calls setup().
+//	SECTION 1: Basic Type definitions
+//	SECTION 2: Infrastructure globals
+//	SECTION 3: Apollo Guidance Computer data structure definitions
+//	SECTION 4: Miscellaneous Arduino Mocks
+//	SECTION 5: 'Adafruit_NeoPixel' Mock
+//	SECTION 6: 'LedControl' Mock
+//	SECTION 7: 'Wire' and 'Secial' Mock
+//	SECTION 8: 'TinyGPSPlus' Mock
+//	SECTION 9: MP3 Player Curses Routines
+//	SECTION 10: 'EEPROM' Mock
+//	SECTION 11: 'Random()' Mock Routines
+//	SECTION 12: Globals Variables (Read-Only & Read/Write)
+//	  SUB-SECTION 12a: Read-Only globals (constants in PROGMEM)
+//	  SUB-SECTION 12b: Read-Write globals (variables in RAM)
+//	SECTION 13: Curses window start/end
+//	SECTION 14: DSKY redraw routines (arduino and curses)
+//	SECTION 15: Keyboard reading (arduino and curses)
+//	SECTION 16: Apollo Guidance Computer routines
+//	SECTION 17: Signal/ISR for Timing control (arduino and curses)
+//	SECTION 18: Sketch setup() routine
+//	SECTION 19: Sketch loop() routine
+//	SECTION 20: load/store mock RTC RAM and mock EEPROM data
+//	SECTION 21: MAIN() - calls setup
 //
 // NOTES:
 //	* When adding/removing VM instructions there are 4 places to edit:
@@ -56,7 +61,7 @@
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: Basic Type definitions
+// SECTION 1: Basic Type definitions
 //
 
 #ifdef CURSES_SIMULATOR
@@ -75,10 +80,31 @@ typedef unsigned char	uint8_t;
 typedef unsigned short	uint16_t;
 typedef int				int32_t;
 
+//
+// Mock PROGMEM access macros
+//
 #define PROGMEM	/* nothing */
 #define pgm_read_byte_near(address_short)	(*((uint8_t*)(address_short)))
 #define pgm_read_word_near(address_short)	(*((uint16_t*)(address_short)))
 #define pgm_read_dword_near(address_short)	(*((uint32_t*)(address_short)))
+
+//
+// Mock timer registers
+//
+static uint8_t TCCR1A;
+static uint8_t TCCR1B;
+static uint8_t TCNT1;
+static uint16_t OCR1A;
+static uint8_t TIMSK1;
+#define WGM12	1
+#define CS12	12
+#define OCIE1A	1
+
+//
+// mock neopixel configuation defines
+//
+#define NEO_GRB			0			// mock value
+#define NEO_KHZ800		0			// mock value
 
 #else
 
@@ -90,9 +116,7 @@ typedef int				int32_t;
 #include <stdint.h>
 #include <EEPROM.h>
 
-#define PIN				6
-#define NUMPIXELS		18
-#define GPS_SW			7 
+#endif
 
 // this macro definition conflicts with 'SP' struct member in struct CPU.
 #ifdef SP
@@ -115,18 +139,20 @@ typedef int				int32_t;
 #define EVENROWDIVIDERVOLTAGE6	823
 #define EVENROWDIVIDERVOLTAGE7	930
 
-#endif
-
-#define RTC_ADDR 0x68			// I2C address of the RTC DS1307
-#define MPU_ADDR 0x69			// I2C address of the MPU-6050
-#define TRACKDB_LEN	17			// number of audio tracks on SD card
+#define RTC_ADDR		0x68		// I2C address of the RTC DS1307
+#define MPU_ADDR		0x69		// I2C address of the MPU-6050
+#define TRACKDB_LEN		17			// number of audio tracks on SD card
+#define PIN				6			// neopixel access pin
+#define NUMPIXELS		18
+#define GPS_SW			7 
 
 //
-// These macros wrap accesses to PROG. MEMORY arrays.
-// Three PROGMEM arrays are stored in program memory:
+// These macros wrap access to PROGRAM MEMORY arrays.
+// Four PROGMEM arrays are stored in program memory:
 //	1) StateMachine[] for the DSKY user input state transistion graph
 //	2) Program[] array for running AGC Virtual Machine assembly code (kennysagc.h)
 //	3) Verbs[] array for looking up valid verbs and their start address
+//	4) accdbm[] array (Accumulated Days By Month) for date math
 //
 #define StateMachineAcc(state, input)	\
 							(const uint8_t)(pgm_read_byte_near((uint8_t*)StateMachine + (10*state) + input))
@@ -140,7 +166,7 @@ typedef int				int32_t;
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: Infrastructure globals
+// SECTION 2: Infrastructure globals
 //
 #ifdef CURSES_SIMULATOR
 
@@ -151,7 +177,7 @@ static WINDOW *c_win;			// curses window
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: Apollo Guidance Computer data structure definitions
+// SECTION 3: Apollo Guidance Computer data structure definitions
 //
 
 //////////////////////////////////////////////////////////////////////
@@ -415,9 +441,9 @@ enum UNHIDE {
 	UNHIDE_OPRERR,
 };
 
-// up to 256 instructions are possible. stored in uint8_t
+// up to 256 instructions are possible. stored as uint8_t.
 // Opcodes range from 0 to 255.
-// This is the machine language for the Apollo Guidance Computer VM
+// This is the machine language for the Apollo Guidance Computer VM.
 enum AGC_INSTRUCTION
 {
 	MOV_R1_A = 0,
@@ -946,7 +972,7 @@ struct CPU
 
 //
 // Everything about the Apollo Guidance Computer is contained
-// in this structure. (excepting Verb[] table and Program[] byte codes)
+// in this structure. (except Verb[] table and Program[] byte codes)
 //
 struct APOLLO_GUIDANCE_COMPUTER
 {
@@ -969,10 +995,100 @@ struct DISPATCH_ENTRY {
 	uint16_t	start;			// start location in 'Program[]' array
 };
 
+//////////////////////////////////////////////////////////////////////
+//
+// SECTION 4: Miscellaneous Arduino Mocks
+//
+//
+#ifdef CURSES_SIMULATOR
+static void cli()
+{
+}
+
+static void sei()
+{
+}
+
+static uint8_t analogRead(uint8_t pin)
+{
+	return 0;
+}
+
+//
+// Mock pinMode() routine
+//
+#define INPUT 0
+#define OUTPUT 1
+#define A0 0
+#define A1 1
+#define A2 2
+#define A7 7
+#define LOW 0
+
+void pinMode(uint8_t pin, uint8_t mode)
+{
+}
+
+void digitalWrite(uint8_t pin, uint8_t sig)
+{
+}
+
+//
+// Mock delay() routine
+//
+static void delay(uint16_t ms)
+{
+}
+#endif
+
+//////////////////////////////////////////////////////////////////////
+//
+// SECTION 5: 'Adafruit_NeoPixel' Mock
+//
+#ifdef CURSES_SIMULATOR
+class Adafruit_NeoPixel
+{
+public:
+	Adafruit_NeoPixel(uint8_t numpixels, uint8_t pin, uint8_t flags)
+	{
+	}
+
+	void begin()
+	{
+	}
+};
+#endif
+
+//////////////////////////////////////////////////////////////////////
+//
+// SECTION 6: 'LedControl' Mock
+//
+#ifdef CURSES_SIMULATOR
+class LedControl
+{
+public:
+	LedControl(uint8_t x, uint8_t y, uint8_t z, uint8_t w)
+	{
+	}
+
+	void shutdown(uint8_t index, bool state)
+	{
+	}
+
+	void setIntensity(uint8_t index, uint8_t intensity)
+	{
+	}
+
+	void clearDisplay(uint8_t index)
+	{
+	}
+};
+#endif
+
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 'Wire' Mock
+// SECTION 7: 'Wire' Mock
 // Emulates the RTC and IMU devices
 //
 // This is a minimal mock 'Wire' class that can simulate the RTC and IMU devices.
@@ -1312,9 +1428,7 @@ uint8_t TwoWire::year;
 uint8_t TwoWire::RTC_RAM[56];
 uint8_t TwoWire::month_duration[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-//
 // Mock Stream class
-//
 class Stream
 {
 public:
@@ -1327,19 +1441,29 @@ public:
 	}
 };
 
+static Stream Serial;		// Mock Serial object
+static TwoWire Wire;		// Mock Wire object
+
 #endif
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: GPS Device Mock
+// SECTION 8: 'TinyGPSPlus' Mock
 //
 #ifdef CURSES_SIMULATOR
-// KJS TODO
+class TinyGPSPlus
+{
+public:
+
+};
 #endif
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: MP3 Player Device Mock and Arduino
+// SECTION 9: MP3 Player Curses Routines
+//
+// These routines render the audio track being played on
+// the bottom line of the curses window.
 //
 #ifdef CURSES_SIMULATOR
 
@@ -1369,22 +1493,6 @@ static const struct {
 
 static int mp3_remaining;
 static int mp3_track;
-
-//
-// Mock pinMode() routine
-//
-#define INPUT 0
-#define OUTPUT 1
-void pinMode(uint8_t pin, uint8_t mode)
-{
-}
-
-//
-// Mock delay() routine
-//
-static void delay(uint16_t ms)
-{
-}
 
 //
 // print out mp3 playing status
@@ -1432,41 +1540,9 @@ static void mp3_play(uint8_t track_number)
 }
 #endif
 
-static uint8_t audioTrack;
-
-//
-// Play audio track 'jfk'
-//
-static
-void jfk(uint8_t jfk)
-{
-	while( audioTrack != jfk ) {
-		pinMode(9, OUTPUT);
-		delay(100);
-		pinMode(9, INPUT);
-		delay(100);
-		audioTrack++;
-		if( audioTrack > TRACKDB_LEN ) {
-            audioTrack = 1;
-        }
-    }
-
-#ifdef CURSES_SIMULATOR
-	mp3_play(audioTrack);
-#endif
-
-	pinMode(9, OUTPUT);
-	delay(100);
-	pinMode(9, INPUT);
-	audioTrack++;
-	if( audioTrack > TRACKDB_LEN ) {
-		audioTrack = 1;
-    }
-}
-
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: EEPROM Mock
+// SECTION 10: 'EEPROM' Mock
 //
 #ifdef CURSES_SIMULATOR
 class EEPROMClass
@@ -1501,20 +1577,40 @@ public:
 	}
 
 private:
-	uint8_t storage[2048];
+	uint8_t storage[2048];		// simulated EEPROM 2K memory
 };
+
+static EEPROMClass EEPROM;	// Mock EEPROM object
 
 #endif
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: Globals Variables (Read Only & Read/Write)
+// SECTION 11: 'Random()' Mock Routines
+//
+#ifdef CURSES_SIMULATOR
+static void randomSeed(uint8_t seed)
+{
+}
+
+static uint32_t random(uint32_t val)
+{
+	uint32_t x;
+	getrandom(&x, sizeof(x), GRND_RANDOM);
+	x = x % val;
+	return x;
+}
+#endif
+
+//////////////////////////////////////////////////////////////////////
+//
+// SECTION 12: Globals Variables (Read-Only & Read/Write)
 //
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
 //
-// SUB-SECTION: Read-Only global variables (fits in Arduino program memory ~ 30K)
+// SUB-SECTION 12a: Read-Only globals (constants in PROGMEM)
 //
 
 //
@@ -1524,9 +1620,9 @@ private:
 //
 // Program[] array comes from the assembly code 'kennysagc.asm'.
 // which is assembled into the file, "./kennysagc.h".
-// The program which assembles is: "assembler.py".
+// The program which creates this file is called: "assembler.py".
 //
-#include "./kennysagc.h"
+#include "./kennysagc.h"			// Program[] array
 
 // Verb Table
 static const DISPATCH_ENTRY Verbs[] PROGMEM = {
@@ -1543,14 +1639,14 @@ static const DISPATCH_ENTRY Verbs[] PROGMEM = {
 };
 
 //
-// This 2 dimensional array forms the state machine for handling
+// This 2 dimensional array forms a state machine for handling
 // user keyboard input. This table forms a state transistion graph.
 // This table is indexed by the (state, input) variables:
 //
 //		new_state = StateMachine[state][input]
 //
-// Since the state machine table is stored in program memory (PROGMEM) the
-// accessor uses this #define macro:
+// Since the state machine table is stored in program memory (PROGMEM) this
+// #define accessor macro must be used:
 //
 //		new_state = StateMachineAcc(state, input)
 //
@@ -1635,43 +1731,18 @@ const uint16_t accdbm[12] PROGMEM = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 27
 
 //////////////////////////////////////////////////////////////////////
 //
-// SUB-SECTION: Read-Write global variables (stored in RAM ~ 2K)
+// SUB-SECTION 12b: Read-Write globals (variables in RAM)
 //
 static APOLLO_GUIDANCE_COMPUTER Agc;
-
-
-#ifdef CURSES_SIMULATOR
-
-static Stream Serial;		// Mock Serial object
-static TwoWire Wire;		// Mock Wire object
-static EEPROMClass EEPROM;	// Mock EEPROM object
-
-#else
-
 static Adafruit_NeoPixel neoPixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 static LedControl ledControl = LedControl(12, 10, 11, 4);
 static TinyGPSPlus gps;
-
-#endif
-
-#ifdef CURSES_SIMULATOR
-//////////////////////////////////////////////////////////////////////
-//
-// SECTION: Random() Mock Routine
-//
-static uint32_t random(uint32_t val)
-{
-	uint32_t x;
-	getrandom(&x, sizeof(x), GRND_RANDOM);
-	x = x % val;
-	return x;
-}
-#endif
+static uint8_t audioTrack;
 
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: Curses window start/end
+// SECTION 13: Curses window start/end
 //
 static
 void curses_window_start()
@@ -1918,7 +1989,7 @@ void curses_redraw_status(int flag, int y, int x, const char *txt)
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: Apollo Guidance Computer routines
+// SECTION 14: DSKY redraw routines (arduino and curses)
 //
 static
 void dsky_init(DSKY *dsky)
@@ -2389,6 +2460,90 @@ void dsky_redraw(DSKY *curr, DSKY *prev)
 	*prev = *curr;
 }
 
+//////////////////////////////////////////////////////////////////////
+//
+// SECTION 15: Keyboard reading (arduino and curses)
+//
+#ifdef CURSES_SIMULATOR
+static
+int8_t readKeyboard()
+{
+	return curses_readkey();
+}
+
+#else
+
+static
+int8_t sampleKeyboard()
+{
+	int value_row1 = analogRead(A0);
+	int value_row2 = analogRead(A1);
+	int value_row3 = analogRead(A2);
+
+	if( (value_row1 > ODDROWDIVIDERVOLTAGE6)
+			&& (value_row2 > ODDROWDIVIDERVOLTAGE6)
+			&& (value_row3 > ODDROWDIVIDERVOLTAGE6))
+	{
+        return ERR;	// no key pressed
+	}
+
+    // keyboard ~top row
+	else if( value_row1 < ODDROWDIVIDERVOLTAGE1 ) return 'v';		// VERB
+	else if( value_row1 < ODDROWDIVIDERVOLTAGE2 ) return '+';
+	else if( value_row1 < ODDROWDIVIDERVOLTAGE3 ) return '7';
+	else if( value_row1 < ODDROWDIVIDERVOLTAGE4 ) return '8';
+	else if( value_row1 < ODDROWDIVIDERVOLTAGE5 ) return '9';
+	else if( value_row1 < ODDROWDIVIDERVOLTAGE6 ) return 'c';		// CLR
+
+	// keyboard ~middle row
+	else if( value_row2 < EVENROWDIVIDERVOLTAGE1 ) return 'n';		// NOUN
+	else if( value_row2 < EVENROWDIVIDERVOLTAGE2 ) return '-';
+	else if( value_row2 < EVENROWDIVIDERVOLTAGE3 ) return '4';
+	else if( value_row2 < EVENROWDIVIDERVOLTAGE4 ) return '5';
+	else if( value_row2 < EVENROWDIVIDERVOLTAGE5 ) return '6';
+	else if( value_row2 < EVENROWDIVIDERVOLTAGE6 ) return 'p';		// PRO
+	else if( value_row2 < EVENROWDIVIDERVOLTAGE7 ) return 'e';		// ENTR
+
+	// keyboard ~bottom row
+	else if( value_row3 < ODDROWDIVIDERVOLTAGE1 ) return '0';
+	else if( value_row3 < ODDROWDIVIDERVOLTAGE2 ) return '1';
+	else if( value_row3 < ODDROWDIVIDERVOLTAGE3 ) return '2';
+	else if( value_row3 < ODDROWDIVIDERVOLTAGE4 ) return '3';
+	else if( value_row3 < ODDROWDIVIDERVOLTAGE5 ) return 'k';		// KEY-REL
+	else if( value_row3 < ODDROWDIVIDERVOLTAGE6 ) return 'r';		// RSET
+	else {
+		return ERR; // no key pressed
+	}
+}
+
+static
+int8_t readKeyboard()
+{
+	static int8_t s0, s1;
+
+	s0 = sampleKeyboard();
+	if( s0 == ERR ) {
+		s1 = s0;
+		return ERR;
+	} else if( s0 == s1 ) {
+		return ERR;
+	} else {
+		delay(10);
+		s1 = sampleKeyboard();
+		if( s0 == s1 ) {
+			return s0;
+		} else {
+			s0 = s1 = ERR;
+			return ERR;
+		}
+	}
+}
+#endif
+
+//////////////////////////////////////////////////////////////////////
+//
+// SECTION 16: Apollo Guidance Computer routines
+//
 static
 void agc_cpu_init(int c, CPU *cpu)
 {
@@ -2644,6 +2799,37 @@ uint32_t timestamp_diff(uint8_t addr1, uint8_t addr2)
 #endif
 
 	return result;
+}
+
+//
+// The John F. Kennedy routine!
+// Play audio track 'jfk'
+//
+static
+void jfk(uint8_t jfk)
+{
+	while( audioTrack != jfk ) {
+		pinMode(9, OUTPUT);
+		delay(100);
+		pinMode(9, INPUT);
+		delay(100);
+		audioTrack++;
+		if( audioTrack > TRACKDB_LEN ) {
+            audioTrack = 1;
+        }
+    }
+
+#ifdef CURSES_SIMULATOR
+	mp3_play(audioTrack);
+#endif
+
+	pinMode(9, OUTPUT);
+	delay(100);
+	pinMode(9, INPUT);
+	audioTrack++;
+	if( audioTrack > TRACKDB_LEN ) {
+		audioTrack = 1;
+    }
 }
 
 //
@@ -3899,88 +4085,13 @@ uint8_t *agc_get_reg(uint8_t reg)
 	return NULL;
 }
 
-#ifdef CURSES_SIMULATOR
-static
-int8_t readKeyboard()
-{
-	return curses_readkey();
-}
-
-#else
-
-static
-int8_t sampleKeyboard()
-{
-	int value_row1 = analogRead(A0);
-	int value_row2 = analogRead(A1);
-	int value_row3 = analogRead(A2);
-
-	if( (value_row1 > ODDROWDIVIDERVOLTAGE6)
-			&& (value_row2 > ODDROWDIVIDERVOLTAGE6)
-			&& (value_row3 > ODDROWDIVIDERVOLTAGE6))
-	{
-        return ERR;	// no key pressed
-	}
-
-    // keyboard ~top row
-	else if( value_row1 < ODDROWDIVIDERVOLTAGE1 ) return 'v';		// VERB
-	else if( value_row1 < ODDROWDIVIDERVOLTAGE2 ) return '+';
-	else if( value_row1 < ODDROWDIVIDERVOLTAGE3 ) return '7';
-	else if( value_row1 < ODDROWDIVIDERVOLTAGE4 ) return '8';
-	else if( value_row1 < ODDROWDIVIDERVOLTAGE5 ) return '9';
-	else if( value_row1 < ODDROWDIVIDERVOLTAGE6 ) return 'c';		// CLR
-
-	// keyboard ~middle row
-	else if( value_row2 < EVENROWDIVIDERVOLTAGE1 ) return 'n';		// NOUN
-	else if( value_row2 < EVENROWDIVIDERVOLTAGE2 ) return '-';
-	else if( value_row2 < EVENROWDIVIDERVOLTAGE3 ) return '4';
-	else if( value_row2 < EVENROWDIVIDERVOLTAGE4 ) return '5';
-	else if( value_row2 < EVENROWDIVIDERVOLTAGE5 ) return '6';
-	else if( value_row2 < EVENROWDIVIDERVOLTAGE6 ) return 'p';		// PRO
-	else if( value_row2 < EVENROWDIVIDERVOLTAGE7 ) return 'e';		// ENTR
-
-	// keyboard ~bottom row
-	else if( value_row3 < ODDROWDIVIDERVOLTAGE1 ) return '0';
-	else if( value_row3 < ODDROWDIVIDERVOLTAGE2 ) return '1';
-	else if( value_row3 < ODDROWDIVIDERVOLTAGE3 ) return '2';
-	else if( value_row3 < ODDROWDIVIDERVOLTAGE4 ) return '3';
-	else if( value_row3 < ODDROWDIVIDERVOLTAGE5 ) return 'k';		// KEY-REL
-	else if( value_row3 < ODDROWDIVIDERVOLTAGE6 ) return 'r';		// RSET
-	else {
-		return ERR; // no key pressed
-	}
-}
-
-static
-int8_t readKeyboard()
-{
-	static int8_t s0, s1;
-
-	s0 = sampleKeyboard();
-	if( s0 == ERR ) {
-		s1 = s0;
-		return ERR;
-	} else if( s0 == s1 ) {
-		return ERR;
-	} else {
-		delay(10);
-		s1 = sampleKeyboard();
-		if( s0 == s1 ) {
-			return s0;
-		} else {
-			s0 = s1 = ERR;
-			return ERR;
-		}
-	}
-}
-#endif	// CURSES_SIMULATOR
-
 //////////////////////////////////////////////////////////////////////
 //
 // Main execution loop for the Apollo Guidance Computer
 // This routine contains its own "forever" loop.
 // Because of this it is not necessary to run this in loop().
 //
+//////////////////////////////////////////////////////////////////////
 static
 void apollo_guidance_computer()
 {
@@ -4408,14 +4519,20 @@ void apollo_guidance_computer()
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: Signal Handler
+// SECTION 17: Signal/ISR for Timing control (arduino and curses)
 //
 // signal handler 100ms
 //	Set the CPU_TIMERx flag for both cpu's
 //
 // Two signal handlers are implemented:
-//	1) Curses Simulator: Uses Unix Signals, via sigaction(SIGALRM)
+//	1) CURSES SIMULATOR: Uses Unix Signals, via sigaction(SIGALRM)
 //	2) Arduino: Uses interrupts and built-in timer 1. Declares an Interrupt Service Routine (ISR)
+//
+//	From the single 100ms timer we derive lower frequency timers:
+//		200ms		called TIMER2
+//		300ms		called TIMER3
+//		1s			called TIMER4
+//		2s			called TIMER5
 //
 #ifdef CURSES_SIMULATOR
 static
@@ -4518,7 +4635,7 @@ ISR(TIMER1_COMPA_vect)
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: setup()
+// SECTION 18: Sketch setup() routine
 //
 static
 void setup()
@@ -4533,9 +4650,6 @@ void setup()
 
 	audioTrack = 1;
 
-#ifdef CURSES_SIMULATOR
-	mp3_update_curses();
-#else
 	pinMode(A0, INPUT);
 	pinMode(A1, INPUT);
 	pinMode(A2, INPUT);
@@ -4561,22 +4675,18 @@ void setup()
 	TCCR1A = 0;			// set entire TCCR1A register to 0
 	TCCR1B = 0;			// same for TCCR1B
 	TCNT1  = 0;			//initialize counter value to 0
-	// set compare match register for 1hz increments
-//	OCR1A = 15624;		// = 1 * (16*10^6) / (1024) - 1 (must be <65536)
 
-// .1 * (16*10^6) / (1024) - 1		// .1 seconds using 1024 prescalar
-// 1561.5
-// .1 * (16*10^6) / (256) - 1		// .1 seconds, using 256 prescalar
-// 6249.00000000000000000000
+	// calculation:
+	// .1 * (16*10^6) / (1024) - 1		// .1 seconds using 1024 prescalar
+	// 1561.5
+	// .1 * (16*10^6) / (256) - 1		// .1 seconds, using 256 prescalar
+	// 6249.00000000000000000000
 
 	// set compare match register for 100ms increments
 	OCR1A = 6249;		// = .1 * (16*10^6) / (1024) - 1 (must be <65536)
 
 	// turn on CTC mode
 	TCCR1B |= (1 << WGM12);
-
-	// Set CS12 and CS10 bits for 1024 prescaler
-//	TCCR1B |= (1 << CS12) | (1 << CS10);  
 
 	// Set CS12 bit for 256 prescaler
 	TCCR1B |= (1 << CS12);  
@@ -4585,13 +4695,11 @@ void setup()
 	TIMSK1 |= (1 << OCIE1A);
 
 	sei();				// enable interrupts
-	//////////////////////////////////////////////////////////////////////
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: loop()
+// SECTION 19: Sketch loop() routine
 //
 static
 void loop()
@@ -4605,10 +4713,10 @@ void loop()
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: load/store mock RTC RAM and mock EEPROM data
+// SECTION 20: load/store mock RTC RAM and mock EEPROM data
 //
-//	The file to be read/written is: ./persist.txt
-//	If the file doesn't exist then initialize persitent storage with 0xFF bytes.
+//	The file to be read/written is: "./persist.txt"
+e//	If the file doesn't exist then initialize persitent storage with 0xFF bytes.
 //
 
 static
@@ -4768,7 +4876,7 @@ void write_persistent_storage()
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION: MAIN()
+// SECTION 21: MAIN() - calls setup
 //
 // This is only used in the linux/macos/windows curses version.
 //
@@ -4789,6 +4897,8 @@ int main(int argc, char *argv[])
 	fprintf(logfp, "Verbs dispatch size = %d\n", sizeof(Verbs));
 	fprintf(logfp, "instruction opcodes size = %d\n", AGC_INSTRUCTIONS_LEN);
 
+	audioTrack = 0;
+
 	//
 	// Setup curses
 	//
@@ -4798,6 +4908,7 @@ int main(int argc, char *argv[])
 	clear();
 
 	curses_window_start();
+	mp3_update_curses();
 
 	//
 	// setup signal handler (100ms repeating timer)
