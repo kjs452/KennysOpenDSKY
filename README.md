@@ -18,7 +18,7 @@ without having to upload to the Arduino nano.
 This is an original implementation of code needed to drive the
 Open DSKY hardware. However, I derived many routines from these sources:
 
-+ **S&T Geotronics** James Sanderson and Macr Tessier for creating the
++ **S&T Geotronics** James Sanderson and Marc Tessier for creating the
 	Open DSKY kit.
 
 + **Scott Pavlovec** github project. <https://github.com/scottpav>. This
@@ -26,10 +26,18 @@ Open DSKY hardware. However, I derived many routines from these sources:
 
 + The functionality offered was inspired by the functionality offered by
 		the **Apollo 50th Anniversary** project which came pre-installed with the Open DSKY kit.
-	(Apollo Education Experience Program, Cumming Georgia)
+	(Apollo Education Experience Program, Cumming Georgia).
+	Thanks **Bill Walker** for an incredible software and user manual.
+	Website 1: <http://apolloexperience.com>.
+	Website 2: <https://www.gofundme.com/apollo-education-experience-project>
 
 + The audio clips provided here are taken from the **Apollo 50th Anniversary** project SD card.
 
++ This website which has information about the virtual apollo guidance
+	computer <http://www.ibiblio.org/apollo/>.
+
++ An online apollo DSKY emulator <https://svtsim.com/moonjs/agc.html>. I used this interface to
+	tweak my code to better reflect how the actual DSKY worked.
 
 ## Features
 + A virtual machine and byte code interpreter
