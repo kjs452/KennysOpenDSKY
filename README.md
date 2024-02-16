@@ -2,15 +2,15 @@
 Kenny's Open DSKY Software
 
 ## Description
-This project contains C/C++ source code for the arduino nano which
-will control the Open DSKY hardware kit.
+This project contains C/C++ source code for the Arduino nano which
+will control the Open DSKY kickstarter kit.
 
 This project also contains source code for Linux/Windows/Macos which
 runs as ```ncurses``` text-based simulator of the arduino software. This
 will be referred to as the **curses simulator**.
 
 The **curses simulator** allows for testing and deugging the complete software
-without having to upload to the arduino nano.
+without having to upload to the Arduino nano.
 
 ![alt text](images/v16n36.jpg "")
 
@@ -18,10 +18,15 @@ without having to upload to the arduino nano.
 This is an original implementation of code needed to drive the
 Open DSKY hardware. However, I derived many routines from these sources:
 
-+ Scott Pav's github project.
++ **S&T Geotronics** James Sanderson and Macr Tessier for creating the
+	Open DSKY kit.
+
++ **Scott Pavlovec** github project. <https://github.com/scottpav>. This
+	contained the reference implementation which I used to talk to the hardware.
 
 + The functionality offered was inspired by the functionality offered by
 		the **Apollo 50th Anniversary** project which came pre-installed with the Open DSKY kit.
+	(Apollo Education Experience Program, Cumming Georgia)
 
 + The audio clips provided here are taken from the **Apollo 50th Anniversary** project SD card.
 
