@@ -141,9 +141,7 @@ To upload the sketch use:
 ```
 Replace **/dev/ttyUSB0** with whatever is required on your system.
 
-The provided simple `Makefile` encapsulares the command by simply running,
-
-This builds the sketch:
+The provided simple `Makefile` encapsulates these commands. This builds the sketch:
 ```
 	$ make sketch
 ```
@@ -158,11 +156,11 @@ This uploads the sketch to your Arduino Nano:
 To compile on linux `gcc` is used. The program itself is written in simple C/C++.
 (Does not use any fancy features of C++ beyond `class`).
 
-To assemble the assmbly code use:
+To assemble the assembly code use:
 ```
 	$ ./assembler.py kennysagc.asm
 ```
-This produced a file caled `kennysagc.h` which is included by `KennysOpenDSKY.cpp`.
+This produces a file caled `kennysagc.h` which is included by `KennysOpenDSKY.cpp`.
 
 This builds the `dsky` executable:
 ```
@@ -179,23 +177,45 @@ The provided simple Makefile builds both executables with this command:
 	$ make
 ```
 
+### Running the Curses Sumulator
+To run the executabale simply run it as follows (no command line arguments are needed):
+```
+	$ ./dsky
+```
+
+or,
+
+```
+	$ ./dsky_debug
+```
+
+or (when debugging),
+```
+	$ gdb ./dsky_debug
+```
+
 ## Compiling for Windows/Macos
 I don't know how to compile for these platforms. Make sure
-you have the ```ncurses``` library available. Make sure you have sigalarm() available.
-The compiliation should be pretty straight forward.
+you have the ```ncurses``` library available. Make sure you have sigaction() available.
+Make sure you have getrandom(). The compiliation should be pretty straight forward.
+
+## Using the Assembler
+The program ``assembler.py`` is a simple one pass assembler written in python.
+You will need python3 to recompile the assembly. This github repository
+however contains a pre-compiled version of the assembly.
 
 ## Assembly Language
 This section documents all the assembly instructions.
 
-## Using the Assembler
-The program ``assembler.py`` is a simple one pass assembler written in python.
-You will need python to recompile the assembly. This github repository
-however contains a pre-compiled version of the assembly.
-
-## Running the curses simulator
+## Running the Curses Simulator
 The **curses simulator** is a text based 'ncurses' application. You run
 the program from any text terminal and you will see a simple text screen
 that represents the DSKY display and DSKY keyboard.
+
+Run with this command,
+```
+	$ ./dsky
+```
 
 ![alt text](images/ncurses2.jpg "")
 
@@ -213,8 +233,16 @@ The keys map to you keyboard thusly. Only lower case keys are accepted.
 + 'r'	- RSET (Reset)
 + 'q'	- Quit the DSKY simulator
 
+The behavior of this program should be identical to the behavior it
+will have when run on the Arduino Open DSKY hardware. The GPS and IMU
+devices are simulated with *fake* data. The MP3 player only shows audio
+as a text line at the bottom of the window. The audio shows how many seconds
+remain in the audio clip. But no sound will play!
+
+
 ### log file
-The file ```./logfile.txt``` is produced which can be used for debugging purposes.
+When running the **curses simulator** the file ```./logfile.txt``` is produced.
+It is used for debugging purposes. Also contains the memory sizes of some data structures.
 
 ### persistent data
 The file ```./persist.txt``` contains a simulated EEPROM storage and simulated RTC clock RAM.
@@ -223,6 +251,20 @@ This allows the **curses simulator** to retain information between runs of the p
 ## DSKY Usage
 This section describes the general usage of the DSKY. The interface was modeled
 by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/moonjs/agc.html>).
+
+### General Notes:
++ **ENTR** not required after each verb or noun entry. Pressing **ENTR** causes
+	the DSKY to take action on the currently showing verb/noun fields.
+
++ **KEY REL** - When the **KEY REL** light is blinking, then the KEY REL button can be
+	pressed to cancel the entry of a noun/verb.
+
++ **OPR ERR** - When **OPR ERR** light is blinking then the user should press **RSET** to reset
+	this.
+
++ You cannot launch a program using the **PRO** key. Instead you must enter `V37` `ENTR` and
+	then type in a two digit program number which appears in the noun field. Then `ENTR` again
+	to launch the program.
 
 ## VERBs, NOUNs, and PROGRAMs
 This section documents the avalable VERB/NOUN combinations and the PROGRAM's.
@@ -234,6 +276,39 @@ plexi-glass window to make the LED region nicer to look at and avoid
 the fuzzyness and dimness of the original kit.
 
 ![alt text](images/v69.jpg "")
+
+I bought this product from amazon:
+```
+	Transparent Green Acrylic Sheet (12" x 20", 1/16" / 1.5mm)
+	(MakerStock Store)
+```
+Make sure the thickness is 1.5mm.
+
+I meausred the desired size and used a box cutter knife to cut the plastic.
+I used a metal ruler to maintain a straight line. After 10 to 12 cuts I broke
+the plastic along a straight table edge. The plastic broke cleanly along the
+line I had scored with the razor.
+
+I then used a utility knife to scrape the size to fit perfectly.
+
+I did the same cutting operation to the provided clear plastic that came
+with the Open DSKY kit.
+
+I used duct tape to adhere my green plexi-glass sheet to the table I was working on
+so that the sheet and ruler wouldn't move.
+
+The sticker that came with the Open DSKY kit I cut in half. I retained the left hand side
+of the sticker for the caution and warning lights pane. But I threw away the right hand side.
+
+Using my laser printer I printed out `screen_stuff.pdf` and used scissors to cut out a the
+black region plus verb/noun/prog text. This I carefully positioned over the verb/noun/prog
+lights.
+
+I also cut out the block of plus symbols. These I overlayed over the plus 7-segment LEDs.
+
+I used a small piece of scotch tape to hold these overlays in place while I assembled the
+display and bezel. Best results are achieved if the black ink covers anything inside that
+might reflect light.
 
 ## Review of the Open DSKY Kit
 This section contains my thoughts on the Open DSKY kit.
@@ -255,6 +330,12 @@ and Real Time Clock.
 Little details included with the Kit were also very nice. There were two stickers that you
 affix to the case which look like official NASA tracking signage. There was also a tiny
 little 3d-printed DSKY.
+
+### Sticker 1
+![alt text](images/sticker1.jpg "")
+
+### Sticker 2
+![alt text](images/sticker2.jpg "")
 
 The assembly instructions were a little sparse. But this increased my feeling of satisfaction
 when I successfully built the thing. How to perform final assembly was not well documented.
