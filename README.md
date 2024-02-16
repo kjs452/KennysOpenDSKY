@@ -23,7 +23,7 @@ Open DSKY hardware. However, I derived many routines from these sources:
 + **S&T Geotronics** James Sanderson and Marc Tessier for creating the
 	Open DSKY kit. <http://www.stgeotronics.com>
 
-+ **Scott Pavlovec** github project. <https://github.com/scottpav>. This
++ **Scott Pavlovec** github project. <https://github.com/scottpav/OpenDSKY>. This
 	contained the reference implementation which I used to talk to the hardware.
 
 + The functionality offered was inspired by the functionality offered by
@@ -199,7 +199,7 @@ or (when debugging),
 ## Compiling for Windows/Macos
 I don't know how to compile for these platforms. Make sure
 you have the ```ncurses``` library available. Make sure you have sigaction() available.
-Make sure you have getrandom(). The compiliation should be pretty straight forward.
+Make sure you have getrandom(). The compilation should be pretty straight forward.
 
 ## Using the Assembler
 The program ``assembler.py`` is a simple one pass assembler written in python.
@@ -208,6 +208,26 @@ however contains a pre-compiled version of the assembly.
 
 ## Assembly Language
 This section documents all the assembly instructions.
+
+Firstly here is the CPU architecture:
+
+![alt text](images/cpuarch.jpg "")
+
+The CPU consists of three 32-bit registers called **A**, **B** and **C**. Different instructions
+operate on different registers. The **C** register has special indirect addressing modes
+associared with it, so it can be thought of as the "index" register. The **A** register
+can be thought of as the "accumulator", although many of the same instructions also
+work with the **B** register. These registers are 32-bits wide.
+
+The stack pointer **SP** points into the RAM area. The RAM area consists of 128 memory locations
+each capable of storing a 32-bit value.
+
+The program counter **PC** points into the Program[] array which contains the byte codes
+that were assembled using the assembler.
+
+Here are all the assembly instructions:
+
+
 
 ## Running the Curses Simulator
 The **curses simulator** is a text based 'ncurses' application. You run
