@@ -4719,7 +4719,7 @@ void loop()
 // SECTION 20: load/store mock RTC RAM and mock EEPROM data
 //
 //	The file to be read/written is: "./persist.txt"
-e//	If the file doesn't exist then initialize persitent storage with 0xFF bytes.
+//	If the file doesn't exist then initialize persitent storage with 0xFF bytes.
 //
 
 static
