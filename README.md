@@ -91,10 +91,10 @@ arduino:avr   1.8.6   /M/kjs/ARDUINO/.arduino15/packages/arduino/hardware/avr/1.
 This section describes the third party libraries needed to compile
 the sketch for Arduino.
 
-+ **Wire - standard arduino library. I2C communications.
++ **Wire** - standard arduino library. I2C communications.
 + **EEPROM** - standard arduino library for reading/writing the 2K eeprom memory.
-+ **Adafruit NeoPixel** - library used to illuminate the neo pixels
-+ **LedControl** - library used to talk to LEDs
++ **Adafruit NeoPixel** - library used to illuminate the neo pixels.
++ **LedControl** - library used to talk to 7-segment LEDs.
 + **TinyGPS++** - library to read the GPS device and parse its output.
 + **Arduino CLI tools for linux** - I don't use the Arduino IDE. I use `arduino-cli` tool.
 + **python3** - this is needed to run `assembler.py`. The assembler is a simple text only
@@ -124,7 +124,60 @@ I use the Arduino Command Line Interface. I run this under linux on a Raspberry 
 The included ```Makefile``` shows the commands needed to compile the sketch and
 upload to your Open DSKY kit.
 
+To assemble the assmbly code use:
+```
+	$ ./assembler.py kennysagc.asm
+```
+This will produce a file called `kennysagc.h` which is included by `KennysOpenDSKY.cpp`.
+
+To compile the sketch use:
+```
+	$ arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
+```
+
+To upload the sketch use:
+```
+	$ arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno KennysOpenDSKY
+```
+Replace **/dev/ttyUSB0** with whatever is required on your system.
+
+The provided simple `Makefile` encapsulares the command by simply running,
+
+This builds the sketch:
+```
+	$ make sketch
+```
+
+This uploads the sketch to your Arduino Nano:
+```
+	$ make upload
+```
+
+
 ## Compiling for Linux
+To compile on linux `gcc` is used. The program itself is written in simple C/C++.
+(Does not use any fancy features of C++ beyond `class`).
+
+To assemble the assmbly code use:
+```
+	$ ./assembler.py kennysagc.asm
+```
+This produced a file caled `kennysagc.h` which is included by `KennysOpenDSKY.cpp`.
+
+This builds the `dsky` executable:
+```
+	$ gcc -DCURSES_SIMULATOR -lncurses KennysOpenDSKY.cpp -o dsky
+```
+
+This builds the `dsky_debug` executable (containing debug symbols):
+```
+	$ gcc -DCURSES_SIMULATOR -DDSKY_DEBUG -g -lncurses KennysOpenDSKY.cpp -o dsky_debug
+```
+
+The provided simple Makefile builds both executables with this command:
+```
+	$ make
+```
 
 ## Compiling for Windows/Macos
 I don't know how to compile for these platforms. Make sure
