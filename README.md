@@ -111,12 +111,12 @@ the curses simulator on linux/macos/windows.
 			systems. Special porting may be needed for Windows or Macos. It is used to
 			implement the 100ms timer.
 
-+ **getrandom()** - this is a library function provdided by linux. It use used to provide
++ **getrandom()** - this is a library function provdided by linux. It is used to provide
 			random numbers to the code for blinking the **Uplink Acty**
-			and **Comp Acty** lights.
+			and **Comp Acty** lights. As well as the random number assembly instruction.
 
 + **python3** - this is needed to run `assembler.py`. The assembler is a simple text only
-		python program which should with most python installations.
+		python program which should work on most python installations.
 
 
 ## Compiling for Arduino Nano
@@ -178,7 +178,7 @@ The provided simple Makefile builds both executables with this command:
 ```
 
 ### Running the Curses Sumulator
-To run the executabale simply run it as follows (no command line arguments are needed):
+To run the executable simply run it as follows (no command line arguments are needed):
 ```
 	$ ./dsky
 ```
@@ -289,10 +289,16 @@ I used a metal ruler to maintain a straight line. After 10 to 12 cuts I broke
 the plastic along a straight table edge. The plastic broke cleanly along the
 line I had scored with the razor.
 
+![alt text](images/gpm1.jpg "")
+
 I then used a utility knife to scrape the size to fit perfectly.
+
+![alt text](images/gpm2.jpg "")
 
 I did the same cutting operation to the provided clear plastic that came
 with the Open DSKY kit.
+
+![alt text](images/gpm3.jpg "")
 
 I used duct tape to adhere my green plexi-glass sheet to the table I was working on
 so that the sheet and ruler wouldn't move.
@@ -336,6 +342,9 @@ little 3d-printed DSKY.
 
 ### Sticker 2
 ![alt text](images/sticker2.jpg "")
+
+### Mini-DSKY
+![alt text](images/minidsky.jpg "")
 
 The assembly instructions were a little sparse. But this increased my feeling of satisfaction
 when I successfully built the thing. How to perform final assembly was not well documented.
