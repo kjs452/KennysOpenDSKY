@@ -2,23 +2,26 @@
 // Kenny's Open DSKY Software
 // 1/31/2024
 //
-// This software compiles for arduino and it installable on the Open DSKY kickstarter kit.
+// This software compiles for arduino and is installable on the 'Open DSKY' kickstarter kit.
 // The same source file compiles on linux/windows/macos with 'ncurses' for a faster development cycle.
 //
 // This single file contains two versions:
 //	1) Arduino sketch
-//	2) Linux/Macos/Window Curses Simulator
+//	2) Linux/Macos/Window Curses Simulator	(when the CURSES_SIMULATOR macro is defined)
 //
-// This program emulates the Apollog Guidance Computer DSKY interface.
+// This program emulates the Apollo Guidance Computer DSKY interface.
 // It contains a byte code interpreter for running programs written in
-// assembly instructions. These programs are the Verbs, Nouns and Programs.
+// assembly instructions. These programs form the Verbs, Nouns and Programs.
+//
+// This program uses a state machine to handle keyboard input. It tries
+// to emulates the original Apollo DSKY as much as possible.
 //
 // Two virtual threads are available:
 //	1) Background thread for running major modes (PROG's)
 //	2) Foreground thread for running foreground tasks (Verbs/Nouns)
 //
-// Forground tasks can stack on top of a previous foreground task and
-// restores the previous run state on RETURN.
+// Forground tasks can stack on top of a previous foreground tasks and
+// restores to the previous run state on RETURN.
 //
 // This program is broken into these sections:
 //
@@ -28,7 +31,7 @@
 //	SECTION 4: Miscellaneous Arduino Mocks
 //	SECTION 5: 'Adafruit_NeoPixel' Mock
 //	SECTION 6: 'LedControl' Mock
-//	SECTION 7: 'Wire' and 'Secial' Mock
+//	SECTION 7: 'Wire' and 'Serial' Mock
 //	SECTION 8: 'TinyGPSPlus' Mock
 //	SECTION 9: MP3 Player Curses Routines
 //	SECTION 10: 'EEPROM' Mock
@@ -1088,9 +1091,9 @@ public:
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 7: 'Wire' Mock
-// Emulates the RTC and IMU devices
+// SECTION 7: 'Wire' and 'Serial' Mock
 //
+// Emulates the RTC and IMU devices
 // This is a minimal mock 'Wire' class that can simulate the RTC and IMU devices.
 //
 class TwoWire
