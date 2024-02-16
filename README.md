@@ -46,7 +46,7 @@ Open DSKY hardware. However, I derived many routines from these sources:
 + Ability to enter values using the keypad instead of +/- keys.
 
 ## Files
-The main source code is in `KennysOpenDSKY.cpp``. 
+The main source code is in `KennysOpenDSKY.cpp`. 
 
 + `KennysOpenDSKY.cpp` - the main source code file C/C++.
 + `kennysagc.asm` - the assembly code for the verb/noun/prog programs.
@@ -61,7 +61,8 @@ The main source code is in `KennysOpenDSKY.cpp``.
 + `log.txt` - a log file for debugging when running the **curses simulator**.
 + `persist.txt` - emulates the EEPROM and RTC RAM area when using the **curses simulator**.
 + `audio` - directory containing the SD card audio files for the MP3 player.
-+ `images` - directory containing images
++ `images` - directory containing images used for documentation purposes. Also contains a
+	`pdf` and `pages` document for use with the **Green Plexi-glass** modification.
 
 
 ## Memory Usage
@@ -154,16 +155,16 @@ The file ```./logfile.txt``` is produced which can be used for debugging purpose
 
 ### persistent data
 The file ```./persist.txt``` contains a simulated EEPROM storage and simulated RTC clock RAM.
-This allows the **curses simulator** to retain information between running the program.
+This allows the **curses simulator** to retain information between runs of the program.
 
 ## DSKY Usage
 This section describes the general usage of the DSKY. The interface was modeled
-by my experimentation with a faithful DSKY simulator (See http:www.XXXXXXXXX).
+by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/moonjs/agc.html>).
 
 ## VERBs, NOUNs, and PROGRAMs
 This section documents the avalable VERB/NOUN combinations and the PROGRAM's.
 
-## Green Plexiglass Modification
+## Green Plexi-glass Modification
 This section describes my modification to the Open DSKY. I decided
 I didn't like how fuzzy the LED digits were. I decided to use a green
 plexi-glass window to make the LED region nicer to look at and avoid
@@ -205,8 +206,10 @@ All the components came in indiviual plastic and were labeled. There was a inven
 showing all the components. The kit arrived in good  packaging. I definately felt the kit was worth the $600.
 
 There are good online schematics. The sample source code is pretty gross, but also pretty easy
-reverse engineer.
+reverse engineer. Unfortunately there lacks a schematic showing how the MP3 player was wired up.
 
 ## Author
-Mr. Kenneth James Stauffer Jr., the second, B.Sc, FAA Drone pilot
+Ken Stauffer<BR>
+New York City, New York<BR>
 2/14/2024
+
