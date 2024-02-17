@@ -20,6 +20,7 @@ Kenny's Open DSKY Software
   + [Compiling for Windows/Macos](#compiling-for-windowsmacos)
   + [Using the Assembler](#using-the-assembler)
   + [Assembly Language](#assembly-language)
+    + [Virtual Machine Architecture](#virtual-machine-architecture)
     + [Comments](#comments)
     + [Labels](#labels)
     + [Scope Brackets](#scope-brackets)
@@ -85,7 +86,7 @@ Open DSKY hardware. However, I derived many routines from these sources:
 
 ## Features
 + A virtual machine and byte code interpreter
-+ Two threads of control: One thread is a backround task, which
++ Two threads of control: One thread is a background task, which
 	runs major modes. The other thread is a foreground task which runs simple verbs/nouns.
 + Ability to enter values using the keypad instead of +/- keys.
 + More accurately reproduces the Apollo DSKY interface.
@@ -252,7 +253,8 @@ however contains a pre-compiled version of the assembly.
 ## Assembly Language
 This section documents all the assembly instructions.
 
-Firstly here is the CPU architecture:
+### Virtual Machine Architecture
+Here is the CPU architecture of the virtual machine:
 
 ![alt text](images/cpuarch.jpg "")
 
@@ -273,6 +275,15 @@ This is to hold variables for the assembly programs. It also contains a small st
 
 The program bytes codes are read-only. You can store data tables in this memory area. It
 mostly contains the subroutines.
+
+There are two CPU's defined. **cpu 0** is the background thread. **cpu 1** is the foreground thread.
+The background thread is designed to run major modes or PROGRAMS. The foreground task runs verbs and noun
+combinations.
+
+The foreground task can be paused and a new foreground task stacked on top of the currently
+running foreground task. For example, If `V16 N36` is running to show the current time.
+If the user runs the `V35` (LAMP TEST) verb, then this will pause the current verb/noun and
+run the LAMP TEST code. When the LAMP TEST finishes the previous Verb/Noun will be resumed.
 
 ### Comments
 Use C++ `//` style comments in the assembly code. I.e.,
