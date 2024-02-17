@@ -18,6 +18,17 @@ Kenny's Open DSKY Software
   + [Compiling for Linux](#compiling-for-linux)
     + [Running the Curses Sumulator](#running-the-curses-sumulator)
   + [Compiling for Windows/Macos](#compiling-for-windowsmacos)
+  + [Running the Curses Simulator](#running-the-curses-simulator)
+    + [Keys](#keys)
+    + [log file](#log-file)
+    + [persistent data](#persistent-data)
+  + [DSKY Usage](#dsky-usage)
+    + [General Notes:](#general-notes)
+    + [VERBs, NOUNs, and PROGRAMs](#verbs-nouns-and-programs)
+    + [Verbs](#verbs)
+    + [Nouns](#nouns)
+    + [Verb-Nouns](#verb-nouns)
+    + [Programs](#programs)
   + [Using the Assembler](#using-the-assembler)
   + [Assembly Language](#assembly-language)
     + [Virtual Machine Architecture](#virtual-machine-architecture)
@@ -30,17 +41,6 @@ Kenny's Open DSKY Software
     + [Numeric Literals](#numeric-literals)
     + [Instructions](#instructions)
     + [Example](#example)
-  + [Running the Curses Simulator](#running-the-curses-simulator)
-    + [Keys](#keys)
-    + [log file](#log-file)
-    + [persistent data](#persistent-data)
-  + [DSKY Usage](#dsky-usage)
-    + [General Notes:](#general-notes)
-    + [VERBs, NOUNs, and PROGRAMs](#verbs-nouns-and-programs)
-    + [Verbs](#verbs)
-    + [Nouns](#nouns)
-    + [Verb-Nouns](#verb-nouns)
-    + [Programs](#programs)
   + [Green Acrylic Modification](#green-acrylic-modification)
   + [Review of the Open DSKY Kit](#review-of-the-open-dsky-kit)
     + [Sticker 1](#sticker-1)
@@ -246,6 +246,166 @@ I don't know how to compile for these platforms. Make sure
 you have the ```ncurses``` library available. Make sure you have sigaction() available.
 Make sure you have getrandom(). The compilation should be pretty straight forward.
 
+## Running the Curses Simulator
+The **curses simulator** is a text based 'ncurses' application. You run
+the program from any text terminal and you will see a simple text screen
+that represents the DSKY display and DSKY keyboard.
+
+Run with this command,
+```
+    $ ./dsky
+```
+
+![alt text](images/ncurses2.jpg "")
+
+### Keys
+The keys map to your keyboard thusly. Only lower case keys are accepted.
++ '0' ... '9' - Digits
++ '+'   - Plus
++ '-'   - Minus
++ 'v'   - VERB
++ 'n'   - NOUN
++ 'p'   - PRO (Proceed)
++ 'c'   - CLR (Clear)
++ 'k'   - KEY REL (Key Release)
++ 'e' or 'Enter' - ENTR (Enter)
++ 'r'   - RSET (Reset)
++ 'q'   - Quit the DSKY simulator
+
+The behavior of this program should be identical to the behavior it
+will have when run on the Arduino Open DSKY hardware. The GPS and IMU
+devices are simulated with *fake* data. The MP3 player only shows audio
+as a text line at the bottom of the window. The audio shows how many seconds
+remain in the audio clip. But no sound will play! The Real Time clock (RTC)
+is simulated but it uses the linux date and time to initialize itself. The
+real time clock can be set by the user to a different date/time in the simulator.
+
+Also emulated is the EEPROM storage and the real time clock 56 byte RAM area.
+These values will be stored in the file `persist.txt` so that they will
+be remembered between runs of the **curses simulator**.
+
+### log file
+When running the **curses simulator** the file `./logfile.txt` is produced.
+It is used for debugging purposes. Also contains the memory sizes of some data structures.
+
+### persistent data
+The file `./persist.txt` contains a simulated EEPROM storage and simulated RTC clock RAM.
+This allows the **curses simulator** to retain information between runs of the program.
+
+## DSKY Usage
+This section describes the general usage of the DSKY. The interface was modeled
+by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/moonjs/agc.html>).
+
+### General Notes:
++ **ENTR** not required after each verb or noun entry. Pressing **ENTR** causes
+    the DSKY to take action on the currently showing verb/noun fields.
+
++ **KEY REL** - When the **KEY REL** light is blinking, then the KEY REL button can be
+    pressed to cancel the entry of a noun/verb.
+
++ **OPR ERR** - When **OPR ERR** light is blinking then the user should press **RSET** to reset
+    this.
+
++ You cannot launch a program using the **PRO** key. Instead you must enter `V37` `ENTR` and
+    then type in a two digit program number which appears in the noun field. Then `ENTR` again
+    to launch the program.
+
+### VERBs, NOUNs, and PROGRAMs
+This section documents the available VERB/NOUN combinations and the PROGRAM's.
+
+### Verbs
+
+| VERB | Description                                        |
+|------|----------------------------------------------------|
+| V06  | Display Selected Value                             |
+| V16  | Monitor Selected Values                            |
+| V21  | Enter value (R1 only)                              |
+| V22  | Enter value (R2 only)                              |
+| V25  | Enter values (R1 + R2 + R3)                        |
+| V26  | Load values from external source                   |
+| V35  | LAMP TEST                                          |
+| V36  | Fresh Start                                        |
+| V37  | Execute Major PROGRAM                              |
+| V69  | Force Restart                                      |
+| V82  | Monitor Orbital Parameters                         |
+
+### Nouns
+| NOUN | Description                                        |
+|------|----------------------------------------------------|
+| N17  | IMU Linear Acceleration values (XXXX, YYYY, ZZZZ)  |
+| N18  | IMU Gyro acceleration values (ROLL, PITCH, YAW)    |
+| N19  | RTC DATE, TIME, IMU TEMP                           |
+| N31  | Time from AGC initialization                       |
+| N32  | Time from Perigee                                  |
+
+### Verb-Nouns
+| VERB-NOUN | Description                                        |
+|-----------|----------------------------------------------------|
+|V06 N17    | Display IMU linear accel values                    |
+|V06 N18    | Display IMU gyro accel values                      |
+|V16 N19    | Display RTC Date/Time and IMU temp                 |
+|V06 N31    | Display time from AGC Init                         |
+|V06 N32    | display time to perigee                            |
+|V06 N36    | Display RTC time                                   |
+|V06 N37    | display RTC date                                   |
+|V06 N65    | display met                                        |
+|V06 N38    | Display GPS time                                   |
+|V06 N39    | Display GPS date                                   |
+|V16 N17    | Monitor IMU linear accel values                    |
+|V16 N18    | Monitor IMU Gyro accel values                      |
+|V16 N19    | Monitor RTC Date/Time and IMU temp                 |
+|V16 N31    | Monitor time from agc init                         |
+|V16 N34    | Monitor/Stop Time From event                       |
+|V16 N35    | Monitor/Stop timer count to event                  |
+|V16 N36    | Monitor RTC Time                                   |
+|V16 N37    | Monitor RTC Date                                   |
+|V16 N38    | Monitor GPS time                                   |
+|V16 N39    | Monitor GPS date                                   |
+|V16 N43    | Monitor GPS coordinates                            |
+|V16 N44    | Monitor Orbital Parameters                         |
+|V16 N65    | Monitor MET                                        |
+|V16 N68    | A11 Lunar Landing simulation                       |
+|V16 N87    | Monitor IMU linear accel values (with random 1202 alarms)  |
+|V16 N98    | Play selected audio clip R1=clip, R2=index adj factor      |
+|V21 N98    | select number of audio clip                        |
+|V22 N98    | Enter index adj factor                             |
+|V25 N34    | Set/Start timer count from event                   |
+|V25 N35    | Set/Start timer count to event                     |
+|V25 N36    | Set RTC Clock Manually                             |
+|V25 N37    | Set RTC Date Manually                              |
+|V26 N36    | Set RTC Clock from GPS                             |
+|V26 N37    | Set RTC Date from GPS                              |
+|V35        | Lamp test                                          |
+|V36        | Fresh Start                                        |
+|V37 N00    | P00 enter idle mode (run major mode, instead of N00 use Nxx)  |
+|V37 N01    | P01 A11 Launch Simulation                          |
+|V37 N06    | P06 Simulates putting AGC into standby mode        |
+|V37 N11    | P11 Monitor IMU ACcel values                       |
+|V37 N61    | P61 playback JFK i believe                         |
+|V37 N62    | P62 playback JFK We choose                         |
+|V37 N68    | P68 playback A8 Genesis                            |
+|V37 N69    | P69 playback A11 eagle has landed                  |
+|V37 N70    | P70 playback A11 we have a problem                 |
+|V69        | Force restart                                      |
+|V82        | Monitor Orbital parameters                         |
+
+### Programs
+To launch a program type: `V37 ENTR`. The verb and noun fields will
+begin blinking. Now enter one of these program numbers.
+I.e. To run program P61 you would enter: `VERB 3 7 ENTR 6 1 ENTR`
+
+| PROG | Description                                                |
+|------|------------------------------------------------------------|
+| P00  | Poo                                                        |
+| P01  | Apollo 11 Launch Simulation                                |
+| P06  | Simulate putting AGC into standby mode                     |
+| P11  | Display IMU linear acceleration values (same as V16 N18)   |
+| P61  | play short version of JFK "I believe"                      |
+| P62  | play short version of JFK "we choose"                      |
+| P68  | play short version of Apollo 8 genesis clip                |
+| P69  | play Apollo 11 the eagle has landed clip                   |
+| P70  | play short version of Apollo 13 "problem" clip             |
+
 ## Using the Assembler
 The program ``assembler.py`` is a simple one pass assembler written in python.
 You will need python3 to recompile the assembly. This github repository
@@ -336,7 +496,7 @@ the contents of the A register are encoded into Binary Coded Decimal (BCD)
 and written to DSKY display field R3.
 
 ### Scope Brackets
-The curly braces `{` and `}` are scope brackets. They can appear on a line
+The curly braces `{` and `}` are scope brackets. They must appear on a line
 by themselves. Any labels defined within scoped brackets are removed from
 the symbol table after the end scope bracket. This allows reusing symbols
 within the body of a function.
@@ -409,6 +569,7 @@ These are the types of arguments instructions can have:
 + `<imm16>` - A 16-bit value provided immediately in the Program byte code stream
 + `<imm32>` - A 32-bit value provided immediately in the Program byte code stream
 + `<addr>` - An 8-bit unsigned value which refers to a RAM location.
++ `<addr16>` - A 16-bit address to a Program[] location. Used for CALL and GOTO instructions.
 + `<addrMin>` - An 8-bit unsigned value which refers to a RAM location. This RAM location
               contains the minimum value in the range of values to be adjusted through.
 + `<addrMax>` - An 8-bit unsigned value which refers to a RAM location. This RAM location
@@ -755,166 +916,6 @@ Done:
             RET
 }
 ```
-
-## Running the Curses Simulator
-The **curses simulator** is a text based 'ncurses' application. You run
-the program from any text terminal and you will see a simple text screen
-that represents the DSKY display and DSKY keyboard.
-
-Run with this command,
-```
-    $ ./dsky
-```
-
-![alt text](images/ncurses2.jpg "")
-
-### Keys
-The keys map to your keyboard thusly. Only lower case keys are accepted.
-+ '0' ... '9' - Digits
-+ '+'   - Plus
-+ '-'   - Minus
-+ 'v'   - VERB
-+ 'n'   - NOUN
-+ 'p'   - PRO (Proceed)
-+ 'c'   - CLR (Clear)
-+ 'k'   - KEY REL (Key Release)
-+ 'e' or 'Enter' - ENTR (Enter)
-+ 'r'   - RSET (Reset)
-+ 'q'   - Quit the DSKY simulator
-
-The behavior of this program should be identical to the behavior it
-will have when run on the Arduino Open DSKY hardware. The GPS and IMU
-devices are simulated with *fake* data. The MP3 player only shows audio
-as a text line at the bottom of the window. The audio shows how many seconds
-remain in the audio clip. But no sound will play! The Real Time clock (RTC)
-is simulated but it uses the linux date and time to initialize itself. The
-real time clock can be set by the user to a different date/time in the simulator.
-
-Also emulated is the EEPROM storage and the real time clock 56 byte RAM area.
-These values will be stored in the file `persist.txt` so that they will
-be remembered between runs of the **curses simulator**.
-
-### log file
-When running the **curses simulator** the file `./logfile.txt` is produced.
-It is used for debugging purposes. Also contains the memory sizes of some data structures.
-
-### persistent data
-The file `./persist.txt` contains a simulated EEPROM storage and simulated RTC clock RAM.
-This allows the **curses simulator** to retain information between runs of the program.
-
-## DSKY Usage
-This section describes the general usage of the DSKY. The interface was modeled
-by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/moonjs/agc.html>).
-
-### General Notes:
-+ **ENTR** not required after each verb or noun entry. Pressing **ENTR** causes
-    the DSKY to take action on the currently showing verb/noun fields.
-
-+ **KEY REL** - When the **KEY REL** light is blinking, then the KEY REL button can be
-    pressed to cancel the entry of a noun/verb.
-
-+ **OPR ERR** - When **OPR ERR** light is blinking then the user should press **RSET** to reset
-    this.
-
-+ You cannot launch a program using the **PRO** key. Instead you must enter `V37` `ENTR` and
-    then type in a two digit program number which appears in the noun field. Then `ENTR` again
-    to launch the program.
-
-### VERBs, NOUNs, and PROGRAMs
-This section documents the available VERB/NOUN combinations and the PROGRAM's.
-
-### Verbs
-
-| VERB | Description                                        |
-|------|----------------------------------------------------|
-| V06  | Display Selected Value                             |
-| V16  | Monitor Selected Values                            |
-| V21  | Enter value (R1 only)                              |
-| V22  | Enter value (R2 only)                              |
-| V25  | Enter values (R1 + R2 + R3)                        |
-| V26  | Load values from external source                   |
-| V35  | LAMP TEST                                          |
-| V36  | Fresh Start                                        |
-| V37  | Execute Major PROGRAM                              |
-| V69  | Force Restart                                      |
-| V82  | Monitor Orbital Parameters                         |
-
-### Nouns
-| NOUN | Description                                        |
-|------|----------------------------------------------------|
-| N17  | IMU Linear Acceleration values (XXXX, YYYY, ZZZZ)  |
-| N18  | IMU Gyro acceleration values (ROLL, PITCH, YAW)    |
-| N19  | RTC DATE, TIME, IMU TEMP                           |
-| N31  | Time from AGC initialization                       |
-| N32  | Time from Perigee                                  |
-
-### Verb-Nouns
-| VERB-NOUN | Description                                        |
-|-----------|----------------------------------------------------|
-|V06 N17    | Display IMU linear accel values                    |
-|V06 N18    | Display IMU gyro accel values                      |
-|V16 N19    | Display RTC Date/Time and IMU temp                 |
-|V06 N31    | Display time from AGC Init                         |
-|V06 N32    | display time to perigee                            |
-|V06 N36    | Display RTC time                                   |
-|V06 N37    | display RTC date                                   |
-|V06 N65    | display met                                        |
-|V06 N38    | Display GPS time                                   |
-|V06 N39    | Display GPS date                                   |
-|V16 N17    | Monitor IMU linear accel values                    |
-|V16 N18    | Monitor IMU Gyro accel values                      |
-|V16 N19    | Monitor RTC Date/Time and IMU temp                 |
-|V16 N31    | Monitor time from agc init                         |
-|V16 N34    | Monitor/Stop Time From event                       |
-|V16 N35    | Monitor/Stop timer count to event                  |
-|V16 N36    | Monitor RTC Time                                   |
-|V16 N37    | Monitor RTC Date                                   |
-|V16 N38    | Monitor GPS time                                   |
-|V16 N39    | Monitor GPS date                                   |
-|V16 N43    | Monitor GPS coordinates                            |
-|V16 N44    | Monitor Orbital Parameters                         |
-|V16 N65    | Monitor MET                                        |
-|V16 N68    | A11 Lunar Landing simulation                       |
-|V16 N87    | Monitor IMU linear accel values (with random 1202 alarms)  |
-|V16 N98    | Play selected audio clip R1=clip, R2=index adj factor      |
-|V21 N98    | select number of audio clip                        |
-|V22 N98    | Enter index adj factor                             |
-|V25 N34    | Set/Start timer count from event                   |
-|V25 N35    | Set/Start timer count to event                     |
-|V25 N36    | Set RTC Clock Manually                             |
-|V25 N37    | Set RTC Date Manually                              |
-|V26 N36    | Set RTC Clock from GPS                             |
-|V26 N37    | Set RTC Date from GPS                              |
-|V35        | Lamp test                                          |
-|V36        | Fresh Start                                        |
-|V37 N00    | P00 enter idle mode (run major mode, instead of N00 use Nxx)  |
-|V37 N01    | P01 A11 Launch Simulation                          |
-|V37 N06    | P06 Simulates putting AGC into standby mode        |
-|V37 N11    | P11 Monitor IMU ACcel values                       |
-|V37 N61    | P61 playback JFK i believe                         |
-|V37 N62    | P62 playback JFK We choose                         |
-|V37 N68    | P68 playback A8 Genesis                            |
-|V37 N69    | P69 playback A11 eagle has landed                  |
-|V37 N70    | P70 playback A11 we have a problem                 |
-|V69        | Force restart                                      |
-|V82        | Monitor Orbital parameters                         |
-
-### Programs
-To launch a program type: `V37 ENTR`. The verb and noun fields will
-begin blinking. Now enter one of these program numbers.
-I.e. To run program P61 you would enter: `VERB 3 7 ENTR 6 1 ENTR`
-
-| PROG | Description                                                |
-|------|------------------------------------------------------------|
-| P00  | Poo                                                        |
-| P01  | Apollo 11 Launch Simulation                                |
-| P06  | Simulate putting AGC into standby mode                     |
-| P11  | Display IMU linear acceleration values (same as V16 N18)   |
-| P61  | play short version of JFK "I believe"                      |
-| P62  | play short version of JFK "we choose"                      |
-| P68  | play short version of Apollo 8 genesis clip                |
-| P69  | play Apollo 11 the eagle has landed clip                   |
-| P70  | play short version of Apollo 13 "problem" clip             |
 
 ## Green Acrylic Modification
 This section describes my modification to the Open DSKY. I decided
