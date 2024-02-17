@@ -5,6 +5,7 @@ Kenny's Open DSKY Software
 
 ## Table Of Contents
 + [KennysOpenDSKY](#kennysopendsky)
+  + [Table Of Contents](#table-of-contents)
   + [Description](#description)
   + [Acknowledgments](#acknowledgments)
   + [Features](#features)
@@ -19,31 +20,30 @@ Kenny's Open DSKY Software
   + [Compiling for Windows/Macos](#compiling-for-windowsmacos)
   + [Using the Assembler](#using-the-assembler)
   + [Assembly Language](#assembly-language)
-  + [Comments](#comments)
-  + [Labels](#labels)
-  + [Scope Brackets](#scope-brackets)
-  + [Directives](#directives)
+    + [Comments](#comments)
+    + [Labels](#labels)
+    + [Scope Brackets](#scope-brackets)
+    + [Directives](#directives)
   + [Instruction Mnemonic Suffixes](#instruction-mnemonic-suffixes)
-  + [Instruction Arguments](#instruction-arguments)
-  + [Instructions](#instructions)
+    + [Instruction Arguments](#instruction-arguments)
+    + [Instructions](#instructions)
   + [Running the Curses Simulator](#running-the-curses-simulator)
     + [Keys](#keys)
     + [log file](#log-file)
     + [persistent data](#persistent-data)
   + [DSKY Usage](#dsky-usage)
     + [General Notes:](#general-notes)
-  + [VERBs, NOUNs, and PROGRAMs](#verbs-nouns-and-programs)
-  + [Verbs](#verbs)
-  + [Nouns](#nouns)
-  + [Verb-Nouns](#verb-nouns)
-  + [Programs](#programs)
+    + [VERBs, NOUNs, and PROGRAMs](#verbs-nouns-and-programs)
+    + [Verbs](#verbs)
+    + [Nouns](#nouns)
+    + [Verb-Nouns](#verb-nouns)
+    + [Programs](#programs)
   + [Green Plexi-glass Modification](#green-plexi-glass-modification)
   + [Review of the Open DSKY Kit](#review-of-the-open-dsky-kit)
     + [Sticker 1](#sticker-1)
     + [Sticker 2](#sticker-2)
     + [Mini-DSKY](#mini-dsky)
   + [Author](#author)
-
 
 ## Description
 This project contains C/C++ source code for the Arduino nano which
@@ -274,7 +274,7 @@ This is to hold variables for the assembly programs. It also contains a small st
 The program bytes codes are read-only. You can store data tables in this memory area. It
 mostly contains the subroutines.
 
-## Comments
+### Comments
 Use C++ `//` style comments in the assembly code. I.e.,
 
 ```
@@ -282,10 +282,10 @@ Loop:
 		BRANCH Loop			// loop forever
 ```
 
-## Labels
+### Labels
 Labels are symbol which appear
 
-## Scope Brackets
+### Scope Brackets
 The curly braces `{` and `}` are scope brakcet. They can appear on a line
 by themselves. Any labels defined within scoped brackets are removed from
 the symbol table after the end scope bracket. This allows reusing symbols
@@ -308,7 +308,7 @@ The symbol `Loop` was reused becuse it appeares in seperate scope blocks.
 The symbols `VERB_34` and `VERB_35` are not inside of scope brackets. These
 symbols will be available for adding to the Verb[] dispatch table.
 
-## Directives
+### Directives
 The two directives are `DATA8` and `DATA16`.
 
 ```
@@ -334,7 +334,7 @@ The instruction mnemonics use these suffixes to indicate the addressing modes/ar
 + `_U`			- the instruction operates in the unsigned domain
 + `_OCT`		- the instruction operates using Octal radix instead of decimal
 
-## Instruction Arguments
+### Instruction Arguments
 These are the types of arguments instructions can have:
 
 + `<offset>` - An 8-bit signed value which is added to the program counter when the branch is taken.
@@ -354,7 +354,7 @@ signed decimal notation or unsined hex notation. I.e.,
      0x4E001F2F		// 32-bit hex literal
 ```
 
-## Instructions
+### Instructions
 
 Here are all the assembly instructions:
 
@@ -658,10 +658,10 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 	then type in a two digit program number which appears in the noun field. Then `ENTR` again
 	to launch the program.
 
-## VERBs, NOUNs, and PROGRAMs
+### VERBs, NOUNs, and PROGRAMs
 This section documents the available VERB/NOUN combinations and the PROGRAM's.
 
-## Verbs
+### Verbs
 
 | VERB | Description                                        |
 |------|----------------------------------------------------|
@@ -677,7 +677,7 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 | V69  | Force Restart                                      |
 | V82  | Monitor Orbital Parameters                         |
 
-## Nouns
+### Nouns
 | NOUN | Description                                        |
 |------|----------------------------------------------------|
 | N17  | IMU Linear Acceleration values (XXXX, YYYY, ZZZZ)  |
@@ -686,7 +686,7 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 | N31  | Time from AGC initialization                       |
 | N32  | Time from Perigee                                  |
 
-## Verb-Nouns
+### Verb-Nouns
 | VERB-NOUN | Description                                        |
 |-----------|----------------------------------------------------|
 |V06 N17    | Display IMU linear accel values                    |
@@ -737,7 +737,7 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 |V69        | Force restart                                      |
 |V82        | Monitor Orbital parameters                         |
 
-## Programs
+### Programs
 | PROG | Description                                                |
 |------|------------------------------------------------------------|
 | P00  | Poo                                                        |
@@ -749,7 +749,6 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 | P68  | play short version of Apollo 8 genesis clip                |
 | P69  | play Apollo 11 the eagle has landed clip                   |
 | P70  | play short version of Apollo 13 "problem" clip             |
-
 
 ## Green Plexi-glass Modification
 This section describes my modification to the Open DSKY. I decided
@@ -766,7 +765,7 @@ I bought this product from amazon:
 ```
 Make sure the thickness is 1.5mm.
 
-I meausred the desired size and used a box cutter knife to cut the plastic.
+I measured the desired size and used a box cutter knife to cut the plastic.
 I used a metal ruler to maintain a straight line. After 10 to 12 cuts I broke
 the plastic along a straight table edge. The plastic broke cleanly along the
 line I had scored with the razor.
