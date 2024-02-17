@@ -41,7 +41,7 @@ Kenny's Open DSKY Software
     + [Nouns](#nouns)
     + [Verb-Nouns](#verb-nouns)
     + [Programs](#programs)
-  + [Green Plexi-glass Modification](#green-plexi-glass-modification)
+  + [Green Acrylic Modification](#green-acrylic-modification)
   + [Review of the Open DSKY Kit](#review-of-the-open-dsky-kit)
     + [Sticker 1](#sticker-1)
     + [Sticker 2](#sticker-2)
@@ -53,7 +53,7 @@ This project contains C/C++ source code for the Arduino nano which
 will control the Open DSKY kickstarter kit.
 
 This project also contains source code for Linux/Windows/Macos which
-runs as `ncurses` text-based simulator of the arduino software. This
+runs as a `ncurses` text-based simulator of the arduino software. This
 will be referred to as the **curses simulator**.
 
 The **curses simulator** allows for testing and debugging the complete software
@@ -66,36 +66,36 @@ This is an original implementation of code needed to drive the
 Open DSKY hardware. However, I derived many routines from these sources:
 
 + **S&T Geotronics** James Sanderson and Marc Tessier for creating the
-	Open DSKY kit. <http://www.stgeotronics.com>
+    Open DSKY kit. <http://www.stgeotronics.com>
 
 + **Scott Pavlovec** github project. <https://github.com/scottpav/OpenDSKY>. This
-	contained the reference implementation which I used to talk to the hardware.
+    contained the reference implementation which I used to talk to the hardware.
 
 + The functionality offered was inspired by the functionality offered by
-		the **Apollo 50th Anniversary** project which came pre-installed with the Open DSKY kit.
-	(Apollo Education Experience Program, Cumming Georgia).
-	Thanks **Bill Walker** for an incredible software and user manual.
-	Website 1: <http://apolloexperience.com>.
-	Website 2: <https://www.gofundme.com/apollo-education-experience-project>
+        the **Apollo 50th Anniversary** project which came pre-installed with the Open DSKY kit.
+    (Apollo Education Experience Program, Cumming Georgia).
+    Thank you **Bill Walker** for an incredible software creation and user manual.
+    Website 1: <http://apolloexperience.com>.
+    Website 2: <https://www.gofundme.com/apollo-education-experience-project>
 
 + The audio clips provided here are taken from the **Apollo 50th Anniversary** project SD card.
 
 + The following website has information about the virtual apollo guidance
-	computer: <http://www.ibiblio.org/apollo/>.
+    computer: <http://www.ibiblio.org/apollo/>.
 
-+ An online apollo DSKY emulator <https://svtsim.com/moonjs/agc.html>. I used this great tool to
-	tweak my code to better reflect how an actual Apollo DSKY worked.
++ An online Apollo DSKY emulator <https://svtsim.com/moonjs/agc.html>. I used this great tool to
+    tweak my code to better reflect how an actual Apollo DSKY worked.
 
 ## Features
 + A virtual machine and byte code interpreter
 + Two threads of control: One thread is a background task, which
-	runs major modes. The other thread is a foreground task which runs simple verbs/nouns.
+    runs major modes (PROGs). The other thread is a foreground task which runs VERBs & NOUNs.
 + Ability to enter values using the keypad instead of +/- keys.
 + More accurately reproduces the Apollo DSKY interface.
 + **Curses Simulator** - test and develop your code on your computer before uploading it to the Arduino.
 
 ## Files
-The main source code is in `KennysOpenDSKY.cpp`. 
+The main source code is in `KennysOpenDSKY.cpp` and `kennysagc.asm`.
 
 + `KennysOpenDSKY.cpp` - the main source code file C/C++.
 + `kennysagc.asm` - the assembly code for the verb/noun/prog programs.
@@ -104,14 +104,14 @@ The main source code is in `KennysOpenDSKY.cpp`.
 + `KennysOpenDSKY.dump` - a dump of the AVR nano assembly code for the Arduino version
 + `assembler.py` - Python 3 program which assembles the assembly code into byte codes.
 + `Makefile` - A simple makefile to compile on Linux and also compile/upload the
-		sketch using the Arduino CLI tools.
+        sketch using the Arduino CLI tools.
 + `dsky` - The **curses simulator** executable produced on linux
 + `dsky_debug` - The **curses simulator** executable produced on linux with debugging symbols (-g).
 + `log.txt` - a log file for debugging when running the **curses simulator**.
 + `persist.txt` - emulates the EEPROM and RTC RAM area when using the **curses simulator**.
 + `audio` - directory containing the SD card audio files for the MP3 player.
 + `images` - directory containing images used for documentation purposes. Also contains a
-	`pdf` and `pages` document for use with the **Green Plexi-glass** modification.
+    `pdf` and `pages` document for use with the **Green Acrylic** modification.
 
 ## Memory Usage
 The current build uses the following memory on the Arduino:
@@ -146,59 +146,58 @@ the sketch for Arduino.
 + **TinyGPS++** - library to read the GPS device and parse its output.
 + **Arduino CLI tools for linux** - I don't use the Arduino IDE. I use `arduino-cli` tool.
 + **python3** - this is needed to run `assembler.py`. The assembler is a simple text only
-		python program which should work on most python installations.
+        python program which should work on most python installations.
 
 ### Linux
-This section describes the notable libraries needed to compile
+This section describes the notable libraries & components needed to compile
 the curses simulator on linux/macos/windows.
 
 + **ncurses** - this is a library for drawing simple text based user interfaces. It
-		is widely available, and comes installed by default on most linux distros.
+        is widely available, and comes installed by default on most linux distros.
 
 + **sigaction()** - this is capability of most unixes. It is included on all linux operating
-			systems. Special porting may be needed for Windows or Macos. It is used to
-			implement the 100ms timer.
+            systems. Special porting may be needed for Windows or Macos. It is used to
+            implement the 100ms timer.
 
 + **getrandom()** - this is a library function provdided by linux. It is used to provide
-			random numbers to the code for blinking the **Uplink Acty**
-			and **Comp Acty** lights. As well as the random number assembly instruction.
+            random numbers to the code for blinking the **Uplink Acty**
+            and **Comp Acty** lights. As well as the random number assembly instruction.
 
 + **python3** - this is needed to run `assembler.py`. The assembler is a simple text only
-		python program which should work on most python installations.
-
+        python program which should work on most python installations.
 
 ## Compiling for Arduino Nano
 I use the Arduino Command Line Interface. I run this under linux on a Raspberry Pi.
+(See <https://github.com/arduino/arduino-cli>)
 The included ```Makefile``` shows the commands needed to compile the sketch and
 upload to your Open DSKY kit.
 
 To assemble the assembly code use:
 ```
-	$ ./assembler.py kennysagc.asm
+    $ ./assembler.py kennysagc.asm
 ```
 This will produce a file called `kennysagc.h` which is included by `KennysOpenDSKY.cpp`.
 
 To compile the sketch use:
 ```
-	$ arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
+    $ arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
 ```
 
 To upload the sketch use:
 ```
-	$ arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno KennysOpenDSKY
+    $ arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno KennysOpenDSKY
 ```
 Replace **/dev/ttyUSB0** with whatever is required on your system.
 
 The provided simple `Makefile` encapsulates these commands. This builds the sketch:
 ```
-	$ make sketch
+    $ make sketch
 ```
 
 This uploads the sketch to your Arduino Nano:
 ```
-	$ make upload
+    $ make upload
 ```
-
 
 ## Compiling for Linux
 To compile on linux `gcc` is used. The program itself is written in simple C/C++.
@@ -206,40 +205,40 @@ To compile on linux `gcc` is used. The program itself is written in simple C/C++
 
 To assemble the assembly code use:
 ```
-	$ ./assembler.py kennysagc.asm
+    $ ./assembler.py kennysagc.asm
 ```
 This produces a file caled `kennysagc.h` which is included by `KennysOpenDSKY.cpp`.
 
 This builds the `dsky` executable:
 ```
-	$ gcc -DCURSES_SIMULATOR -lncurses KennysOpenDSKY.cpp -o dsky
+    $ gcc -DCURSES_SIMULATOR -lncurses KennysOpenDSKY.cpp -o dsky
 ```
 
 This builds the `dsky_debug` executable (containing debug symbols):
 ```
-	$ gcc -DCURSES_SIMULATOR -DDSKY_DEBUG -g -lncurses KennysOpenDSKY.cpp -o dsky_debug
+    $ gcc -DCURSES_SIMULATOR -DDSKY_DEBUG -g -lncurses KennysOpenDSKY.cpp -o dsky_debug
 ```
 
 The provided simple Makefile builds both executables with this command:
 ```
-	$ make
+    $ make
 ```
 
 ### Running the Curses Sumulator
 To run the executable simply run it as follows (no command line arguments are needed):
 ```
-	$ ./dsky
+    $ ./dsky
 ```
 
 or,
 
 ```
-	$ ./dsky_debug
+    $ ./dsky_debug
 ```
 
 or (when debugging),
 ```
-	$ gdb ./dsky_debug
+    $ gdb ./dsky_debug
 ```
 
 ## Compiling for Windows/Macos
@@ -252,8 +251,25 @@ The program ``assembler.py`` is a simple one pass assembler written in python.
 You will need python3 to recompile the assembly. This github repository
 however contains a pre-compiled version of the assembly.
 
+```
+  $ ./assembly.py filename.asm
+  Kenny's OpenDSKY Apollo Guidance Computer Assembler
+  Little-endian encoding will be used.
+  Assembling 'filename.asm'.
+  Finished assembling 'filename.asm' -> 'filename.h'.
+```
+
+The output is `filename.h`. This file contains the bytecodes in a `Program[]` array.
+This is the code that the virtual CPUs will be executing.
+
+If you are compiling on a big endian computer (for example a Solaris or IBM 
+big iron unix machine) you will need to switch the byte ordering to big endian.
+The default is little endian. To enabled big endian byte ordering use the `-b` command
+line option. **Little endian** is the appropriate byte ordering to use for
+Linux machines and Arduino.
+
 ## Assembly Language
-This section documents all the assembly instructions.
+This section documents the virtual machine and its machine instructions.
 
 ### Virtual Machine Architecture
 Here is the CPU architecture of the virtual machine:
@@ -262,7 +278,7 @@ Here is the CPU architecture of the virtual machine:
 
 The CPU consists of three 32-bit registers called **A**, **B** and **C**. Different instructions
 operate on different registers. The **C** register has special indirect addressing modes
-associared with it, so it can be thought of as the "index" register. The **A** register
+associated with it, so it can be thought of as the "index" register. The **A** register
 can be thought of as the "accumulator", although many of the same instructions also
 work with the **B** register. These registers are 32-bits wide.
 
@@ -272,31 +288,52 @@ each capable of storing a 32-bit value.
 The program counter **PC** points into the Program[] array which contains the byte codes
 that were assembled using the assembler.
 
-The program as access to a bank of RAM locations which are 32-bits wide. There are 128 RAM locations.
+The program has access to a bank of RAM locations which are 32-bits wide. There are 128 RAM locations.
 This is to hold variables for the assembly programs. It also contains a small stack for each cpu.
 
-The program bytes codes are read-only. You can store data tables in this memory area. It
-mostly contains the subroutines.
+The program byte codes are read-only. You can store data tables in this memory area. It
+mostly contains the subroutines. VERBs are written in this assembly language. The
+starting location for each VERB is stored in a `Verb[]` dispatch table in `KennyOpenDSKY.cpp`.
+Handling of the NOUNs is done by the code for each VERB. Each VERB is responsible for
+checking the NOUN field and acting appropriately.
 
 There are two CPU's defined. **cpu 0** is the background thread. **cpu 1** is the foreground thread.
-The background thread is designed to run major modes or PROGRAMS. The foreground task runs verbs and noun
+Both threads run concurrently.
+The background thread is designed to run major modes (or PROGs). The foreground task runs VERB/NOUN
 combinations.
 
 The foreground task can be paused and a new foreground task stacked on top of the currently
 running foreground task. For example, If `V16 N36` is running to show the current time.
-If the user runs the `V35` (LAMP TEST) verb, then this will pause the current verb/noun and
+If the user runs the `V35` (LAMP TEST) verb, then this will pause the current VERB/NOUN and
 run the LAMP TEST code. When the LAMP TEST finishes the previous Verb/Noun will be resumed.
+
+The following sections cover the assmebly language syntax:
 
 ### Comments
 Use C++ `//` style comments in the assembly code. I.e.,
 
 ```
 Loop:
-		BRANCH Loop			// loop forever
+        BRANCH Loop         // loop forever
 ```
 
 ### Labels
-Labels are symbol which appear
+Labels are symbols which appear at the beginning of a line and followed by a colon `:`.
+
+```
+          CLR_A
+          LD_B_IMM8         100
+AGAIN:    ADD_A_IMM8        34      // A = A + 34
+          DEC_B
+          BRANCH_B_GT_IMM8  0  AGAIN
+          ENCODE_A_TO_DEC
+          MOV_A_R3
+```
+
+This code has one label `AGAIN`. It is used as a branch target.
+This code adds 34 to the A register one hundred times. Then
+the contents of the A register are encoded into Binary Coded Decimal (BCD)
+and written to DSKY display field R3.
 
 ### Scope Brackets
 The curly braces `{` and `}` are scope brackets. They can appear on a line
@@ -306,16 +343,16 @@ within the body of a function.
 
 ```
 VERB_34:
-{               // begin scope
+{                       // begin scope
 Loop:
-       GOTO Loop
-}              // end scope
+         GOTO     Loop
+}                       // end scope
 
 VERB_35:
-{             // begin scope
-Loop: ADD_A_B
-      BRANCH Loop
-}             // end scope
+{                       // begin scope
+Loop:    ADD_A_B
+         BRANCH   Loop
+}                       // end scope
 ```
 
 The symbol `Loop` was reused becuse it appears in seperate scope blocks.
@@ -323,21 +360,32 @@ The symbols `VERB_34` and `VERB_35` are not inside of scope brackets. These
 symbols will be global (and can be referenced in the KennysOpenDSY.cpp file to
 add to the Verb[] dispatch table).
 
+Scope brackets allow for the use of common label names in many places without
+having to invent different label names that are unique.
+
+Scope brackets cannot be nested.
+
 ### Directives
-The three directives are `DATA8`, `DATA16` and 'DEFINE'.
+The assembler supports three directives: `DATA8`, `DATA16` and 'DEFINE'.
 
 ```
-        DATA8       0xFF
-        DATA8       0x1F
-        DATA16      SomeLabel
         DEFINE MaxVal = 100
         DEFINE JUNK   = 0x45
+
+        DATA8       0xFF
+        DATA8       0x1F
+        DATA8       -120
+Foo:    DATA8       111
+        DATA16      SomeLabel
+        DATA16      0x1234
+        DATA16      65000
+        DATA8       MaxVal
 ```
 
 The `DATA` directives compile raw data into the Program instruction stream.
 This can be used to implement lookup tables. The `DEFINE` directive associates
 a value with a symbol. For example instead of using `100` in your assembly code you
-can say `MaxVal`.
+can say `MaxVal`. `DATA` directives may be preceeded by a label. I.e., **Foo**.
 
 ### Instruction Mnemonic Suffixes
 
@@ -345,13 +393,13 @@ The instruction mnemonics use these suffixes to indicate the addressing modes/ar
 
 + `_IMM8` - Takes an immediate 8-bit value
 + `_IMM16` - Takes an immediate 16-bit value
-+ `_IMM32` - Takes an immediate 16-bit value
++ `_IMM32` - Takes an immediate 32-bit value
 + `_DIRECT` - Takes an 8-bit value which represents a RAM memory location
 + `_CDIRECT` - Takes an 8-bit address constant and adds it to the C register
-				to form the effective address. `C+<addr>`
+                to form the effective address. `C+<addr>`
 + `_INDIRECT_C` - The C register contains the address to RAM. RAM[C]
-+ `_U`			- the instruction operates in the unsigned domain
-+ `_OCT`		- the instruction operates using Octal radix instead of decimal
++ `_U`          - the instruction operates in the unsigned domain
++ `_OCT`        - the instruction operates using Octal radix instead of decimal
 
 ### Instruction Arguments
 These are the types of arguments instructions can have:
@@ -361,24 +409,38 @@ These are the types of arguments instructions can have:
 + `<imm16>` - A 16-bit value provided immediately in the Program byte code stream
 + `<imm32>` - A 32-bit value provided immediately in the Program byte code stream
 + `<addr>` - An 8-bit unsigned value which refers to a RAM location.
-+ `<addrMin>` - An 8-bit unsigned value which refers to a RAM location. Refers to the minimum value
-		in the range of values.
-+ `<addrMax>` - An 8-bit unsigned value which refers to a RAM location. Refers to the maximum value in
-		the range of values.
++ `<addrMin>` - An 8-bit unsigned value which refers to a RAM location. This RAM location
+              contains the minimum value in the range of values to be adjusted through.
++ `<addrMax>` - An 8-bit unsigned value which refers to a RAM location. This RAM location
+              contains the maximum value in the range of values to be adjusted through.
 
-In the assembly syntax arguments are seperated by whitspace. Do not use commas or other
+In the assembly syntax, arguments are seperated by whitspace. Do not use commas or other
 punctuation in the assembly code.
 
 ### Numeric Literals
-Numeric literal can use signed decimal notation or unsined hex notation. I.e.,
+Numeric literals can use signed decimal notation or unsigned hex notation. I.e.,
 
 ```
-    0x4E            // hex literal
     -4              // decimal literal 8-bits
     1234            // decimal literal 16-bits
     1234999         // decimal literal 32-bits
+    0x4E            // hex literal (8-bit)
+    0x1f2b          // hex literal (16-bit)
     0x4E001F2F      // 32-bit hex literal
 ```
+
+The assembler knows the bit size the operands are supposed to be. So
+the numeric literal will be converted to the correct width.
+Each of the following instructions load A with the number **12**.
+But the Program[] array will contain different sized immediate values.
+
+```
+     LD_A_IMM32      12       // generates a 32-bit immediate value
+     LD_A_IMM16      12       // generates a 16-bit immediate value
+     LD_A_IMM8       12       // generates a 8-bit immediate value
+```
+
+The most space efficient encoding is the last instruction.
 
 ### Instructions
 
@@ -701,7 +763,7 @@ that represents the DSKY display and DSKY keyboard.
 
 Run with this command,
 ```
-	$ ./dsky
+    $ ./dsky
 ```
 
 ![alt text](images/ncurses2.jpg "")
@@ -709,31 +771,35 @@ Run with this command,
 ### Keys
 The keys map to your keyboard thusly. Only lower case keys are accepted.
 + '0' ... '9' - Digits
-+ '+'	- Plus
-+ '-'	- Minus
-+ 'v'	- VERB
-+ 'n'	- NOUN
-+ 'p'	- PRO (Proceed)
-+ 'c'	- CLR (Clear)
-+ 'k'	- KEY REL (Key Release)
++ '+'   - Plus
++ '-'   - Minus
++ 'v'   - VERB
++ 'n'   - NOUN
++ 'p'   - PRO (Proceed)
++ 'c'   - CLR (Clear)
++ 'k'   - KEY REL (Key Release)
 + 'e' or 'Enter' - ENTR (Enter)
-+ 'r'	- RSET (Reset)
-+ 'q'	- Quit the DSKY simulator
++ 'r'   - RSET (Reset)
++ 'q'   - Quit the DSKY simulator
 
 The behavior of this program should be identical to the behavior it
 will have when run on the Arduino Open DSKY hardware. The GPS and IMU
 devices are simulated with *fake* data. The MP3 player only shows audio
 as a text line at the bottom of the window. The audio shows how many seconds
-remain in the audio clip. But no sound will play! The Real Time cLock (RTC)
+remain in the audio clip. But no sound will play! The Real Time clock (RTC)
 is simulated but it uses the linux date and time to initialize itself. The
 real time clock can be set by the user to a different date/time in the simulator.
 
+Also emulated is the EEPROM storage and the real time clock 56 byte RAM area.
+These values will be stored in the file `persist.txt` so that they will
+be remembered between runs of the **curses simulator**.
+
 ### log file
-When running the **curses simulator** the file ```./logfile.txt``` is produced.
+When running the **curses simulator** the file `./logfile.txt` is produced.
 It is used for debugging purposes. Also contains the memory sizes of some data structures.
 
 ### persistent data
-The file ```./persist.txt``` contains a simulated EEPROM storage and simulated RTC clock RAM.
+The file `./persist.txt` contains a simulated EEPROM storage and simulated RTC clock RAM.
 This allows the **curses simulator** to retain information between runs of the program.
 
 ## DSKY Usage
@@ -742,17 +808,17 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 
 ### General Notes:
 + **ENTR** not required after each verb or noun entry. Pressing **ENTR** causes
-	the DSKY to take action on the currently showing verb/noun fields.
+    the DSKY to take action on the currently showing verb/noun fields.
 
 + **KEY REL** - When the **KEY REL** light is blinking, then the KEY REL button can be
-	pressed to cancel the entry of a noun/verb.
+    pressed to cancel the entry of a noun/verb.
 
 + **OPR ERR** - When **OPR ERR** light is blinking then the user should press **RSET** to reset
-	this.
+    this.
 
 + You cannot launch a program using the **PRO** key. Instead you must enter `V37` `ENTR` and
-	then type in a two digit program number which appears in the noun field. Then `ENTR` again
-	to launch the program.
+    then type in a two digit program number which appears in the noun field. Then `ENTR` again
+    to launch the program.
 
 ### VERBs, NOUNs, and PROGRAMs
 This section documents the available VERB/NOUN combinations and the PROGRAM's.
@@ -846,29 +912,30 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 | P69  | play Apollo 11 the eagle has landed clip                   |
 | P70  | play short version of Apollo 13 "problem" clip             |
 
-## Green Plexi-glass Modification
+## Green Acrylic Modification
 This section describes my modification to the Open DSKY. I decided
 I didn't like how fuzzy the LED digits were. I decided to use a green
-plexi-glass window to make the LED region nicer to look at and avoid
+acrylic window to make the LED region nicer to look at and avoid
 the fuzzyness and dimness of the original kit.
 
 ![alt text](images/v69.jpg "")
 
-I bought this product from amazon:
+I bought this product from amazon.com:
 ```
-	Transparent Green Acrylic Sheet (12" x 20", 1/16" / 1.5mm)
-	(MakerStock Store)
+    Transparent Green Acrylic Sheet (12" x 20", 1/16" / 1.5mm)
+    (MakerStock Store)
 ```
 Make sure the thickness is 1.5mm.
 
-I measured the desired size and used a box cutter knife to cut the plastic.
-I used a metal ruler to maintain a straight line. After 10 to 12 cuts I broke
-the plastic along a straight table edge. The plastic broke cleanly along the
-line I had scored with the razor.
+I measured the desired size and used a utility knife to cut the plastic.
+I used a metal ruler to maintain a straight line.
 
 ![alt text](images/gpm1.jpg "")
 
-I then used a utility knife to scrape the size to fit perfectly.
+After 10 to 12 cuts I broke
+the plastic along a straight edge of a table. The plastic broke cleanly along the
+line I had scored with the knife.
+I then used my utility knife to scrape the edge in order to fine tune the size.
 
 ![alt text](images/gpm2.jpg "")
 
@@ -877,10 +944,10 @@ with the Open DSKY kit.
 
 ![alt text](images/gpm3.jpg "")
 
-I used duct tape to adhere my green plexi-glass sheet to the table I was working on
-so that the sheet and ruler wouldn't move.
+NOTE: I used duct tape to adhere my green acrylic sheet to the table I was working on
+as well as the ruler so that is wouldn't move.
 
-The sticker that came with the Open DSKY kit I cut in half. I retained the left hand side
+I cut in half the sticker that came with the Open DSKY kit. I retained the left hand side
 of the sticker for the caution and warning lights pane. But I threw away the right hand side.
 
 Using my laser printer I printed out `screen_stuff.pdf` and used scissors to cut out a the
@@ -897,8 +964,9 @@ might reflect light.
 This section contains my thoughts on the Open DSKY kit.
 
 Overall I loved it. It requires a lot of detail work for final assembly.
-However this is a kit and as the creators say in various YouTube videos
-this is a DIY (Do It Yourself) project. The most important letter is the "Y" letter.
+However, this is a kit and as one of the creators says in a YouTube video:
+"This is a DIY (Do It Yourself) project. The most important letter is the **Y** letter."
+<https://www.youtube.com/watch?v=xPJfywL251g&t=2251s>
 
 Final assembly required me to use a dremel grinding tool to carve out plastic
 from the back in order to ensure the front cover fits snuggly onto the cicruit board.
@@ -907,7 +975,7 @@ I didn't like the "sticker" which you use to cover over the beautiful LED's, so 
 customized my device.
 
 The electronics and provided circuit board were excellent. All the parts were well labeled.
-It makes for a greate arduino platform to play with many different devices: GPS, IMU, MP3 player
+This kit makes for a great platform to play with the Arduino and program different devices: GPS, IMU, MP3 player
 and Real Time Clock.
 
 Little details included with the Kit were also very nice. There were two stickers that you
@@ -924,7 +992,11 @@ little 3d-printed DSKY.
 ![alt text](images/minidsky.jpg "")
 
 The assembly instructions were a little sparse. But this increased my feeling of satisfaction
-when I successfully built the thing. How to perform final assembly was not well documented.
+`when I successfully built the thing. How to perform final assembly was not well documented.
+Having said that, the instructables website was pretty good with lots of pictures of each step.
+The instructions became sparse when the assembly of the case was concerned. The kit offered
+several logical points to test the device before final soldering of all components. For example
+you could test the lamps early on. Then the button lights, then the 7-segment LEDs.
 
 Be careful with the buttons. Using wire cutters to cut off the plastic bump on all the buttons
 can result in inadvertently cutting the wire lead that illuminates the button. Thankfully
@@ -933,7 +1005,7 @@ they provide an extra button if you screw one of them up.
 Make sure the GPS unit is flush with the circuit board when you solder it on.
 
 All the components came in indiviual plastic and were labeled. There was a inventory sheet
-showing all the components. The kit arrived in good  packaging. I definately felt the kit was worth the $600.
+showing all the components. The kit arrived in good packaging. I definately felt the kit was worth the $600.
 
 There are good online schematics. The sample source code is pretty gross, but also pretty easy
 reverse engineer. Unfortunately there lacks a schematic showing how the MP3 player was wired up.
