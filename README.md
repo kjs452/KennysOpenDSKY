@@ -333,27 +333,27 @@ Here are all the assembly instructions:
 | MOV_B_C           |            | Move contents of B into C                                            |
 | MOV_C_A           |            | Move contents of C into A                                            |
 | MOV_C_B           |            | Move contents of C into B                                            |
-| LD_A_DIRECT       | <addr>     | Load into the A register the contents of RAM at <addr>               |
-| LD_B_DIRECT       | <addr>     | Load into the B register the contents of RAM at <addr>               |
-| LD_C_DIRECT       | <addr>     | Load into the C register the contents of RAM at <addr>               |
-| LD_A_IMM32        | <imm32>    | Load into the A register the immediate 32-bit value give by <imm32>  |
-| LD_B_IMM32        | <imm32>    | Load into the B register the immediate 32-bit value give by <imm32>  |
-| LD_C_IMM32        | <imm32>    | Load into the C register the immediate 32-bit value give by <imm32>  |
-| LD_A_IMM16        | <imm16>    | Load into the A register the immediate 16-bit value give by <imm16>  |
-| LD_B_IMM16        | <imm16>    | Load into the B register the immediate 16-bit value give by <imm16>  |
-| LD_C_IMM16        | <imm16>    | Load into the C register the immediate 16-bit value give by <imm16>  |
-| LD_A_IMM8         | <imm8>     | Load into the A register the immediate 8-bit value give by <imm8>    |
-| LD_B_IMM8         | <imm8>     | Load into the B register the immediate 8-bit value give by <imm8>    |
-| LD_C_IMM8         | <imm8>     | Load into the C register the immediate 8-bit value give by <imm8>    |
-| LD_A_CDIRECT      | <addr>     | Load A register with contents of RAM at address C+<addr>             |
-| LD_B_CDIRECT      | <addr>     | Load B register with contents of RAM at address C+<addr>             |
+| LD_A_DIRECT       | addr       | Load into the A register the contents of RAM at addr                 |
+| LD_B_DIRECT       | addr       | Load into the B register the contents of RAM at addr                 |
+| LD_C_DIRECT       | addr       | Load into the C register the contents of RAM at addr                 |
+| LD_A_IMM32        | imm32      | Load into the A register the immediate 32-bit value give by imm32    |
+| LD_B_IMM32        | imm32      | Load into the B register the immediate 32-bit value give by imm32    |
+| LD_C_IMM32        | imm32      | Load into the C register the immediate 32-bit value give by imm32    |
+| LD_A_IMM16        | imm16      | Load into the A register the immediate 16-bit value give by imm16    |
+| LD_B_IMM16        | imm16      | Load into the B register the immediate 16-bit value give by imm16    |
+| LD_C_IMM16        | imm16      | Load into the C register the immediate 16-bit value give by imm16    |
+| LD_A_IMM8         | imm8       | Load into the A register the immediate 8-bit value give by imm8      |
+| LD_B_IMM8         | imm8       | Load into the B register the immediate 8-bit value give by imm8      |
+| LD_C_IMM8         | imm8       | Load into the C register the immediate 8-bit value give by imm8      |
+| LD_A_CDIRECT      | addr       | Load A register with contents of RAM at address C+addr               |
+| LD_B_CDIRECT      | addr       | Load B register with contents of RAM at address C+addr               |
 | LD_A_INDIRECT_C   |            | Load A register with contents of RAM at address given by C           |
 | LD_B_INDIRECT_C   |            | Load B register with contents of RAM at address given by C           |
-| ST_A_DIRECT       | <addr>     | Store A register to the RAM location given by <addr>                 |
-| ST_B_DIRECT       | <addr>     | Store B register to the RAM location given by <addr>                 |
-| ST_C_DIRECT       | <addr>     | Store C register to the RAM location given by <addr>                 |
-| ST_A_CDIRECT      | <addr>     | Store A register to the RAM location given by C+<addr>               |
-| ST_B_CDIRECT      | <addr>     | Store B register to the RAM location given by C+<addr>               |
+| ST_A_DIRECT       | addr       | Store A register to the RAM location given by addr                   |
+| ST_B_DIRECT       | addr       | Store B register to the RAM location given by addr                   |
+| ST_C_DIRECT       | addr       | Store C register to the RAM location given by addr                   |
+| ST_A_CDIRECT      | addr       | Store A register to the RAM location given by C+addr                 |
+| ST_B_CDIRECT      | addr       | Store B register to the RAM location given by C+addr                 |
 | ST_A_INDIRECT_C   |            | Store A register to the RAM location given by C                      |
 | ST_B_INDIRECT_C   |            | Store B register to the RAM location given by C                      |
 | CLR_A             |            | Clear the A register to a value of 0                                 |
@@ -371,158 +371,158 @@ Here are all the assembly instructions:
 | POP_A             |            | Increment SP. Load the A register from RAM address given by SP       |
 | POP_B             |            | Increment SP. Load the B register from RAM address given by SP       |
 | POP_C             |            | Increment SP. Load the C register from RAM address given by SP       |
-| CALL              | <addr16>   | Call subroutine at <addr16>. Push PC+3 on the stack                  |
+| CALL              | addr16     | Call subroutine at addr16. Push PC+3 on the stack                    |
 | RET               |            | Pop program counter from the stack                                   |
-| GOTO              | <addr16>   | Store <addr16> into the program counter PC                           |
-| BRANCH            | <offset>   | Add signed 8-bit value to program counter                            |
-| BRANCH_A_GT_B     | <offset>   | If A > B then add the branch <offset> to PC. Else next instruction   |
-| BRANCH_A_GE_B     | <offset>   | If A >= B then add the branch <offset> to PC. Else next instruction  |
-| BRANCH_A_LE_B     | <offset>   | If A <= B then add the branch <offset> to PC. Else next instruction  |
-| BRANCH_A_LT_B     | <offset>   | If A < B then add the branch <offset> to PC. Else next instruction   |
-| BRANCH_A_EQ_B     | <offset>   | If A == B then add the branch <offset> to PC. Else next instruction  |
-| BRANCH_A_NE_B     | <offset>   | If A != B then add the branch <offset> to PC. Else next instruction  |
-| BRANCH_A_GT_DIRECT | <addr> <offset> | If A > RAM[<addr>] then add <offset> to PC. Else next instr.   |
-| BRANCH_A_GE_DIRECT | <addr> <offset> | If A >= RAM[<addr>] then add <offset> to PC. Else next instr.  |
-| BRANCH_A_LE_DIRECT | <addr> <offset> | If A <= RAM[<addr>] then add <offset> to PC. Else next instr.  |
-| BRANCH_A_LT_DIRECT | <addr> <offset> | If A < RAM[<addr>] then add <offset> to PC. Else next instr.   |
-| BRANCH_A_EQ_DIRECT | <addr> <offset> | If A == RAM[<addr>] then add <offset> to PC. Else next instr.  |
-| BRANCH_A_NE_DIRECT | <addr> <offset> | If A != RAM[<addr>] then add <offset> to PC. Else next instr.  |
-| BRANCH_A_GT_IMM8   | <imm8> <offset> | If A > imm8 then add <offset> to PC. Else next instr.          |
-| BRANCH_A_GE_IMM8   | <imm8> <offset> | If A >= imm8 then add <offset> to PC. Else next instr.         |
-| BRANCH_A_LE_IMM8   | <imm8> <offset> | If A <= imm8 then add <offset> to PC. Else next instr.         |
-| BRANCH_A_LT_IMM8   | <imm8> <offset> | If A < imm8 then add <offset> to PC. Else next instr.          |
-| BRANCH_A_EQ_IMM8   | <imm8> <offset> | If A == imm8 then add <offset> to PC. Else next instr.         |
-| BRANCH_A_NE_IMM8   | <imm8> <offset> | If A != imm8 then add <offset> to PC. Else next instr.         |
-| BRANCH_A_GT_IMM16  | <imm16> <offset> | If A > imm16 then add <offset> to PC. Else next instr.        |
-| BRANCH_A_GE_IMM16  | <imm16> <offset> | If A >= imm16 then add <offset> to PC. Else next instr.       |
-| BRANCH_A_LE_IMM16  | <imm16> <offset> | If A <= imm16 then add <offset> to PC. Else next instr.       |
-| BRANCH_A_LT_IMM16  | <imm16> <offset> | If A < imm16 then add <offset> to PC. Else next instr.        |
-| BRANCH_A_EQ_IMM16  | <imm16> <offset> | If A == imm16 then add <offset> to PC. Else next instr.       |
-| BRANCH_A_NE_IMM16  | <imm16> <offset> | If A != imm16 then add <offset> to PC. Else next instr.       |
-| BRANCH_B_GT_DIRECT | <addr> <offset> | If B > RAM[<addr>] then add <offset> to PC. Else next instr.   |
-| BRANCH_B_GE_DIRECT | <addr> <offset> | If B >= RAM[<addr>] then add <offset> to PC. Else next instr.  |
-| BRANCH_B_LE_DIRECT | <addr> <offset> | If B <= RAM[<addr>] then add <offset> to PC. Else next instr.  |
-| BRANCH_B_LT_DIRECT | <addr> <offset> | If B < RAM[<addr>] then add <offset> to PC. Else next instr.   |
-| BRANCH_B_EQ_DIRECT | <addr> <offset> | If B == RAM[<addr>] then add <offset> to PC. Else next instr.  |
-| BRANCH_B_NE_DIRECT | <addr> <offset> | If B != RAM[<addr>] then add <offset> to PC. Else next instr.  |
-| BRANCH_B_GT_IMM8   | <imm8> <offset> | If B > imm8 then add <offset> to PC. Else next instr.          |
-| BRANCH_B_GE_IMM8   | <imm8> <offset> | If B >= imm8 then add <offset> to PC. Else next instr.         |
-| BRANCH_B_LE_IMM8   | <imm8> <offset> | If B <= imm8 then add <offset> to PC. Else next instr.         |
-| BRANCH_B_LT_IMM8   | <imm8> <offset> | If B < imm8 then add <offset> to PC. Else next instr.          |
-| BRANCH_B_EQ_IMM8   | <imm8> <offset> | If B == imm8 then add <offset> to PC. Else next instr.         |
-| BRANCH_B_NE_IMM8   | <imm8> <offset> | If B != imm8 then add <offset> to PC. Else next instr.         |
-| BRANCH_B_GT_IMM16  | <imm16> <offset> | If B > imm16 then add <offset> to PC. Else next instr.        |
-| BRANCH_B_GE_IMM16  | <imm16> <offset> | If B >= imm16 then add <offset> to PC. Else next instr.       |
-| BRANCH_B_LE_IMM16  | <imm16> <offset> | If B <= imm16 then add <offset> to PC. Else next instr.       |
-| BRANCH_B_LT_IMM16  | <imm16> <offset> | If B < imm16 then add <offset> to PC. Else next instr.        |
-| BRANCH_B_EQ_IMM16  | <imm16> <offset> | If B == imm16 then add <offset> to PC. Else next instr.       |
-| BRANCH_B_NE_IMM16  | <imm16> <offset> | If B != imm16 then add <offset> to PC. Else next instr.       |
-| BRANCH_NOT_TIMER1  | <offset>      | branch if timer1 (100ms) hasn't triggered, else next instruction |
-| BRANCH_NOT_TIMER2  | <offset>      | branch if timer2 (200ms) hasn't triggered, else next instruction |
-| BRANCH_NOT_TIMER3  | <offset>      | branch if timer3 (300ms) hasn't triggered, else next instruction |
-| BRANCH_NOT_TIMER4  | <offset>      | branch if timer4 (1s) hasn't triggered, else next instruction    |
-| BRANCH_NOT_TIMER5  | <offset>      | branch if timer5 (2s) hasn't triggered, else next instruction    |
-| SWAP_A_B           |               | Swap registers A and B                                           |
-| SWAP_A_C           |               | Swap registers A and C                                           |
-| SWAP_B_C           |               | Swap registers B and C                                           |
-| ADD_A_B            |               | A = A + B                                                        |
-| ADD_B_A            |               | B = B + A                                                        |
-| SUB_A_B            |               | A = A - B                                                        |
-| SUB_B_A            |               | B = B - A                                                        |
-| MUL_A_B            |               | A = A * B                                                        |
-| MUL_B_A            |               | B = B * A                                                        |
-| DIV_A_B            |               | A = A / B                                                        |
-| DIV_B_A            |               | B = B / A                                                        |
-| MOD_A_B            |               | A = A % B                                                        |
-| MOD_B_A            |               | B = B % A                                                        |
-| AND_A_B            |               | A = A & B                                                        |
-| AND_B_A            |               | B = B & A                                                        |
-| OR_A_B             |               | A = A \| B                                                       |
-| OR_B_A             |               | B = B \| A                                                       |
-| OR_A_IMM32         | <imm32>       | A = A \| imm32                                                   |
-| OR_B_IMM32         | <imm32>       | B = B \| imm32                                                   |
-| AND_A_IMM32        | <imm32>       | A = A & imm32                                                    |
-| AND_B_IMM32        | <imm32>       | B = B & imm32                                                    |
-| LSHIFT_A_IMM8      | <imm8>        | A = A << imm8                                                    |
-| LSHIFT_B_IMM8      | <imm8>        | B = B << imm8                                                    |
-| RSHIFT_A_IMM8      | <imm8>        | A = A >> imm8                                                    |
-| RSHIFT_B_IMM8      | <imm8>        | B = B >> imm8                                                    |
-| NOT_A              |               | A = ~A                                                           |
-| NOT_B              |               | B = ~B                                                           |
-| NEG_A              |               | A = -A                                                           |
-| NEG_B              |               | B = -B                                                           |
+| GOTO              | addr16     | Store addr16 into the program counter PC                             |
+| BRANCH            | offset     | Add signed 8-bit value to program counter                            |
+| BRANCH_A_GT_B     | offset     | If A >  B then add the branch offset to PC. Else next instruction    |
+| BRANCH_A_GE_B     | offset     | If A >= B then add the branch offset to PC. Else next instruction    |
+| BRANCH_A_LE_B     | offset     | If A <= B then add the branch offset to PC. Else next instruction    |
+| BRANCH_A_LT_B     | offset     | If A < B then add the branch offset to PC. Else next instruction     |
+| BRANCH_A_EQ_B     | offset     | If A == B then add the branch offset to PC. Else next instruction    |
+| BRANCH_A_NE_B     | offset     | If A != B then add the branch offset to PC. Else next instruction    |
+| BRANCH_A_GT_DIRECT | addr offset | If A >  RAM[addr] then add offset to PC. Else next instr.          |
+| BRANCH_A_GE_DIRECT | addr offset | If A >= RAM[addr] then add offset to PC. Else next instr.          |
+| BRANCH_A_LE_DIRECT | addr offset | If A <= RAM[addr] then add offset to PC. Else next instr.          |
+| BRANCH_A_LT_DIRECT | addr offset | If A < RAM[addr] then add offset to PC. Else next instr.           |
+| BRANCH_A_EQ_DIRECT | addr offset | If A == RAM[addr] then add offset to PC. Else next instr.          |
+| BRANCH_A_NE_DIRECT | addr offset | If A != RAM[addr] then add offset to PC. Else next instr.          |
+| BRANCH_A_GT_IMM8   | imm8 offset | If A >  imm8 then add offset to PC. Else next instr.               |
+| BRANCH_A_GE_IMM8   | imm8 offset | If A >= imm8 then add offset to PC. Else next instr.               |
+| BRANCH_A_LE_IMM8   | imm8 offset | If A <= imm8 then add offset to PC. Else next instr.               |
+| BRANCH_A_LT_IMM8   | imm8 offset | If A < imm8 then add offset to PC. Else next instr.                |
+| BRANCH_A_EQ_IMM8   | imm8 offset | If A == imm8 then add offset to PC. Else next instr.               |
+| BRANCH_A_NE_IMM8   | imm8 offset | If A != imm8 then add offset to PC. Else next instr.               |
+| BRANCH_A_GT_IMM16  | imm16 offset | If A >  imm16 then add offset to PC. Else next instr.             |
+| BRANCH_A_GE_IMM16  | imm16 offset | If A >= imm16 then add offset to PC. Else next instr.             |
+| BRANCH_A_LE_IMM16  | imm16 offset | If A <= imm16 then add offset to PC. Else next instr.             |
+| BRANCH_A_LT_IMM16  | imm16 offset | If A < imm16 then add offset to PC. Else next instr.              |
+| BRANCH_A_EQ_IMM16  | imm16 offset | If A == imm16 then add offset to PC. Else next instr.             |
+| BRANCH_A_NE_IMM16  | imm16 offset | If A != imm16 then add offset to PC. Else next instr.             |
+| BRANCH_B_GT_DIRECT | addr offset | If B > RAM[addr] then add offset to PC. Else next instr.           |
+| BRANCH_B_GE_DIRECT | addr offset | If B >= RAM[addr] then add offset to PC. Else next instr.          |
+| BRANCH_B_LE_DIRECT | addr offset | If B <= RAM[addr] then add offset to PC. Else next instr.          |
+| BRANCH_B_LT_DIRECT | addr offset | If B < RAM[addr] then add offset to PC. Else next instr.           |
+| BRANCH_B_EQ_DIRECT | addr offset | If B == RAM[addr] then add offset to PC. Else next instr.          |
+| BRANCH_B_NE_DIRECT | addr offset | If B != RAM[addr] then add offset to PC. Else next instr.          |
+| BRANCH_B_GT_IMM8   | imm8 offset | If B > imm8 then add offset to PC. Else next instr.                |
+| BRANCH_B_GE_IMM8   | imm8 offset | If B >= imm8 then add offset to PC. Else next instr.               |
+| BRANCH_B_LE_IMM8   | imm8 offset | If B <= imm8 then add offset to PC. Else next instr.               |
+| BRANCH_B_LT_IMM8   | imm8 offset | If B < imm8 then add offset to PC. Else next instr.                |
+| BRANCH_B_EQ_IMM8   | imm8 offset | If B == imm8 then add offset to PC. Else next instr.               |
+| BRANCH_B_NE_IMM8   | imm8 offset | If B != imm8 then add offset to PC. Else next instr.               |
+| BRANCH_B_GT_IMM16  | imm16 offset | If B > imm16 then add offset to PC. Else next instr.              |
+| BRANCH_B_GE_IMM16  | imm16 offset | If B >= imm16 then add offset to PC. Else next instr.             |
+| BRANCH_B_LE_IMM16  | imm16 offset | If B <= imm16 then add offset to PC. Else next instr.             |
+| BRANCH_B_LT_IMM16  | imm16 offset | If B < imm16 then add offset to PC. Else next instr.              |
+| BRANCH_B_EQ_IMM16  | imm16 offset | If B == imm16 then add offset to PC. Else next instr.             |
+| BRANCH_B_NE_IMM16  | imm16 offset | If B != imm16 then add offset to PC. Else next instr.             |
+| BRANCH_NOT_TIMER1  | offset    | branch if timer1 (100ms) hasn't triggered, else next instruction     |
+| BRANCH_NOT_TIMER2  | offset    | branch if timer2 (200ms) hasn't triggered, else next instruction     |
+| BRANCH_NOT_TIMER3  | offset    | branch if timer3 (300ms) hasn't triggered, else next instruction     |
+| BRANCH_NOT_TIMER4  | offset    | branch if timer4 (1s) hasn't triggered, else next instruction        |
+| BRANCH_NOT_TIMER5  | offset    | branch if timer5 (2s) hasn't triggered, else next instruction        |
+| SWAP_A_B           |           | Swap registers A and B                                               |
+| SWAP_A_C           |           | Swap registers A and C                                               |
+| SWAP_B_C           |           | Swap registers B and C                                               |
+| ADD_A_B            |           | A = A + B                                                            |
+| ADD_B_A            |           | B = B + A                                                            |
+| SUB_A_B            |           | A = A - B                                                            |
+| SUB_B_A            |           | B = B - A                                                            |
+| MUL_A_B            |           | A = A * B                                                            |
+| MUL_B_A            |           | B = B * A                                                            |
+| DIV_A_B            |           | A = A / B                                                            |
+| DIV_B_A            |           | B = B / A                                                            |
+| MOD_A_B            |           | A = A % B                                                            |
+| MOD_B_A            |           | B = B % A                                                            |
+| AND_A_B            |           | A = A & B                                                            |
+| AND_B_A            |           | B = B & A                                                            |
+| OR_A_B             |           | A = A \| B                                                           |
+| OR_B_A             |           | B = B \| A                                                           |
+| OR_A_IMM32         | imm32     | A = A \| imm32                                                       |
+| OR_B_IMM32         | imm32     | B = B \| imm32                                                       |
+| AND_A_IMM32        | imm32     | A = A & imm32                                                        |
+| AND_B_IMM32        | imm32     | B = B & imm32                                                        |
+| LSHIFT_A_IMM8      | imm8      | A = A << imm8                                                        |
+| LSHIFT_B_IMM8      | imm8      | B = B << imm8                                                        |
+| RSHIFT_A_IMM8      | imm8      | A = A >> imm8                                                        |
+| RSHIFT_B_IMM8      | imm8      | B = B >> imm8                                                        |
+| NOT_A              |           | A = ~A                                                               |
+| NOT_B              |           | B = ~B                                                               |
+| NEG_A              |           | A = -A                                                               |
+| NEG_B              |           | B = -B                                                               |
 | MOV_A_VERB         |   | Move LSB byte of register A into VERB DSKY field (assumed to be BCD encoded) |
 | MOV_A_NOUN         |   | Move LSB byte of register A into NOUN DSKY field (assumed to be BCD encoded) |
 | MOV_A_PROG         |   | Move LSB byte of register A into PROG DSKY field (assumed to be BCD encoded) |
 | MOV_NOUN_A         |   | Move NOUN DSKY field into LSB byte of register A                             |
 | MOV_VERB_A         |   | Move VERB DSKY field into LSB byte of register A                             |
 | MOV_PROG_A         |   | Move PROG DSKY field into LSB byte of register A                             |
-| BLINK_VERB         | <imm8>       | 1 or 0. enable/disable blinking of VERB digits                    |
-| BLINK_NOUN         | <imm8>       | 1 or 0. enable/disable blinking of NOUN digits                    |
-| BLINK_PROG         | <imm8>       | 1 or 0. enable/disable blinking of PROG digits                    |
-| BLINK_KEYREL       | <imm8>       | 1 or 0. enable/disable blinking of KEYREL status light            |
-| BLINK_OPRERR       | <imm8>       | 1 or 0. enable/disable blinking of OPR ERR status light           |
-| BLINK_R1           | <imm8>       | 1 or 0. enable/disable blinking of DSKY R1 digits                 |
-| BLINK_R2           | <imm8>       | 1 or 0. enable/disable blinking of DSKY R2 digits                 |
-| BLINK_R3           | <imm8>       | 1 or 0. enable/disable blinking of DSKY R3 digits                 |
-| LT_UPLINK_ACTY     | <imm8>       | 1 or 0. turn on/turn off the UPLINK ACTY status light             |
-| LT_NO_ATT          | <imm8>       | 1 or 0. turn on/turn off the NO ATT status light                  |
-| LT_STBY            | <imm8>       | 1 or 0. turn on/turn off the STBY status light                    |
-| LT_OPR_ERR         | <imm8>       | 1 or 0. turn on/turn off the OPR ERR status light                 |
-| LT_KEY_REL         | <imm8>       | 1 or 0. turn on/turn off the KEY REL status light                 |
-| LT_NA1             | <imm8>       | 1 or 0. turn on/turn off the NA1 status light                     |
-| LT_NA2             | <imm8>       | 1 or 0. turn on/turn off the NA2 status light                     |
-| LT_TEMP            | <imm8>       | 1 or 0. turn on/turn off the TEMP status light                    |
-| LT_GIMBAL_LOCK     | <imm8>       | 1 or 0. turn on/turn off the GIMBAL LOCK status light             |
-| LT_PROG_ALRM       | <imm8>       | 1 or 0. turn on/turn off the PROG ALRM status light               |
-| LT_RESTART         | <imm8>       | 1 or 0. turn on/turn off the RESTART status light                 |
-| LT_TRACKER         | <imm8>       | 1 or 0. turn on/turn off the TRACKER status light                 |
-| LT_ALT             | <imm8>       | 1 or 0. turn on/turn off the ALT status light                     |
-| LT_VEL             | <imm8>       | 1 or 0. turn on/turn off the VEL status light                     |
-| LT_COMP_ACTY       | <imm8>       | 1 or 0. turn on/turn off the COMP ACTY light                      |
-| LT_VERB            | <imm8>       | 1 or 0. turn on/turn off the VERB light                           |
-| LT_NOUN            | <imm8>       | 1 or 0. turn on/turn off the NOUN light                           |
-| LT_PROG            | <imm8>       | 1 or 0. turn on/turn off the PROG light                           |
-| LT_ALL             | <imm8>       | 1 or 0. turn on/turn off ALL status lights                        |
-| UPLINK_PROB_IMM8   | <imm8> | set UPLINK ACTY random blink probability to <imm8> 0=off, 255=always on |
-| COMPACTY_PROB_IMM8 | <imm8> | set COMP ACTY random blink probability to <imm8> 0=off, 255=always on   |
-| GPS_LAT_A          |              | Read GPS unit and place Latitude into A                           |
-| GPS_LON_A          |              | Read GPS unit and place Longtitude into A                         |
-| GPS_YEAR_A         |              | Read GPS unit and place Year into A                               |
-| GPS_MON_A          |              | Read GPS unit and place Month into A                              |
-| GPS_DAY_A          |              | Read GPS unit and place Day into A                                |
-| GPS_HH_A           |              | Read GPS unit and place Hours into A                              |
-| GPS_MM_A           |              | Read GPS unit and place Minutes into A                            |
-| GPS_SS_A           |              | Read GPS unit and place Seconds into A                            |
-| BRANCH_TIMESTAMP_LT| <addr1> <addr2> <offset> | branch if timestamp1 less than timestamp2             |
-| TIMESTAMP_DIFF_A   | <addr1> <addr2> | diff timestamp1 in <addr1> and timestamp2 in <addr2> put result into A |
-| RTC_TIMESTAMP_DIRECT | <addr>     | store entire RTC timestamp to <addr>+0 and <addr>+1               |
-| RTC_DAY_A          |              | Read RTC and place DAY field into A register  (BCD encoded)       |
-| RTC_YEAR_A         |              | Read RTC and place YEAR field into A register (BCD encoded)       |
-| RTC_MON_A          |              | Read RTC and place MONTH field into A register (BCD encoded)      |
-| RTC_HH_A           |              | Read RTC and place HOURS field into A register (BCD encoded)      |
-| RTC_MM_A           |              | Read RTC and place MINUTES field into A register (BCD encoded)    |
-| RTC_SS_A           |              | Read RTC and place SECONDS field into A register (BCD encoded)    |
-| RTC_MEM_A          | <addr>       | Read RTC RAM address <addr> and place into A register             |
-| RTC_A_MEM          | <addr>       | Write LSB of A register into RTC RAM address <addr>               |
-| RTC_MEM_A_CDIRECT  | <addr>       | Read RTC RAM address <addr>+C and place into A register           |
-| RTC_A_MEM_CDIRECT  | <addr>       | Write LSB of A register into RTC RAM address <addr>+C             |
-| IMU_ACCX_A         |              | Move IMU Acceleration X value into A                              |
-| IMU_ACCY_A         |              | Move IMU Acceleration Y value into A                              |
-| IMU_ACCZ_A         |              | Move IMU Acceleration Z value into A                              |
-| IMU_PITCH_A        |              | Move IMU Pitch value into A                                       |
-| IMU_ROLL_A         |              | Move IMU Roll value into A                                        |
-| IMU_YAW_A          |              | Move IMU Yaw value into A                                         |
-| IMU_TEMP_A         |              | Move IMU Temp value into A                                        |
-| MP3_PLAY_A         |              | play track number indicated by register A                         |
-| MP3_STOP           |              | stop playing any track. (play the silence clip)                   |
-| EEPROM_WRITE_A_CDIRECT |          | write A register byte to EEPROM[C]                                |
-| EEPROM_READ_A_CDIRECT  |          | read into A register byte from EEPROM[C]                          |
-| WAIT1              |              | pause CPU until 100ms timer triggers, then proceed to next instr. |
-| WAIT2              |              | pause CPU until 200ms timer triggers, then proceed to next instr. |
-| WAIT3              |              | pause CPU until 300ms timer triggers, then proceed to next instr. |
-| WAIT4              |              | pause CPU until 1s timer triggers, then proceed to next instr.    |
-| WAIT5              |              | pause CPU until 2s timer triggers, then proceed to next instr.    |
+| BLINK_VERB         | imm8      | 1 or 0. enable/disable blinking of VERB digits                       |
+| BLINK_NOUN         | imm8      | 1 or 0. enable/disable blinking of NOUN digits                       |
+| BLINK_PROG         | imm8      | 1 or 0. enable/disable blinking of PROG digits                       |
+| BLINK_KEYREL       | imm8      | 1 or 0. enable/disable blinking of KEYREL status light               |
+| BLINK_OPRERR       | imm8      | 1 or 0. enable/disable blinking of OPR ERR status light              |
+| BLINK_R1           | imm8      | 1 or 0. enable/disable blinking of DSKY R1 digits                    |
+| BLINK_R2           | imm8      | 1 or 0. enable/disable blinking of DSKY R2 digits                    |
+| BLINK_R3           | imm8      | 1 or 0. enable/disable blinking of DSKY R3 digits                    |
+| LT_UPLINK_ACTY     | imm8      | 1 or 0. turn on/turn off the UPLINK ACTY status light                |
+| LT_NO_ATT          | imm8      | 1 or 0. turn on/turn off the NO ATT status light                     |
+| LT_STBY            | imm8      | 1 or 0. turn on/turn off the STBY status light                       |
+| LT_OPR_ERR         | imm8      | 1 or 0. turn on/turn off the OPR ERR status light                    |
+| LT_KEY_REL         | imm8      | 1 or 0. turn on/turn off the KEY REL status light                    |
+| LT_NA1             | imm8      | 1 or 0. turn on/turn off the NA1 status light                        |
+| LT_NA2             | imm8      | 1 or 0. turn on/turn off the NA2 status light                        |
+| LT_TEMP            | imm8      | 1 or 0. turn on/turn off the TEMP status light                       |
+| LT_GIMBAL_LOCK     | imm8      | 1 or 0. turn on/turn off the GIMBAL LOCK status light                |
+| LT_PROG_ALRM       | imm8      | 1 or 0. turn on/turn off the PROG ALRM status light                  |
+| LT_RESTART         | imm8      | 1 or 0. turn on/turn off the RESTART status light                    |
+| LT_TRACKER         | imm8      | 1 or 0. turn on/turn off the TRACKER status light                    |
+| LT_ALT             | imm8      | 1 or 0. turn on/turn off the ALT status light                        |
+| LT_VEL             | imm8      | 1 or 0. turn on/turn off the VEL status light                        |
+| LT_COMP_ACTY       | imm8      | 1 or 0. turn on/turn off the COMP ACTY light                         |
+| LT_VERB            | imm8      | 1 or 0. turn on/turn off the VERB light                              |
+| LT_NOUN            | imm8      | 1 or 0. turn on/turn off the NOUN light                              |
+| LT_PROG            | imm8      | 1 or 0. turn on/turn off the PROG light                              |
+| LT_ALL             | imm8      | 1 or 0. turn on/turn off ALL status lights                           |
+| UPLINK_PROB_IMM8   | imm8 | set UPLINK ACTY random blink probability to imm8 0=off, 255=always on     |
+| COMPACTY_PROB_IMM8 | imm8 | set COMP ACTY random blink probability to imm8 0=off, 255=always on       |
+| GPS_LAT_A          |           | Read GPS unit and place Latitude into A                              |
+| GPS_LON_A          |           | Read GPS unit and place Longtitude into A                            |
+| GPS_YEAR_A         |           | Read GPS unit and place Year into A                                  |
+| GPS_MON_A          |           | Read GPS unit and place Month into A                                 |
+| GPS_DAY_A          |           | Read GPS unit and place Day into A                                   |
+| GPS_HH_A           |           | Read GPS unit and place Hours into A                                 |
+| GPS_MM_A           |           | Read GPS unit and place Minutes into A                               |
+| GPS_SS_A           |           | Read GPS unit and place Seconds into A                               |
+| BRANCH_TIMESTAMP_LT| addr1 addr2 offset | branch if timestamp1 less than timestamp2                   |
+| TIMESTAMP_DIFF_A   | addr1 addr2 | diff timestamp1 in addr1 and timestamp2 in addr2 put result into A |
+| RTC_TIMESTAMP_DIRECT | addr    | store entire RTC timestamp to addr+0 and addr+1                      |
+| RTC_DAY_A          |           | Read RTC and place DAY field into A register  (BCD encoded)          |
+| RTC_YEAR_A         |           | Read RTC and place YEAR field into A register (BCD encoded)          |
+| RTC_MON_A          |           | Read RTC and place MONTH field into A register (BCD encoded)         |
+| RTC_HH_A           |           | Read RTC and place HOURS field into A register (BCD encoded)         |
+| RTC_MM_A           |           | Read RTC and place MINUTES field into A register (BCD encoded)       |
+| RTC_SS_A           |           | Read RTC and place SECONDS field into A register (BCD encoded)       |
+| RTC_MEM_A          | addr      | Read RTC RAM address addr and place into A register                  |
+| RTC_A_MEM          | addr      | Write LSB of A register into RTC RAM address addr                    |
+| RTC_MEM_A_CDIRECT  | addr      | Read RTC RAM address addr+C and place into A register                |
+| RTC_A_MEM_CDIRECT  | addr      | Write LSB of A register into RTC RAM address addr+C                  |
+| IMU_ACCX_A         |           | Move IMU Acceleration X value into A                                 |
+| IMU_ACCY_A         |           | Move IMU Acceleration Y value into A                                 |
+| IMU_ACCZ_A         |           | Move IMU Acceleration Z value into A                                 |
+| IMU_PITCH_A        |           | Move IMU Pitch value into A                                          |
+| IMU_ROLL_A         |           | Move IMU Roll value into A                                           |
+| IMU_YAW_A          |           | Move IMU Yaw value into A                                            |
+| IMU_TEMP_A         |           | Move IMU Temp value into A                                           |
+| MP3_PLAY_A         |           | play track number indicated by register A                            |
+| MP3_STOP           |           | stop playing any track. (play the silence clip)                      |
+| EEPROM_WRITE_A_CDIRECT |       | write A register byte to EEPROM[C]                                   |
+| EEPROM_READ_A_CDIRECT  |       | read into A register byte from EEPROM[C]                             |
+| WAIT1              |           | pause CPU until 100ms timer triggers, then proceed to next instr.    |
+| WAIT2              |           | pause CPU until 200ms timer triggers, then proceed to next instr.    |
+| WAIT3              |           | pause CPU until 300ms timer triggers, then proceed to next instr.    |
+| WAIT4              |           | pause CPU until 1s timer triggers, then proceed to next instr.       |
+| WAIT5              |           | pause CPU until 2s timer triggers, then proceed to next instr.       |
 | INPUT_NOUN         |  | Read a NOUN from the keyboard. A=value means good. A=-1 means bad             |
 | INPUT_R1           |  | Read a signed decimal number into R1. A=value good. A=-1 Bad                  |
 | INPUT_R2           |  | Read a signed decimal number into R2. A=value good. A=-1 Bad                  |
@@ -533,18 +533,18 @@ Here are all the assembly instructions:
 | INPUT_R1_OCT       |  | Read an octal value into R1. A=value good. A=-1 Bad                           |
 | INPUT_R2_OCT       |  | Read an octal value into R2. A=value good. A=-1 Bad                           |
 | INPUT_R3_OCT       |  | Read an octal value into R3. A=value good. A=-1 Bad                           |
-| ADJUST_R1          | <addr-min> <addr-max> | use +/- keys to adjust value in R1 up and down.          |
-| ADJUST_R2          | <addr-min> <addr-max> | use +/- keys to adjust value in R2 up and down.          |
-| ADJUST_R3          | <addr-min> <addr-max> | use +/- keys to adjust value in R3 up and down.          |
-| ADJUST_R1_OCT      | <addr-min> <addr-max> | use +/- keys to adjust value in R1 up and down. (octal)  |
-| ADJUST_R2_OCT      | <addr-min> <addr-max> | use +/- keys to adjust value in R2 up and down. (octal)  |
-| ADJUST_R3_OCT      | <addr-min> <addr-max> | use +/- keys to adjust value in R3 up and down. (octal)  |
+| ADJUST_R1          | addr-min addr-max | use +/- keys to adjust value in R1 up and down.              |
+| ADJUST_R2          | addr-min addr-max | use +/- keys to adjust value in R2 up and down.              |
+| ADJUST_R3          | addr-min addr-max | use +/- keys to adjust value in R3 up and down.              |
+| ADJUST_R1_OCT      | addr-min addr-max | use +/- keys to adjust value in R1 up and down. (octal)      |
+| ADJUST_R2_OCT      | addr-min addr-max | use +/- keys to adjust value in R2 up and down. (octal)      |
+| ADJUST_R3_OCT      | addr-min addr-max | use +/- keys to adjust value in R3 up and down. (octal)      |
 | PROG8_A_INDIRECT_C |           | A = Program[C] read byte from program memory                         |
 | PROG16_A_INDIRECT_C|           | A = Program[C] read 16-bit word from program memory C, C+1           |
 | PROG32_A_INDIRECT_C|           | A = Program[C] read 32-bit word from program memory C, C+1, C+2, C+3 |
-| ADD_A_IMM8         | \<imm8\>    | Add signed byte <imm8> to A register                                 |
-| ADD_B_IMM8         | \<imm8\>    | Add signed byte <imm8> to B register                                 |
-| ADD_C_IMM8         | \<imm8\>    | Add signed byte <imm8> to C register                                 |
+| ADD_A_IMM8         | imm8      | Add signed byte imm8 to A register                                   |
+| ADD_B_IMM8         | imm8      | Add signed byte imm8 to B register                                   |
+| ADD_C_IMM8         | imm8      | Add signed byte imm8 to C register                                   |
 | EMPTY_STACK        |           | Reset the stack to be empty for the CPU core                         |
 | RUN_PROG_A         | | cause cpu core 0 to run program located at 16-bit address in A. Reset stack    |
 | CALL_CINDIRECT     |           | call a subroutine whose address is in the C register                 |
