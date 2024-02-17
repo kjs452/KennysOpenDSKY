@@ -542,9 +542,9 @@ Here are all the assembly instructions:
 | PROG8_A_INDIRECT_C |           | A = Program[C] read byte from program memory                         |
 | PROG16_A_INDIRECT_C|           | A = Program[C] read 16-bit word from program memory C, C+1           |
 | PROG32_A_INDIRECT_C|           | A = Program[C] read 32-bit word from program memory C, C+1, C+2, C+3 |
-| ADD_A_IMM8         | <imm8>    | Add signed byte <imm8> to A register                                 |
-| ADD_B_IMM8         | <imm8>    | Add signed byte <imm8> to B register                                 |
-| ADD_C_IMM8         | <imm8>    | Add signed byte <imm8> to C register                                 |
+| ADD_A_IMM8         | \<imm8\>    | Add signed byte <imm8> to A register                                 |
+| ADD_B_IMM8         | \<imm8\>    | Add signed byte <imm8> to B register                                 |
+| ADD_C_IMM8         | \<imm8\>    | Add signed byte <imm8> to C register                                 |
 | EMPTY_STACK        |           | Reset the stack to be empty for the CPU core                         |
 | RUN_PROG_A         | | cause cpu core 0 to run program located at 16-bit address in A. Reset stack    |
 | CALL_CINDIRECT     |           | call a subroutine whose address is in the C register                 |
