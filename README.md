@@ -27,7 +27,9 @@ Kenny's Open DSKY Software
     + [Directives](#directives)
     + [Instruction Mnemonic Suffixes](#instruction-mnemonic-suffixes)
     + [Instruction Arguments](#instruction-arguments)
+    + [Numeric Literals](#numeric-literals)
     + [Instructions](#instructions)
+    + [Example](#example)
   + [Running the Curses Simulator](#running-the-curses-simulator)
     + [Keys](#keys)
     + [log file](#log-file)
@@ -297,42 +299,45 @@ Loop:
 Labels are symbol which appear
 
 ### Scope Brackets
-The curly braces `{` and `}` are scope brakcet. They can appear on a line
+The curly braces `{` and `}` are scope brackets. They can appear on a line
 by themselves. Any labels defined within scoped brackets are removed from
 the symbol table after the end scope bracket. This allows reusing symbols
 within the body of a function.
 
 ```
 VERB_34:
-{				// begin scope
+{               // begin scope
 Loop:
-		GOTO Loop
-}				// end scope
+       GOTO Loop
+}              // end scope
 
 VERB_35:
-{				// begin scope
-Loop:	GOTO Loop
-}				// end scope
+{             // begin scope
+Loop: ADD_A_B
+      BRANCH Loop
+}             // end scope
 ```
 
-The symbol `Loop` was reused becuse it appeares in seperate scope blocks.
+The symbol `Loop` was reused becuse it appears in seperate scope blocks.
 The symbols `VERB_34` and `VERB_35` are not inside of scope brackets. These
-symbols will be available for adding to the Verb[] dispatch table.
+symbols will be global (and can be referenced in the KennysOpenDSY.cpp file to
+add to the Verb[] dispatch table).
 
 ### Directives
 The three directives are `DATA8`, `DATA16` and 'DEFINE'.
 
 ```
-		DATA8		0xFF
-		DATA8		0x1F
-		DATA16		SomeLabel
-		DEFINE Symbol = 100
-		DEFINE JUNK   = 0x45
+        DATA8       0xFF
+        DATA8       0x1F
+        DATA16      SomeLabel
+        DEFINE MaxVal = 100
+        DEFINE JUNK   = 0x45
 ```
 
-The `DATA` directives compile raw data into the Program instructions stream.
+The `DATA` directives compile raw data into the Program instruction stream.
 This can be used to implement lookup tables. The `DEFINE` directive associates
-a value with a symbol.
+a value with a symbol. For example instead of using `100` in your assembly code you
+can say `MaxVal`.
 
 ### Instruction Mnemonic Suffixes
 
@@ -361,8 +366,11 @@ These are the types of arguments instructions can have:
 + `<addrMax>` - An 8-bit unsigned value which refers to a RAM location. Refers to the maximum value in
 		the range of values.
 
-In the assembly syntax argument are provided seperated by whitspace. Numeric literal can use
-signed decimal notation or unsined hex notation. I.e.,
+In the assembly syntax arguments are seperated by whitspace. Do not use commas or other
+punctuation in the assembly code.
+
+### Numeric Literals
+Numeric literal can use signed decimal notation or unsined hex notation. I.e.,
 
 ```
     0x4E            // hex literal
@@ -615,6 +623,76 @@ Here are all the assembly instructions:
 | MOV_A_AGC_FLAGS2   |           | Move A register to the AGC_FLAGS2 field   DELETED                    |
 | MOV_AGC_FLAGS2_A   |           | Move AGC_FLAGS2 field into A register     DELETED                    |
 
+### Example
+This is an example of what the assembly code looks like.
+This is `VERB_37` from the assembly file.
+
+```
+//
+// Run major mode
+//
+VERB_37:
+{
+            LD_A_IMM8       0xAA
+            MOV_A_NOUN          // clear noun field
+            BLINK_VERB  1
+            BLINK_NOUN  1
+
+            INPUT_NOUN
+            LD_B_IMM16  0x00FF
+            AND_A_B
+            MOV_A_B
+            BRANCH_B_LT_IMM8    0   Error
+
+            LD_C_IMM16  Programs
+
+Next:       PROG8_A_INDIRECT_C
+            BRANCH_A_EQ_IMM8    -1      NotFound
+            INC_C
+            ST_A_DIRECT         PROG_TMP1
+            PROG16_A_INDIRECT_C
+            ADD_C_IMM8          2
+            BRANCH_B_EQ_DIRECT  PROG_TMP1   Found
+            BRANCH  Next
+
+Programs:   DATA8       0x00
+            DATA16      PROG_00
+            DATA8       0x01
+            DATA16      PROG_01
+            DATA8       0x02
+            DATA16      PROG_02
+            DATA8       0x60
+            DATA16      PROG_60
+            DATA8       0x61
+            DATA16      PROG_61
+            DATA8       0x62
+            DATA16      PROG_62
+            DATA8       0x68
+            DATA16      PROG_68
+            DATA8       0x69
+            DATA16      PROG_69
+            DATA8       0x70
+            DATA16      PROG_70
+            DATA8       -1
+
+Found:
+            SWAP_A_B
+            // ENCODE_A_TO_DEC
+            MOV_A_PROG
+            SWAP_A_B
+            RUN_PROG_A
+            BRANCH Done
+
+NotFound:
+Error:
+            BLINK_OPRERR    1
+
+Done:
+            BLINK_VERB  0
+            BLINK_NOUN  0
+            RET
+}
+```
 
 ## Running the Curses Simulator
 The **curses simulator** is a text based 'ncurses' application. You run
