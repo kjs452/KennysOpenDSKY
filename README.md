@@ -24,7 +24,7 @@ Kenny's Open DSKY Software
     + [Labels](#labels)
     + [Scope Brackets](#scope-brackets)
     + [Directives](#directives)
-  + [Instruction Mnemonic Suffixes](#instruction-mnemonic-suffixes)
+    + [Instruction Mnemonic Suffixes](#instruction-mnemonic-suffixes)
     + [Instruction Arguments](#instruction-arguments)
     + [Instructions](#instructions)
   + [Running the Curses Simulator](#running-the-curses-simulator)
@@ -309,18 +309,21 @@ The symbols `VERB_34` and `VERB_35` are not inside of scope brackets. These
 symbols will be available for adding to the Verb[] dispatch table.
 
 ### Directives
-The two directives are `DATA8` and `DATA16`.
+The three directives are `DATA8`, `DATA16` and 'DEFINE'.
 
 ```
 		DATA8		0xFF
 		DATA8		0x1F
 		DATA16		SomeLabel
+		DEFINE Symbol = 100
+		DEFINE JUNK   = 0x45
 ```
 
-The directives compile raw data into the Program instructions stream.
-This can be used to implement lookup tables.
+The `DATA` directives compile raw data into the Program instructions stream.
+This can be used to implement lookup tables. The `DEFINE` directive associates
+a value with a symbol.
 
-## Instruction Mnemonic Suffixes
+### Instruction Mnemonic Suffixes
 
 The instruction mnemonics use these suffixes to indicate the addressing modes/arguments:
 
@@ -342,16 +345,20 @@ These are the types of arguments instructions can have:
 + `<imm16>` - A 16-bit value provided immediately in the Program byte code stream
 + `<imm32>` - A 32-bit value provided immediately in the Program byte code stream
 + `<addr>` - An 8-bit unsigned value which refers to a RAM location.
++ `<addrMin>` - An 8-bit unsigned value which refers to a RAM location. Refers to the minimum value
+		in the range of values.
++ `<addrMax>` - An 8-bit unsigned value which refers to a RAM location. Refers to the maximum value in
+		the range of values.
 
 In the assembly syntax argument are provided seperated by whitspace. Numeric literal can use
 signed decimal notation or unsined hex notation. I.e.,
 
 ```
-     0x4E			// hex literal
-	-4				// decimal literal 8-bits
-	1234			// decimal literal 16-bits
-	1234999			// decimal literal 32-bits
-     0x4E001F2F		// 32-bit hex literal
+    0x4E            // hex literal
+    -4              // decimal literal 8-bits
+    1234            // decimal literal 16-bits
+    1234999         // decimal literal 32-bits
+    0x4E001F2F      // 32-bit hex literal
 ```
 
 ### Instructions
@@ -577,12 +584,12 @@ Here are all the assembly instructions:
 | INPUT_R1_OCT       |  | Read an octal value into R1. A=value good. A=-1 Bad                           |
 | INPUT_R2_OCT       |  | Read an octal value into R2. A=value good. A=-1 Bad                           |
 | INPUT_R3_OCT       |  | Read an octal value into R3. A=value good. A=-1 Bad                           |
-| ADJUST_R1          | addr-min addr-max | use +/- keys to adjust value in R1 up and down.              |
-| ADJUST_R2          | addr-min addr-max | use +/- keys to adjust value in R2 up and down.              |
-| ADJUST_R3          | addr-min addr-max | use +/- keys to adjust value in R3 up and down.              |
-| ADJUST_R1_OCT      | addr-min addr-max | use +/- keys to adjust value in R1 up and down. (octal)      |
-| ADJUST_R2_OCT      | addr-min addr-max | use +/- keys to adjust value in R2 up and down. (octal)      |
-| ADJUST_R3_OCT      | addr-min addr-max | use +/- keys to adjust value in R3 up and down. (octal)      |
+| ADJUST_R1          | addrMin addrMax | use +/- keys to adjust value in R1 up and down.              |
+| ADJUST_R2          | addrMin addrMax | use +/- keys to adjust value in R2 up and down.              |
+| ADJUST_R3          | addrMin addrMax | use +/- keys to adjust value in R3 up and down.              |
+| ADJUST_R1_OCT      | addrMin addrMax | use +/- keys to adjust value in R1 up and down. (octal)      |
+| ADJUST_R2_OCT      | addrMin addrMax | use +/- keys to adjust value in R2 up and down. (octal)      |
+| ADJUST_R3_OCT      | addrMin addrMax | use +/- keys to adjust value in R3 up and down. (octal)      |
 | PROG8_A_INDIRECT_C |           | A = Program[C] read byte from program memory                         |
 | PROG16_A_INDIRECT_C|           | A = Program[C] read 16-bit word from program memory C, C+1           |
 | PROG32_A_INDIRECT_C|           | A = Program[C] read 32-bit word from program memory C, C+1, C+2, C+3 |
