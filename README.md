@@ -900,6 +900,10 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 |V82        | Monitor Orbital parameters                         |
 
 ### Programs
+To launch a program type: `V37 ENTR`. The verb and noun fields will
+begin blinking. Now enter one of these program numbers.
+I.e. To run program P61 you would enter: `VERB 3 7 ENTR 6 1 ENTR`
+
 | PROG | Description                                                |
 |------|------------------------------------------------------------|
 | P00  | Poo                                                        |
@@ -992,7 +996,7 @@ little 3d-printed DSKY.
 ![alt text](images/minidsky.jpg "")
 
 The assembly instructions were a little sparse. But this increased my feeling of satisfaction
-`when I successfully built the thing. How to perform final assembly was not well documented.
+when I successfully built the thing. How to perform final assembly was not well documented.
 Having said that, the instructables website was pretty good with lots of pictures of each step.
 The instructions became sparse when the assembly of the case was concerned. The kit offered
 several logical points to test the device before final soldering of all components. For example
