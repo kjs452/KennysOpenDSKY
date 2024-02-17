@@ -3,6 +3,48 @@ Kenny's Open DSKY Software
 
 ![alt text](images/panorama_dsky.jpg "")
 
+## Table Of Contents
++ [KennysOpenDSKY](#kennysopendsky)
+  + [Description](#description)
+  + [Acknowledgments](#acknowledgments)
+  + [Features](#features)
+  + [Files](#files)
+  + [Memory Usage](#memory-usage)
+  + [Dependencies](#dependencies)
+    + [Arduino](#arduino)
+    + [Linux](#linux)
+  + [Compiling for Arduino Nano](#compiling-for-arduino-nano)
+  + [Compiling for Linux](#compiling-for-linux)
+    + [Running the Curses Sumulator](#running-the-curses-sumulator)
+  + [Compiling for Windows/Macos](#compiling-for-windowsmacos)
+  + [Using the Assembler](#using-the-assembler)
+  + [Assembly Language](#assembly-language)
+  + [Comments](#comments)
+  + [Labels](#labels)
+  + [Scope Brackets](#scope-brackets)
+  + [Directives](#directives)
+  + [Instruction Mnemonic Suffixes](#instruction-mnemonic-suffixes)
+  + [Instruction Arguments](#instruction-arguments)
+  + [Instructions](#instructions)
+  + [Running the Curses Simulator](#running-the-curses-simulator)
+    + [Keys](#keys)
+    + [log file](#log-file)
+    + [persistent data](#persistent-data)
+  + [DSKY Usage](#dsky-usage)
+    + [General Notes:](#general-notes)
+  + [VERBs, NOUNs, and PROGRAMs](#verbs-nouns-and-programs)
+  + [Verbs](#verbs)
+  + [Nouns](#nouns)
+  + [Verb-Nouns](#verb-nouns)
+  + [Programs](#programs)
+  + [Green Plexi-glass Modification](#green-plexi-glass-modification)
+  + [Review of the Open DSKY Kit](#review-of-the-open-dsky-kit)
+    + [Sticker 1](#sticker-1)
+    + [Sticker 2](#sticker-2)
+    + [Mini-DSKY](#mini-dsky)
+  + [Author](#author)
+
+
 ## Description
 This project contains C/C++ source code for the Arduino nano which
 will control the Open DSKY kickstarter kit.
@@ -311,6 +353,8 @@ signed decimal notation or unsined hex notation. I.e.,
 	1234999			// decimal literal 32-bits
      0x4E001F2F		// 32-bit hex literal
 ```
+
+## Instructions
 
 Here are all the assembly instructions:
 
