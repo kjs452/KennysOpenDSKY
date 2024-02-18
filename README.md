@@ -90,6 +90,10 @@ Open DSKY hardware. However, I derived many routines from these sources:
 + An online Apollo DSKY emulator <https://svtsim.com/moonjs/agc.html>. I used this great tool to
     tweak my code to better reflect how an actual Apollo DSKY worked.
 
++ Keyboard debouncing logic comes from *James Sanderson's* code mentioned in this
+    youtube video: <https://www.youtube.com/watch?v=zMDSz0iKxIs&t=1726s>
+    This is an improvement over Scott Pavlovec's keyboard reading code.
+
 ## Features
 + A virtual machine and byte code interpreter
 + Two threads of control: One thread is a background task, which
@@ -97,6 +101,7 @@ Open DSKY hardware. However, I derived many routines from these sources:
 + Ability to enter values using the keypad instead of +/- keys.
 + More accurately reproduces the Apollo DSKY interface.
 + **Curses Simulator** - test and develop your code on your computer before uploading it to the Arduino.
++ Better keyboard debounce logic.
 
 ## Files
 The main source code is in `KennysOpenDSKY.cpp` and `kennysagc.asm`.
@@ -925,7 +930,7 @@ Done:
 The main function is called `apollo_guidance_computer()`.
 The main data structure that is manipulated is the variable `Agc`
 
-The `Agc` variable contains the DSKY state (both current and prevous). It
+The `Agc` variable contains the DSKY state (both current and previous). It
 also contains the two CPU cores and the RAM area. Plus some additional flags.
 
 ```
@@ -969,7 +974,7 @@ This function performs these steps:
 1. The `Agc` is initialized by the call to `agc_init()`.
 2. A forever loop that is the main event-display loop
 3. Execute the two CPU cores for one instruction.
-	`agc_execute_cpu()` runs the CPU core for one instruction.
+   `agc_execute_cpu()` runs the CPU core for one instruction.
 4. Check the keyboard. If a keyboard character has been recieved then
     apply the new input to the state machine. `Agc.state` is the current state
     the DKSY is in.
@@ -985,6 +990,7 @@ To add a new instruction to the virtual machine:
 2. Add your new instruction to the debug string array `Mnemonics[]`.
 3. Add your new instruction to the associative array `InstructionTable` in `assembler.py`.
 4. Add a new case to the switch statement in the routine, `agc_execute_cpu()`.
+5. And of course update the `README.md` file.
 
 ### Adding a new VERB
 There is an array called `Verbs[]` which contains all the verbs that can be entered.
