@@ -400,6 +400,7 @@ I.e. To run program P61 you would enter: `VERB 3 7 ENTR 6 1 ENTR`
 | P01  | Apollo 11 Launch Simulation                                |
 | P06  | Simulate putting AGC into standby mode                     |
 | P11  | Display IMU linear acceleration values (same as V16 N18)   |
+| P42  | "blinky" - randomly illuminate caution and warning lights  |
 | P61  | play short version of JFK "I believe"                      |
 | P62  | play short version of JFK "we choose"                      |
 | P68  | play short version of Apollo 8 genesis clip                |
@@ -1026,3 +1027,5 @@ reverse engineer. Unfortunately there lacks a schematic showing how the MP3 play
 Ken Stauffer<BR>
 New York, NY.<BR>
 2/14/2024
+
+![alt text](images/blinky2.jpg "")
