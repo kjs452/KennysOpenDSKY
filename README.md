@@ -90,7 +90,7 @@ Open DSKY hardware. However, I derived many routines from these sources:
 + An online Apollo DSKY emulator <https://svtsim.com/moonjs/agc.html>. I used this great tool to
     tweak my code to better reflect how an actual Apollo DSKY worked.
 
-+ Keyboard debouncing logic comes from *James Sanderson's* code mentioned in this
++ Keyboard debouncing logic comes from **James Sanderson's** code mentioned in this
     youtube video: <https://www.youtube.com/watch?v=zMDSz0iKxIs&t=1726s>
     This is an improvement over Scott Pavlovec's keyboard reading code.
 
@@ -1093,18 +1093,18 @@ This section contains my thoughts on the Open DSKY kit.
 
 Overall I loved it. It requires a lot of detail work for final assembly.
 However, this is a kit and as one of the creators says in a YouTube video:
-"A big part of the DIY is the **Y**. Do it yourself, not do it for me"
-<https://www.youtube.com/watch?v=xPJfywL251g&t=2251s> **(at 7m 30s)**
+"A big part of the DIY is the **Y**. Do it yourself, not do it for me."
+<https://www.youtube.com/watch?v=xPJfywL251g&t=2251s> *[at 7 minutes 30 second]*
 
 Final assembly required me to use a dremel grinding tool to carve out plastic
 from the back in order to ensure the front cover fits snuggly onto the cicruit board.
 
-I didn't like the "sticker" which you use to cover over the beautiful LED's, so I
-customized my device.
+I didn't like the "sticker" which you use to cover over the beautiful 7-segment LED's, so I
+customized my device (See the section [Green Acrylic Modification](#green-acrylic-modification)).
 
 The electronics and provided circuit board were excellent. All the parts were well labeled.
-This kit makes for a great platform to play with the Arduino and program different devices: GPS, IMU, MP3 player
-and Real Time Clock.
+This kit makes for a great platform to play with the Arduino and program different devices:
+GPS, IMU, MP3 player and Real Time Clock.
 
 Little details included with the Kit were also very nice. There were two stickers that you
 affix to the case which look like official NASA tracking signage. There was also a tiny
