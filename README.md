@@ -917,6 +917,110 @@ Done:
 }
 ```
 
+## Code Walk Through
+The main function is called apollo_guidance_computer().
+The main data structure that is manipulated is the variable `Agc`
+
+```
+static APOLLO_GUIDANCE_COMPUTER Agc;
+```
+
+This object contains the DSKY state (both current and prevous)
+
+```
+void apollo_guidance_computer()
+{
+    agc_init();
+
+    for(;;)
+    {
+        agc_execute_cpu(0);     // background thread
+        agc_execute_cpu(1);     // foreground thread
+
+        ch = readKeyboard();
+        input = MAP_INPUT(ch);
+
+        new_state = StateMachine[Agc.state][input];
+        Agc.state = new_state;
+        switch(Agc.state) {
+        case S_ST:
+            ...
+        }
+
+        // timer 1 action - blinking behavior and 'COMP ACTY' and 'UPLINK ACTY' flicker.
+        // timer 2 action NOT USED
+        // timer 3 action NOT USED
+        // timer 4 action NOT USED
+        // timer 5 action NOT USED
+
+        dsky_redraw(&Agc.dsky, &Agc.prev);
+    }
+}
+```
+
+The steps:
+1. The `Agc` is initialized.
+2. A forever loop that is the main event-display loop
+3. Execute the two CPU cores for one instruction.
+4. Check the keyboard. If a keyboard character has been recieved then
+    apply the new input to the state machine. `Agc.state` is the current state
+    the DKSY is in.
+5. Check the timer bits to see if the 100ms timer has triggered. If it has then:
+    a. Handle blinking behavior for various DSKY elements that can be set to blink.
+    b. Handle the flickering of the COMP ACTY and UPLINK ACTY lights.
+6. Redraw the DSKY state.
+
+This is a rough skeleton of the code. `agc_execute_cpu()` runs the two threads.
+Then 
+
+### Add New Instructions
+To add a new instruction to the virtual machine:
+
+1. Add your new instruction to `enum AGC_INSTRUCTION` in `KennysOpenDSKY.cpp`.
+2. Add your new instruction to the debug string array `Mnemonics[]`.
+3. Add your new instruction to the associative array `InstructionTable` in `assemble.py`.
+4. Add a new case to the switch statement in the routine `agc_execute_cpu()`.
+
+### Adding a new VERB
+There is an array called `Verbs[]` which contains all the verbs that can be entered.
+
+```
+static const DISPATCH_ENTRY Verbs[] PROGMEM = {
+    { 0x35, LBL_VERB_35 },
+    { 0x01, LBL_VERB_01 },
+    { 0x37, LBL_VERB_37 },
+    { 0x02, LBL_VERB_02 },
+    { 0x03, LBL_VERB_03 },
+    { 0x04, LBL_VERB_04 },
+    { 0x05, LBL_VERB_05 },
+    { 0x16, LBL_VERB_16 },
+    { 0x36, LBL_VERB_36 },
+    { 0x69, LBL_VERB_69 },
+};
+```
+
+To add a new verb add a new entry to this table. The identifier `LBL_VERB_03` is created
+from the assembly files: `kennysagc.asm` and `kennysagc.h`. In this table you provide
+the BCD encoded verb number and the starting location for the VERB code.
+
+Nouns and Programs are not stored in any dispatch table. These features are all handled
+by the assembly code. Each VERB must handle the set of NOUNs it knows about.
+
+Programs are launched by using the **VERB 37** verb.
+
+### Display Refresh
+The way the display is redraw is via the function `dsky_redraw()`.
+Two copies of the DSKY display state are stored. `Agc.prev` contains
+the DSKY display state most recently drawn. `Agc.dsky` contains the
+new DSKY display state that we wish to display.
+
+`dsky_redraw()` compared the old and new state. If nothing has changed
+then nothing needs to be redrawn. Otherwise a series of `if` statements
+are executed to see what parts of the DSKY has changed.
+
+The last step of `dsky_redraw()` is to assign the current DSKY state to
+the previous DSKY state.
+
 ## Green Acrylic Modification
 This section describes my modification to the Open DSKY. I decided
 I didn't like how fuzzy the LED digits were. I decided to use a green
