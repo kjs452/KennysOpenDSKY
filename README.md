@@ -59,7 +59,7 @@ will be referred to as the **curses simulator**.
 The **curses simulator** allows for testing and debugging the complete software
 without having to upload to the Arduino nano.
 
-![alt text](images/v16n36.jpg "")
+![alt text](images/blinky1.jpg "")
 
 ## Acknowledgments
 This is an original implementation of code needed to drive the
@@ -843,8 +843,7 @@ Here are all the assembly instructions:
 | CALL_CINDIRECT     |           | call a subroutine whose address is in the C register                 |
 | PUSH_DSKY          |           | push DSKY state on stack                                             |
 | POP_DSKY           |           | pop DSKY state on stack                                              |
-| MOV_A_AGC_FLAGS2   |           | Move A register to the AGC_FLAGS2 field   DELETED                    |
-| MOV_AGC_FLAGS2_A   |           | Move AGC_FLAGS2 field into A register     DELETED                    |
+| RANDOM_A           |           | Populate A register with a random 16-bit value                       |
 
 ### Example
 This is an example of what the assembly code looks like.
@@ -955,16 +954,17 @@ as well as the ruler so that is wouldn't move.
 I cut in half the sticker that came with the Open DSKY kit. I retained the left hand side
 of the sticker for the caution and warning lights pane. But I threw away the right hand side.
 
-Using my laser printer I printed out `screen_stuff.pdf`  
+Using my laser printer I printed out `screen_stuff.pdf`.
 
 ![alt text](images/sheet1.jpg "")
 
-and used scissors to cut out a the black region plus verb/noun/prog text.
-I also cut out the block of **plus** symbols. These I overlayed over the plus 7-segment LEDs.
+Then I used scissors to cut out a the black region plus VERB/NOUN/PROG text.
+I also cut out the block of **plus** symbols.
 
 ![alt text](images/sheet2b.jpg "")
 
-This I carefully positioned over the verb/noun/prog lights.
+This I carefully positioned over the VERB/NOUN/PROG lights. I also
+overlayed the block of **plus** symbols over the **plus** 7-segment LEDs.
 
 ![alt text](images/sheet3.jpg "")
 
@@ -977,8 +977,8 @@ This section contains my thoughts on the Open DSKY kit.
 
 Overall I loved it. It requires a lot of detail work for final assembly.
 However, this is a kit and as one of the creators says in a YouTube video:
-"This is a DIY (Do It Yourself) project. The most important letter is the **Y** letter."
-<https://www.youtube.com/watch?v=xPJfywL251g&t=2251s>
+"A big part of the DIY is the **Y**. Do it yourself, not do it for me"
+<https://www.youtube.com/watch?v=xPJfywL251g&t=2251s> **(at 7m 30s)**
 
 Final assembly required me to use a dremel grinding tool to carve out plastic
 from the back in order to ensure the front cover fits snuggly onto the cicruit board.

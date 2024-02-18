@@ -65,6 +65,8 @@ Programs:	DATA8		0x00
 			DATA16		PROG_69
 			DATA8		0x70
 			DATA16		PROG_70
+			DATA8		0x42
+			DATA16		PROG_42
 			DATA8		-1
 
 Found:
@@ -443,6 +445,80 @@ PROG_70:
 	LD_A_IMM8	17
 	MP3_PLAY_A
 f:	BRANCH f
+}
+
+//
+// Blinky: Randomly light caution and warning lamps
+//
+PROG_42:
+{
+			RANDOM_A
+			LD_B_IMM8		4
+			MOD_A_B							// A contains random delay in seconds between 0 and 30
+
+waiting:	WAIT4							// wait 1 second
+			DEC_A
+			BRANCH_A_GE_IMM8	0	waiting		// waiting
+
+			// change lamps
+			RANDOM_A
+			LD_B_IMM8		22				// pick a light 0-21
+			MOD_A_B							// A is a value between 0 and 21
+			LD_B_IMM8		3
+			MUL_A_B							// A = A*3
+			LD_B_IMM16		LampList
+			ADD_B_A							// B = LampList + A
+			MOV_B_C
+			CALL_CINDIRECT
+
+			GOTO PROG_42
+
+LampList:						// LampList consists of 21 3-byte functions
+
+On_NOATT:		LT_NO_ATT	1			// 0
+				RET
+On_STBY:		LT_STBY		1			// 1
+				RET
+On_NA1:			LT_NA1		1			// 2
+				RET
+On_NA2:			LT_NA2		1
+				RET
+On_TEMP:		LT_TEMP		1
+				RET
+On_GIMBAL_LOCK:	LT_GIMBAL_LOCK	1		// 5
+				RET
+On_PROG_ALRM:	LT_PROG_ALRM	1
+				RET
+On_RESTART:		LT_RESTART	1
+				RET
+On_TRACKER:		LT_TRACKER	1
+				RET
+On_ALT:			LT_ALT	1
+				RET
+On_VEL:			LT_VEL	1				// 10
+				RET
+Off_NOATT:		LT_NO_ATT	0
+				RET
+Off_STBY:		LT_STBY		0
+				RET
+Off_NA1:		LT_NA1		0
+				RET
+Off_NA2:		LT_NA2		0
+				RET
+Off_TEMP:		LT_TEMP		0			// 15
+				RET
+Off_GIMBAL_LOCK: LT_GIMBAL_LOCK	0
+				RET
+Off_PROG_ALRM:	LT_PROG_ALRM	0
+				RET
+Off_RESTART:	LT_RESTART	0
+				RET
+Off_TRACKER:	LT_TRACKER	0
+				RET
+Off_ALT:		LT_ALT	0				// 20
+				RET
+Off_VEL:		LT_VEL	0				// 21
+				RET
 }
 
 Help:

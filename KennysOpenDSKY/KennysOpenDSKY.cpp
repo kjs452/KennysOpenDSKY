@@ -683,8 +683,7 @@ enum AGC_INSTRUCTION
 	CALL_CINDIRECT,			// call a routine using C register
 	PUSH_DSKY,				// push DSKY state on stack
 	POP_DSKY,				// push DSKY state on stack
-	MOV_A_AGC_FLAGS2,		// Move A into AGC_FLAGS2
-	MOV_AGC_FLAGS2_A,		// Move AGC_FLAGS2 into A
+	RANDOM_A,				// Populate A with a random 16-bit value
 	AGC_INSTRUCTIONS_LEN,	// number of instruction opcode must be <= 127
 };
 
@@ -928,8 +927,7 @@ static const char *Mnemonics[] = {
 	"CALL_CINDIRECT",			// call a routine using C register
 	"PUSH_DSKY",				// push DSKY state on stack
 	"POP_DSKY",				// push DSKY state on stack
-	"MOV_A_AGC_FLAGS2",		// Move A into AGC_FLAGS2
-	"MOV_AGC_FLAGS2_A",		// Move AGC_FLAGS2 into A
+	"RANDOM_A",				// Populate A with a random 16-bit value
 	"AGC_INSTRUCTIONS_LEN",	// number of instruction opcode must be <= 127
 };
 #endif
@@ -3713,12 +3711,8 @@ void agc_execute_cpu(uint8_t c)
 		cpu->SP += 3;
 		break;
 
-	case MOV_A_AGC_FLAGS2:		// KJS TODO: get rid of this
-		Agc.dsky.blink = cpu->regs[0];
-		break;
-
-	case MOV_AGC_FLAGS2_A:		// KJS TODO: get rid of this
-		cpu->regs[0] = Agc.dsky.blink & 0xff;
+	case RANDOM_A:
+		cpu->regs[0] = random(0xffff);
 		break;
 	}
 

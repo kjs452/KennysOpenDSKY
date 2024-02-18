@@ -308,8 +308,7 @@ InstructionTable = {
 	'CALL_CINDIRECT': '',
 	'PUSH_DSKY': '',
 	'POP_DSKY': '',
-	'MOV_A_AGC_FLAGS2': '',
-	'MOV_AGC_FLAGS2_A': '',
+	'RANDOM_A': '',
 }
 
 #
