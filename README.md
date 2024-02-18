@@ -922,14 +922,17 @@ Done:
 ```
 
 ## Code Walk Through
-The main function is called apollo_guidance_computer().
+The main function is called `apollo_guidance_computer()`.
 The main data structure that is manipulated is the variable `Agc`
+
+The `Agc` variable contains the DSKY state (both current and prevous). It
+also contains the two CPU cores and the RAM area. Plus some additional flags.
 
 ```
 static APOLLO_GUIDANCE_COMPUTER Agc;
 ```
 
-This object contains the DSKY state (both current and prevous)
+This is the main routine for the whole thing:
 
 ```
 void apollo_guidance_computer()
@@ -962,10 +965,11 @@ void apollo_guidance_computer()
 }
 ```
 
-The steps:
-1. The `Agc` is initialized.
+This function performs these steps:
+1. The `Agc` is initialized by the call to `agc_init()`.
 2. A forever loop that is the main event-display loop
 3. Execute the two CPU cores for one instruction.
+	`agc_execute_cpu()` runs the CPU core for one instruction.
 4. Check the keyboard. If a keyboard character has been recieved then
     apply the new input to the state machine. `Agc.state` is the current state
     the DKSY is in.
@@ -974,16 +978,13 @@ The steps:
     b. Handle the flickering of the COMP ACTY and UPLINK ACTY lights.
 6. Redraw the DSKY state.
 
-This is a rough skeleton of the code. `agc_execute_cpu()` runs the two threads.
-Then 
-
 ### Add New Instructions
 To add a new instruction to the virtual machine:
 
 1. Add your new instruction to `enum AGC_INSTRUCTION` in `KennysOpenDSKY.cpp`.
 2. Add your new instruction to the debug string array `Mnemonics[]`.
-3. Add your new instruction to the associative array `InstructionTable` in `assemble.py`.
-4. Add a new case to the switch statement in the routine `agc_execute_cpu()`.
+3. Add your new instruction to the associative array `InstructionTable` in `assembler.py`.
+4. Add a new case to the switch statement in the routine, `agc_execute_cpu()`.
 
 ### Adding a new VERB
 There is an array called `Verbs[]` which contains all the verbs that can be entered.
@@ -1018,7 +1019,7 @@ Two copies of the DSKY display state are stored. `Agc.prev` contains
 the DSKY display state most recently drawn. `Agc.dsky` contains the
 new DSKY display state that we wish to display.
 
-`dsky_redraw()` compared the old and new state. If nothing has changed
+`dsky_redraw()` compares the old and new state. If nothing has changed
 then nothing needs to be redrawn. Otherwise a series of `if` statements
 are executed to see what parts of the DSKY has changed.
 
