@@ -102,6 +102,7 @@ Open DSKY hardware. However, I derived many routines from these sources:
 + More accurately reproduces the Apollo DSKY interface.
 + **Curses Simulator** - test and develop your code on your computer before uploading it to the Arduino.
 + Better keyboard debounce logic.
++ Allows for easy modifications to add custom apps to the DSKY.
 
 ## Files
 The main source code is in `KennysOpenDSKY.cpp` and `kennysagc.asm`.
@@ -983,6 +984,19 @@ This function performs these steps:
     + Handle the flickering of the COMP ACTY and UPLINK ACTY lights.
 6. Redraw the DSKY state.
 
+### Display Refresh
+The way the display is redrawn is via the function `dsky_redraw()`.
+Two copies of the DSKY display state are stored. `Agc.prev` contains
+the DSKY display state most recently drawn. `Agc.dsky` contains the
+new DSKY display state that we wish to display.
+
+`dsky_redraw()` compares the old and new state. If nothing has changed
+then nothing needs to be redrawn. Otherwise a series of `if` statements
+are executed to see what parts of the DSKY has changed.
+
+The last step of `dsky_redraw()` is to assign the current DSKY state to
+the previous DSKY state.
+
 ### Add New Instructions
 To add a new instruction to the virtual machine:
 
@@ -993,7 +1007,8 @@ To add a new instruction to the virtual machine:
 5. And of course update the `README.md` file.
 
 ### Adding a new VERB
-There is an array called `Verbs[]` which contains all the verbs that can be entered.
+There is an array called `Verbs[]` (in `KennysOpenDSKY.cpp`) which contains all the
+verbs that can be entered.
 
 ```
 static const DISPATCH_ENTRY Verbs[] PROGMEM = {
@@ -1019,18 +1034,11 @@ by the assembly code. Each VERB must handle the set of NOUNs it knows about.
 
 Programs are launched by using the **VERB 37** verb.
 
-### Display Refresh
-The way the display is redrawn is via the function `dsky_redraw()`.
-Two copies of the DSKY display state are stored. `Agc.prev` contains
-the DSKY display state most recently drawn. `Agc.dsky` contains the
-new DSKY display state that we wish to display.
-
-`dsky_redraw()` compares the old and new state. If nothing has changed
-then nothing needs to be redrawn. Otherwise a series of `if` statements
-are executed to see what parts of the DSKY has changed.
-
-The last step of `dsky_redraw()` is to assign the current DSKY state to
-the previous DSKY state.
+### Adding a new PROGRAM
+To add a new program edit, `kennysagc.asm` and modify the subroutine `VERB_37`.
+In there is a table of program labeled `Programs` which you can extend.
+Now write your code as a seperate subroutine. This program can now be invoked
+by entering the correct `V37 Nxx` command.
 
 ## Green Acrylic Modification
 This section describes my modification to the Open DSKY. I decided
