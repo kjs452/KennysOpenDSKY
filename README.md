@@ -463,7 +463,7 @@ This is to hold variables for the assembly programs. It also contains a small st
 
 The program byte codes are read-only. You can store data tables in this memory area. It
 mostly contains the subroutines. VERBs are written in this assembly language. The
-starting location for each VERB is stored in a `Verb[]` dispatch table in `KennyOpenDSKY.cpp`.
+starting location for each VERB is stored in a `Verbs[]` dispatch table in `KennyOpenDSKY.cpp`.
 Handling of the NOUNs is done by the code for each VERB. Each VERB is responsible for
 checking the NOUN field and acting appropriately.
 
@@ -528,7 +528,7 @@ Loop:    ADD_A_B
 The symbol `Loop` was reused becuse it appears in seperate scope blocks.
 The symbols `VERB_34` and `VERB_35` are not inside of scope brackets. These
 symbols will be global (and can be referenced in the KennysOpenDSY.cpp file to
-add to the Verb[] dispatch table).
+add to the Verbs[] dispatch table).
 
 Scope brackets allow for the use of common label names in many places without
 having to invent different label names that are unique.
@@ -979,8 +979,8 @@ This function performs these steps:
     apply the new input to the state machine. `Agc.state` is the current state
     the DKSY is in.
 5. Check the timer bits to see if the 100ms timer has triggered. If it has then:
-    a. Handle blinking behavior for various DSKY elements that can be set to blink.
-    b. Handle the flickering of the COMP ACTY and UPLINK ACTY lights.
+    + Handle blinking behavior for various DSKY elements that can be set to blink.
+    + Handle the flickering of the COMP ACTY and UPLINK ACTY lights.
 6. Redraw the DSKY state.
 
 ### Add New Instructions
@@ -1020,7 +1020,7 @@ by the assembly code. Each VERB must handle the set of NOUNs it knows about.
 Programs are launched by using the **VERB 37** verb.
 
 ### Display Refresh
-The way the display is redraw is via the function `dsky_redraw()`.
+The way the display is redrawn is via the function `dsky_redraw()`.
 Two copies of the DSKY display state are stored. `Agc.prev` contains
 the DSKY display state most recently drawn. `Agc.dsky` contains the
 new DSKY display state that we wish to display.
@@ -1094,7 +1094,7 @@ This section contains my thoughts on the Open DSKY kit.
 Overall I loved it. It requires a lot of detail work for final assembly.
 However, this is a kit and as one of the creators says in a YouTube video:
 "A big part of the DIY is the **Y**. Do it yourself, not do it for me."
-<https://www.youtube.com/watch?v=xPJfywL251g&t=2251s> *[at 7 minutes 30 second]*
+<https://www.youtube.com/watch?v=xPJfywL251g&t=2251s> *[at 7 minutes 30 seconds]*
 
 Final assembly required me to use a dremel grinding tool to carve out plastic
 from the back in order to ensure the front cover fits snuggly onto the cicruit board.
@@ -1136,7 +1136,13 @@ All the components came in indiviual plastic and were labeled. There was a inven
 showing all the components. The kit arrived in good packaging. I definately felt the kit was worth the $600.
 
 There are good online schematics. The sample source code is pretty gross, but also pretty easy
-reverse engineer. Unfortunately there lacks a schematic showing how the MP3 player was wired up.
+to reverse engineer. Unfortunately, there lacks a schematic showing how the MP3 player was wired up.
+
+In summary, I am very happy with the kit and feel I got my money's worth. I am an Apollo
+space nut, so a DSKY was always something I wanted. I am pleased that my **Kenny's
+Open DSKY software** will give me a way to experiment with this kit and build cool apps for it.
+It was fun trying to write software for a such a constrained system
+(The arduino Nano only has 30KB of program memory and 2KB of RAM; and it is an 8-bit CPU).
 
 ## Author
 Ken Stauffer<BR>

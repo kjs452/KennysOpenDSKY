@@ -973,7 +973,7 @@ struct CPU
 
 //
 // Everything about the Apollo Guidance Computer is contained
-// in this structure. (except Verb[] table and Program[] byte codes)
+// in this structure. (except Verbs[] table and Program[] byte codes)
 //
 struct APOLLO_GUIDANCE_COMPUTER
 {
@@ -4485,6 +4485,7 @@ void apollo_guidance_computer()
 			}
 		}
 
+#if 0 // not used
 		if( Agc.flags & AGC_TIMER2 )
 		{
 			Agc.flags &= ~AGC_TIMER2;
@@ -4494,21 +4495,24 @@ void apollo_guidance_computer()
 		{
 			Agc.flags &= ~AGC_TIMER3;
 		}
+#endif
 
+#ifdef CURSES_SIMULATOR
 		if( Agc.flags & AGC_TIMER4 )
 		{
 			Agc.flags &= ~AGC_TIMER4;
 
-#ifdef CURSES_SIMULATOR
 			mp3_increment_1s();
 			Wire.tick();
-#endif
 		}
+#endif
 
+#if 0 // not used
 		if( Agc.flags & AGC_TIMER5 )
 		{
 			Agc.flags &= ~AGC_TIMER5;
 		}
+#endif
 
 		dsky_redraw(&Agc.dsky, &Agc.prev);
 	}

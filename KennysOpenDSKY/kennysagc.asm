@@ -453,8 +453,8 @@ f:	BRANCH f
 PROG_42:
 {
 			RANDOM_A
-			LD_B_IMM8		4
-			MOD_A_B							// A contains random delay in seconds between 0 and 30
+			LD_B_IMM8		3
+			MOD_A_B							// A contains random delay in seconds between 0 and 3
 
 waiting:	WAIT4							// wait 1 second
 			DEC_A

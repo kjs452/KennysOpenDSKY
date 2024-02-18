@@ -466,7 +466,7 @@ static const uint8_t Program[] PROGMEM = {
     // PROG_42:
     // {
         RANDOM_A, 
-        LD_B_IMM8, 0x04, 
+        LD_B_IMM8, 0x03, 
         MOD_A_B, 
     // waiting:
         WAIT4, 
