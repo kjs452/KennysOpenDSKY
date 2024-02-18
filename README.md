@@ -17,7 +17,7 @@ Kenny's Open DSKY Software
   + [Compiling for Arduino Nano](#compiling-for-arduino-nano)
   + [Compiling for Linux](#compiling-for-linux)
     + [Running the Curses Sumulator](#running-the-curses-sumulator)
-  + [Compiling for Windows/Macos](#compiling-for-windowsmacos)
+  + [Compiling for Windows/MacOS](#compiling-for-windowsmacos)
   + [Running the Curses Simulator](#running-the-curses-simulator)
     + [Keys](#keys)
     + [log file](#log-file)
@@ -52,7 +52,7 @@ Kenny's Open DSKY Software
 This project contains C/C++ source code for the Arduino nano which
 will control the Open DSKY kickstarter kit.
 
-This project also contains source code for Linux/Windows/Macos which
+This project also contains source code for Linux/Windows/MacOS which
 runs as a `ncurses` text-based simulator of the arduino software. This
 will be referred to as the **curses simulator**.
 
@@ -150,13 +150,13 @@ the sketch for Arduino.
 
 ### Linux
 This section describes the notable libraries & components needed to compile
-the curses simulator on linux/macos/windows.
+the curses simulator on linux/MacOS/windows.
 
 + **ncurses** - this is a library for drawing simple text based user interfaces. It
         is widely available, and comes installed by default on most linux distros.
 
 + **sigaction()** - this is capability of most unixes. It is included on all linux operating
-            systems. Special porting may be needed for Windows or Macos. It is used to
+            systems. Special porting may be needed for Windows or MacOS. It is used to
             implement the 100ms timer.
 
 + **getrandom()** - this is a library function provdided by linux. It is used to provide
@@ -241,7 +241,7 @@ or (when debugging),
     $ gdb ./dsky_debug
 ```
 
-## Compiling for Windows/Macos
+## Compiling for Windows/MacOS
 I don't know how to compile for these platforms. Make sure
 you have the ```ncurses``` library available. Make sure you have sigaction() available.
 Make sure you have getrandom(). The compilation should be pretty straight forward.
@@ -422,9 +422,9 @@ however contains a pre-compiled version of the assembly.
 The output is `filename.h`. This file contains the bytecodes in a `Program[]` array.
 This is the code that the virtual CPUs will be executing.
 
-If you are compiling on a big endian computer (for example a Solaris or IBM 
+If your target architecture is a big endian computer (for example a Solaris or IBM 
 big iron unix machine) you will need to switch the byte ordering to big endian.
-The default is little endian. To enabled big endian byte ordering use the `-b` command
+The default is little endian. To enable big endian byte ordering use the `-b` command
 line option. **Little endian** is the appropriate byte ordering to use for
 Linux machines and Arduino.
 
@@ -467,7 +467,7 @@ running foreground task. For example, If `V16 N36` is running to show the curren
 If the user runs the `V35` (LAMP TEST) verb, then this will pause the current VERB/NOUN and
 run the LAMP TEST code. When the LAMP TEST finishes the previous Verb/Noun will be resumed.
 
-The following sections cover the assmebly language syntax:
+The following sections cover the assembly language syntax:
 
 ### Comments
 Use C++ `//` style comments in the assembly code. I.e.,
@@ -526,7 +526,7 @@ having to invent different label names that are unique.
 Scope brackets cannot be nested.
 
 ### Directives
-The assembler supports three directives: `DATA8`, `DATA16` and 'DEFINE'.
+The assembler supports three directives: `DATA8`, `DATA16` and `DEFINE`.
 
 ```
         DEFINE MaxVal = 100
@@ -955,11 +955,18 @@ as well as the ruler so that is wouldn't move.
 I cut in half the sticker that came with the Open DSKY kit. I retained the left hand side
 of the sticker for the caution and warning lights pane. But I threw away the right hand side.
 
-Using my laser printer I printed out `screen_stuff.pdf` and used scissors to cut out a the
-black region plus verb/noun/prog text. This I carefully positioned over the verb/noun/prog
-lights.
+Using my laser printer I printed out `screen_stuff.pdf`  
 
+![alt text](images/sheet1.jpg "")
+
+and used scissors to cut out a the black region plus verb/noun/prog text.
 I also cut out the block of **plus** symbols. These I overlayed over the plus 7-segment LEDs.
+
+![alt text](images/sheet2b.jpg "")
+
+This I carefully positioned over the verb/noun/prog lights.
+
+![alt text](images/sheet3.jpg "")
 
 I used a small piece of scotch tape to hold these overlays in place while I assembled the
 display and bezel. Best results are achieved if the black ink covers anything inside that
