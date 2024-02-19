@@ -67,7 +67,7 @@ without having to upload to the Arduino nano.
 
 ## Acknowledgments
 This is an original implementation of code needed to drive the
-Open DSKY hardware. However, I derived many routines from these sources:
+Open DSKY hardware. However, I derived many ideas and code from these sources:
 
 + **S&T Geotronics** James Sanderson and Marc Tessier for creating the
     Open DSKY kit. <http://www.stgeotronics.com>
@@ -95,7 +95,7 @@ Open DSKY hardware. However, I derived many routines from these sources:
     This is an improvement over Scott Pavlovec's keyboard reading code.
 
 ## Features
-+ A virtual machine and byte code interpreter
++ A virtual machine and byte code interpreter.
 + Two threads of control: One thread is a background task, which
     runs major modes (PROGs). The other thread is a foreground task which runs VERBs & NOUNs.
 + Ability to enter values using the keypad instead of +/- keys.
@@ -271,17 +271,17 @@ Run with this command,
 
 ### Keys
 The keys map to your keyboard thusly. Only lower case keys are accepted.
-+ '0' ... '9' - Digits
-+ '+'   - Plus
-+ '-'   - Minus
-+ 'v'   - VERB
-+ 'n'   - NOUN
-+ 'p'   - PRO (Proceed)
-+ 'c'   - CLR (Clear)
-+ 'k'   - KEY REL (Key Release)
-+ 'e' or 'Enter' - ENTR (Enter)
-+ 'r'   - RSET (Reset)
-+ 'q'   - Quit the DSKY simulator
++ `0` ... `9` - Digits
++ `+`   - Plus
++ `-`   - Minus
++ `v`   - VERB
++ `n`   - NOUN
++ `p`   - PRO (Proceed)
++ `c`   - CLR (Clear)
++ `k`   - KEY REL (Key Release)
++ `e` or `[return]` - ENTR (Enter)
++ `r`   - RSET (Reset)
++ `q`   - Quit the DSKY simulator
 
 The behavior of this program should be identical to the behavior it
 will have when run on the Arduino Open DSKY hardware. The GPS and IMU
