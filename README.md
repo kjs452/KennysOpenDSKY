@@ -407,10 +407,11 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 |           |                                                    |
 |V36        | Fresh Start                                        |
 |           |                                                    |
-|V37 N00    | P00 enter idle mode (run major mode, instead of N00 use Nxx)  |
+|V37 N00    | P00 enter idle mode                                |
 |V37 N01    | P01 A11 Launch Simulation                          |
 |V37 N06    | P06 Simulates putting AGC into standby mode        |
 |V37 N11    | P11 Monitor IMU ACcel values                       |
+|V37 N42    | "blinky" - randomly illuminate caution and warning lights |
 |V37 N61    | P61 playback JFK i believe                         |
 |V37 N62    | P62 playback JFK We choose                         |
 |V37 N68    | P68 playback A8 Genesis                            |
@@ -590,7 +591,7 @@ The instruction mnemonics use these suffixes to indicate the addressing modes/ar
 + `_DIRECT` - Takes an 8-bit value which represents a RAM memory location
 + `_CDIRECT` - Takes an 8-bit address constant and adds it to the C register
                 to form the effective address. `C+<addr>`
-+ `_INDIRECT_C` - The C register contains the address to RAM. RAM[C]
++ `_INDIRECT_C` - The C register contains the address to RAM[C] or Program[C].
 + `_U`          - the instruction operates in the unsigned domain
 + `_OCT`        - the instruction operates using Octal radix instead of decimal
 
@@ -603,10 +604,6 @@ These are the types of arguments instructions can have:
 + `<imm32>` - A 32-bit value provided immediately in the Program byte code stream
 + `<addr>` - An 8-bit unsigned value which refers to a RAM location.
 + `<addr16>` - A 16-bit address to a Program[] location. Used for CALL and GOTO instructions.
-+ `<addrMin>` - An 8-bit unsigned value which refers to a RAM location. This RAM location
-              contains the minimum value in the range of values to be adjusted through.
-+ `<addrMax>` - An 8-bit unsigned value which refers to a RAM location. This RAM location
-              contains the maximum value in the range of values to be adjusted through.
 
 In the assembly syntax, arguments are seperated by whitspace. Do not use commas or other
 punctuation in the assembly code.
@@ -942,7 +939,7 @@ Done:
 
 ## Code Walk Through
 The main function is called `apollo_guidance_computer()`.
-The main data structure that is manipulated is the variable `Agc`
+The main data structure that is manipulated is the variable `Agc`.
 
 The `Agc` variable contains the DSKY state (both current and previous). It
 also contains the two CPU cores and the RAM area. Plus some additional flags.
@@ -1111,6 +1108,7 @@ might reflect light.
 
 ## Review of the Open DSKY Kit
 This section contains my thoughts on the Open DSKY kit.
+The specific product I ordered was the **DSKY Slim Kit**.
 
 Overall I loved it. It requires a lot of detail work for final assembly.
 However, this is a kit and as one of the creators says in a YouTube video:
@@ -1142,7 +1140,8 @@ little 3d-printed DSKY.
 
 The assembly instructions were a little sparse. But this increased my feeling of satisfaction
 when I successfully built the thing. How to perform final assembly was not well documented.
-Having said that, the instructables website was pretty good with lots of pictures of each step.
+Having said that, the [instructables](https://www.instructables.com/Open-Apollo-Guidance-Computer-DSKY)
+website was pretty good with lots of pictures of each step.
 The instructions became sparse when the assembly of the case was concerned. The kit offered
 several logical points to test the device before final soldering of all components. For example
 you could test the lamps early on. Then the button lights, then the 7-segment LEDs.
