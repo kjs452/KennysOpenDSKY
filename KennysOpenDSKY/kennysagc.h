@@ -65,7 +65,8 @@ enum ASM_SYMBOLS {
 	LBL_Query_Major_Mode = 856,    // LABEL
 	LBL_Query_IMU_1202 = 856,    // LABEL
 	LBL_Query_AudioClipPlaying = 856,    // LABEL
-	LBL_ASM_END = 856,    // LABEL
+	LBL_VERB_09 = 856,    // LABEL
+	LBL_ASM_END = 931,    // LABEL
 };
 
 static const uint8_t Program[] PROGMEM = {
@@ -797,6 +798,63 @@ static const uint8_t Program[] PROGMEM = {
     // }
     // Query_AudioClipPlaying:
     // {
+    // }
+    // VERB_09:
+    // {
+    // check noun
+        MOV_NOUN_A, 
+        DECODE_A_FROM_DEC, 
+        BRANCH_A_LT_IMM8, 0x01, 0x39 /* error=+57 */, 
+        BRANCH_A_GT_IMM8, 0x04, 0x36 /* error=+54 */, 
+        DEC_A, 
+        LSHIFT_A_IMM8, 0x01, 
+        LD_B_IMM16, 0x9B, 0x03 /* Add=923 */, 
+        ADD_A_B, 
+        ST_A_DIRECT, TMP3, 
+        BLINK_R1, 0x01, 
+        BLINK_R2, 0x01, 
+        LD_A_IMM32, 0xAA, 0xAA, 0xAA, 0x00, 
+        MOV_A_R1, 
+        MOV_A_R2, 
+        MOV_A_R3, 
+        INPUT_R1, 
+        BRANCH_A_LT_IMM8, 0x00, 0x1D /* error=+29 */, 
+        DECODE_A_FROM_DEC, 
+        ST_A_DIRECT, TMP1, 
+        BLINK_R1, 0x00, 
+        ENCODE_A_TO_DEC, 
+        MOV_A_R1, 
+        INPUT_R2, 
+        BRANCH_A_LT_IMM8, 0x00, 0x12 /* error=+18 */, 
+        DECODE_A_FROM_DEC, 
+        ST_A_DIRECT, TMP2, 
+        BLINK_R2, 0x00, 
+        ENCODE_A_TO_DEC, 
+        MOV_A_R2, 
+        LD_A_DIRECT, TMP1, 
+        LD_B_DIRECT, TMP2, 
+        LD_C_DIRECT, TMP3, 
+        CALL_CINDIRECT, 
+        ENCODE_A_TO_DEC, 
+        MOV_A_R3, 
+        BRANCH, 0x03 /* done=+3 */, 
+    // error:
+        BLINK_OPRERR, 0x01, 
+        RET, 
+    // done:
+        BRANCH, 0xFE /* done=-2 */, 
+    // Add:
+        ADD_A_B, 
+        RET, 
+    // Mul:
+        MUL_A_B, 
+        RET, 
+    // Div:
+        DIV_A_B, 
+        RET, 
+    // Mod:
+        MOD_A_B, 
+        RET, 
     // }
     // ASM_END:
 };

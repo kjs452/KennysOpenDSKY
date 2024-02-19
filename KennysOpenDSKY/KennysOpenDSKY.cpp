@@ -400,19 +400,6 @@ enum DSKY_STATE {
 	S_IO5,		// got 4th digit.
 	S_IO6,		// got 5th digit.
 	S_IOA,		// accept
-
-	S_IU1,		// input unsigned decimal number into register
-	S_IU2,		// got 1st digit.
-	S_IU3,		// got 2nd digit.
-	S_IU4,		// got 3rd digit.
-	S_IU5,		// got 4th digit.
-	S_IU6,		// got 5th digit.
-	S_IU7,		// accept
-
-	S_AR1,		// adjust decimal number +/- in register
-
-	S_AO1,		// adjust octal number +/- in register
-
 };
 
 //
@@ -660,18 +647,9 @@ enum AGC_INSTRUCTION
 	INPUT_R1,
 	INPUT_R2,
 	INPUT_R3,
-	INPUT_R1_U,			// unsigned
-	INPUT_R2_U,
-	INPUT_R3_U,
 	INPUT_R1_OCT,	// read an octal value from keyboard and put into R1	A=result 0=good key=bad
 	INPUT_R2_OCT,	// read an octal value from keyboard and put into R2	A=result 0=good key=bad
 	INPUT_R3_OCT,	// read an octal value from keyboard and put into R3	A=result 0=good key=bad
-	ADJUST_R1,				// <addr-min> <addr-max> use +/- keys to adjust value up and down.
-	ADJUST_R2,				// <addr-min> <addr-max>
-	ADJUST_R3,				// <addr-min> <addr-max>
-	ADJUST_R1_OCT,			// <addr-min> <addr-max> use +/- keys to adjust value up and down. octal
-	ADJUST_R2_OCT,			// <addr-min> <addr-max>
-	ADJUST_R3_OCT,			// <addr-min> <addr-max>
 	PROG8_A_INDIRECT_C,		// A = Program[C]		byte
 	PROG16_A_INDIRECT_C,	// A = Program[C]		short (little endian)
 	PROG32_A_INDIRECT_C,	// A = Program[C]		int (little endian)
@@ -904,18 +882,9 @@ static const char *Mnemonics[] = {
 	"INPUT_R1",
 	"INPUT_R2",
 	"INPUT_R3",
-	"INPUT_R1_U",			// unsigned
-	"INPUT_R2_U",
-	"INPUT_R3_U",
 	"INPUT_R1_OCT",	// read an octal value from keyboard and put into R1	A=result 0=good key=bad
 	"INPUT_R2_OCT",	// read an octal value from keyboard and put into R2	A=result 0=good key=bad
 	"INPUT_R3_OCT",	// read an octal value from keyboard and put into R3	A=result 0=good key=bad
-	"ADJUST_R1",				// <addr-min> <addr-max> use +/- keys to adjust value up and down.
-	"ADJUST_R2",				// <addr-min> <addr-max>
-	"ADJUST_R3",				// <addr-min> <addr-max>
-	"ADJUST_R1_OCT",			// <addr-min> <addr-max> use +/- keys to adjust value up and down. octal
-	"ADJUST_R2_OCT",			// <addr-min> <addr-max>
-	"ADJUST_R3_OCT",			// <addr-min> <addr-max>
 	"PROG8_A_INDIRECT_C",		// A = Program[C]		byte
 	"PROG16_A_INDIRECT_C",	// A = Program[C]		short (little endian)
 	"PROG32_A_INDIRECT_C",	// A = Program[C]		int (little endian)
@@ -1637,6 +1606,7 @@ static const DISPATCH_ENTRY Verbs[] PROGMEM = {
 	{ 0x16, LBL_VERB_16 },
 	{ 0x36, LBL_VERB_36 },
 	{ 0x69, LBL_VERB_69 },
+	{ 0x09, LBL_VERB_09 },
 };
 
 //
@@ -1665,10 +1635,7 @@ static const DISPATCH_ENTRY Verbs[] PROGMEM = {
 //	S_ST		<none>										main start state
 //	S_NI1		INPUT_NOUN									input noun
 //	S_IR1		INPUT_R1, INPUT_R2, INPUT_R3, 				input register (decimal)
-//	S_IU1		INPUT_R1_U, INPUT_R2_U, INPUT_R3_U			input register (unsigned decimal)
 //	S_IO1		INPUT_R1_OCT, INPUT_R2_OCT, INPUT_R3_OCT	input register (octal)
-//	S_AR1		ADJUST_R1, ADJUST_R2, ADJUST_R3				adjust register (decimal)
-//	S_AO1		ADJUST_R1_OCT, ADJUST_R2_OCT, ADJUST_R3_OCT	adjust register (octal)
 //	S_PR1		PROCEED_PROMPT								wait for PRO key press
 //
 
@@ -3604,18 +3571,6 @@ void agc_execute_cpu(uint8_t c)
 	case INPUT_R3:
 		reg1 = 2; op = S_IR1; goto input_reg1_op;
 
-	case INPUT_R1_U:
-		reg1 = 0; op = S_IU1; goto input_reg1_op;
-		break;
-
-	case INPUT_R2_U:
-		reg1 = 1; op = S_IU1; goto input_reg1_op;
-		break;
-
-	case INPUT_R3_U:
-		reg1 = 2; op = S_IU1; goto input_reg1_op;
-		break;
-
 	case INPUT_R1_OCT:
 		reg1 = 0; op = S_IO1; goto input_reg1_op;
 		break;
@@ -3626,30 +3581,6 @@ void agc_execute_cpu(uint8_t c)
 
 	case INPUT_R3_OCT:
 		reg1 = 2; op = S_IO1; goto input_reg1_op;
-		break;
-
-	case ADJUST_R1:
-		reg1 = 0; op = S_AR1; goto adjust_reg1_op;
-		break;
-
-	case ADJUST_R2:
-		reg1 = 1; op = S_AR1; goto adjust_reg1_op;
-		break;
-
-	case ADJUST_R3:
-		reg1 = 2; op = S_AR1; goto adjust_reg1_op;
-		break;
-
-	case ADJUST_R1_OCT:
-		reg1 = 0; op = S_AO1; goto adjust_reg1_op;
-		break;
-
-	case ADJUST_R2_OCT:
-		reg1 = 1; op = S_AO1; goto adjust_reg1_op;
-		break;
-
-	case ADJUST_R3_OCT:
-		reg1 = 2; op = S_AO1; goto adjust_reg1_op;
 		break;
 
 	case PROG8_A_INDIRECT_C:
@@ -3960,9 +3891,6 @@ input_reg1_op:
 	} else if( (cpu->flags & CPU_GOT_INPUT) != 0 ) {
 		cpu->flags &= ~(CPU_GOT_INPUT | CPU_NEED_INPUT);
 	}
-	goto done;
-
-adjust_reg1_op:
 	goto done;
 
 encode_a_to_decimal:
