@@ -1079,7 +1079,7 @@ as well as the ruler so that is wouldn't move.
 I cut in half the sticker that came with the Open DSKY kit. I retained the left hand side
 of the sticker for the caution and warning lights pane. But I threw away the right hand side.
 
-Using my laser printer I printed out `[screen_stuff.pdf](images/screen_stuff.pdf)`.
+Using my laser printer I printed out [`screen_stuff.pdf`](images/screen_stuff.pdf).
 
 ![alt text](images/sheet1.jpg "")
 
