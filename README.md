@@ -254,7 +254,8 @@ or (when debugging),
 ## Compiling for Windows/MacOS
 I don't know how to compile for these platforms. Make sure
 you have the ```ncurses``` library available. Make sure you have sigaction() available.
-Make sure you have getrandom(). The compilation should be pretty straight forward.
+Make sure you have getrandom(). Make sure your have python3. The compilation should
+be pretty straight forward.
 
 ## Running the Curses Simulator
 The **curses simulator** is a text based 'ncurses' application. You run
@@ -433,8 +434,8 @@ however contains a pre-compiled version of the assembly.
 The output is `filename.h`. This file contains the bytecodes in a `Program[]` array.
 This is the code that the virtual CPUs will be executing.
 
-If your target architecture is a big endian computer (for example a Solaris or IBM 
-big iron unix machine) you will need to switch the byte ordering to big endian.
+If your target architecture is a big endian computer (for example a Solaris or
+IBM/AIX unix machine) you will need to switch the byte ordering to big endian.
 The default is little endian. To enable big endian byte ordering use the `-b` command
 line option. **Little endian** is the appropriate byte ordering to use for
 Linux machines and Arduino.
@@ -640,15 +641,15 @@ Here are all the assembly instructions:
 | LD_A_DIRECT       | addr       | Load into the A register the contents of RAM at addr                 |
 | LD_B_DIRECT       | addr       | Load into the B register the contents of RAM at addr                 |
 | LD_C_DIRECT       | addr       | Load into the C register the contents of RAM at addr                 |
-| LD_A_IMM32        | imm32      | Load into the A register the immediate 32-bit value give by imm32    |
-| LD_B_IMM32        | imm32      | Load into the B register the immediate 32-bit value give by imm32    |
-| LD_C_IMM32        | imm32      | Load into the C register the immediate 32-bit value give by imm32    |
-| LD_A_IMM16        | imm16      | Load into the A register the immediate 16-bit value give by imm16    |
-| LD_B_IMM16        | imm16      | Load into the B register the immediate 16-bit value give by imm16    |
-| LD_C_IMM16        | imm16      | Load into the C register the immediate 16-bit value give by imm16    |
-| LD_A_IMM8         | imm8       | Load into the A register the immediate 8-bit value give by imm8      |
-| LD_B_IMM8         | imm8       | Load into the B register the immediate 8-bit value give by imm8      |
-| LD_C_IMM8         | imm8       | Load into the C register the immediate 8-bit value give by imm8      |
+| LD_A_IMM32        | imm32      | Load into the A register the immediate 32-bit value given by imm32    |
+| LD_B_IMM32        | imm32      | Load into the B register the immediate 32-bit value given by imm32    |
+| LD_C_IMM32        | imm32      | Load into the C register the immediate 32-bit value given by imm32    |
+| LD_A_IMM16        | imm16      | Load into the A register the immediate 16-bit value given by imm16    |
+| LD_B_IMM16        | imm16      | Load into the B register the immediate 16-bit value given by imm16    |
+| LD_C_IMM16        | imm16      | Load into the C register the immediate 16-bit value given by imm16    |
+| LD_A_IMM8         | imm8       | Load into the A register the immediate 8-bit value given by imm8      |
+| LD_B_IMM8         | imm8       | Load into the B register the immediate 8-bit value given by imm8      |
+| LD_C_IMM8         | imm8       | Load into the C register the immediate 8-bit value given by imm8      |
 | LD_A_CDIRECT      | addr       | Load A register with contents of RAM at address C+addr               |
 | LD_B_CDIRECT      | addr       | Load B register with contents of RAM at address C+addr               |
 | LD_A_INDIRECT_C   |            | Load A register with contents of RAM at address given by C           |
@@ -978,7 +979,7 @@ This function performs these steps:
    `agc_execute_cpu()` runs the CPU core for one instruction.
 4. Check the keyboard. If a keyboard character has been recieved then
     apply the new input to the state machine. `Agc.state` is the current state
-    the DKSY is in.
+    the DSKY is in.
 5. Check the timer bits to see if the 100ms timer has triggered. If it has then:
     + Handle blinking behavior for various DSKY elements that can be set to blink.
     + Handle the flickering of the COMP ACTY and UPLINK ACTY lights.
