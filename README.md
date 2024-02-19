@@ -254,7 +254,7 @@ or (when debugging),
 ## Compiling for Windows/MacOS
 I don't know how to compile for these platforms. Make sure
 you have the ```ncurses``` library available. Make sure you have sigaction() available.
-Make sure you have getrandom(). Make sure your have python3. The compilation should
+Make sure you have getrandom(). Make sure you have python3. The compilation should
 be pretty straight forward.
 
 ## Running the Curses Simulator
@@ -1062,9 +1062,9 @@ I used a metal ruler to maintain a straight line.
 ![alt text](images/gpm1.jpg "")
 
 After 10 to 12 cuts I broke
-the plastic along a straight edge of a table. The plastic broke cleanly along the
+the plastic along the straight edge of a table. The plastic broke cleanly along the
 line I had scored with the knife.
-I then used my utility knife to scrape the edge in order to fine tune the size.
+I fine tuned the size of the piece by shaving off plastic from the sides using the knife.
 
 ![alt text](images/gpm2.jpg "")
 
@@ -1079,7 +1079,7 @@ as well as the ruler so that is wouldn't move.
 I cut in half the sticker that came with the Open DSKY kit. I retained the left hand side
 of the sticker for the caution and warning lights pane. But I threw away the right hand side.
 
-Using my laser printer I printed out `screen_stuff.pdf`.
+Using my laser printer I printed out `[screen_stuff.pdf](images/screen_stuff.pdf)`.
 
 ![alt text](images/sheet1.jpg "")
 
