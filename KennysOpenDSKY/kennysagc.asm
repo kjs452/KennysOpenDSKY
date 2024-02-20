@@ -828,6 +828,8 @@ Query_AudioClipPlaying:
 
 VERB_09:
 {
+	EMPTY_STACK
+
 	// check noun
 	MOV_NOUN_A
 	DECODE_A_FROM_DEC
@@ -847,7 +849,6 @@ VERB_09:
 	MOV_A_R3
 
 	INPUT_R1
-
 	BRANCH_A_LT_IMM8	0		error
 	DECODE_A_FROM_DEC
 	ST_A_DIRECT		TMP1
@@ -875,8 +876,6 @@ VERB_09:
 
 error:
 	BLINK_OPRERR	1
-	RET
-
 done:
 	BRANCH done
 
@@ -888,6 +887,71 @@ Div:	DIV_A_B		// N03
 		RET
 Mod:	MOD_A_B		// N04
 		RET
+}
+
+// Decimal to Octal conversion N01
+// Octal to Decimal conversion N02
+//
+VERB_10:
+{
+		EMPTY_STACK
+		BLINK_R1		1
+		LD_A_IMM32		0xAAAAAA
+		MOV_A_R1
+		MOV_A_R2
+		MOV_A_R3
+
+		MOV_NOUN_A
+		DECODE_A_FROM_DEC
+		BRANCH_A_EQ_IMM8	1	DecimalToOctal
+		BRANCH_A_EQ_IMM8	2	OctalToDecimal
+		BRANCH				error
+
+DecimalToOctal:
+		INPUT_R1
+		BLINK_R1			0
+		BRANCH_A_LT_IMM8	0		error
+		DECODE_A_FROM_DEC
+		MOV_A_B
+		ENCODE_A_TO_DEC
+		MOV_A_R1
+		MOV_B_A
+
+		LD_C_IMM8			0
+		BRANCH_A_GT_IMM8	0		notneg	// check negative
+		NEG_A								// A = -A
+		LD_C_IMM8			1
+notneg:
+		ENCODE_A_TO_OCT
+
+		MOV_C_B
+		BRANCH_B_NE_IMM8	1		over
+		LD_B_IMM32			0x0fffff
+		AND_A_B
+		LD_B_IMM32			0xC00000
+		OR_A_B
+over:
+		MOV_A_R2
+		BRANCH				done
+
+OctalToDecimal:
+		INPUT_R1_OCT
+		BLINK_R1			0
+		BRANCH_A_LT_IMM8	0		error
+		DECODE_A_FROM_OCT
+		MOV_A_B
+		ENCODE_A_TO_OCT
+		MOV_A_R1
+		MOV_B_A
+		ENCODE_A_TO_DEC
+		MOV_A_R2
+		BRANCH				done
+
+error:
+		BLINK_OPRERR		1
+
+done:
+		BRANCH	done
 }
 
 ASM_END:

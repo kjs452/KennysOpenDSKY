@@ -66,7 +66,8 @@ enum ASM_SYMBOLS {
 	LBL_Query_IMU_1202 = 856,    // LABEL
 	LBL_Query_AudioClipPlaying = 856,    // LABEL
 	LBL_VERB_09 = 856,    // LABEL
-	LBL_ASM_END = 931,    // LABEL
+	LBL_VERB_10 = 931,    // LABEL
+	LBL_ASM_END = 1010,    // LABEL
 };
 
 static const uint8_t Program[] PROGMEM = {
@@ -801,6 +802,7 @@ static const uint8_t Program[] PROGMEM = {
     // }
     // VERB_09:
     // {
+        EMPTY_STACK, 
     // check noun
         MOV_NOUN_A, 
         DECODE_A_FROM_DEC, 
@@ -837,10 +839,9 @@ static const uint8_t Program[] PROGMEM = {
         CALL_CINDIRECT, 
         ENCODE_A_TO_DEC, 
         MOV_A_R3, 
-        BRANCH, 0x03 /* done=+3 */, 
+        BRANCH, 0x02 /* done=+2 */, 
     // error:
         BLINK_OPRERR, 0x01, 
-        RET, 
     // done:
         BRANCH, 0xFE /* done=-2 */, 
     // Add:
@@ -855,6 +856,63 @@ static const uint8_t Program[] PROGMEM = {
     // Mod:
         MOD_A_B, 
         RET, 
+    // }
+    // Decimal to Octal conversion N01
+    // Octal to Decimal conversion N02
+    //
+    // VERB_10:
+    // {
+        EMPTY_STACK, 
+        BLINK_R1, 0x01, 
+        LD_A_IMM32, 0xAA, 0xAA, 0xAA, 0x00, 
+        MOV_A_R1, 
+        MOV_A_R2, 
+        MOV_A_R3, 
+        MOV_NOUN_A, 
+        DECODE_A_FROM_DEC, 
+        BRANCH_A_EQ_IMM8, 0x01, 0x05 /* DecimalToOctal=+5 */, 
+        BRANCH_A_EQ_IMM8, 0x02, 0x29 /* OctalToDecimal=+41 */, 
+        BRANCH, 0x36 /* error=+54 */, 
+    // DecimalToOctal:
+        INPUT_R1, 
+        BLINK_R1, 0x00, 
+        BRANCH_A_LT_IMM8, 0x00, 0x30 /* error=+48 */, 
+        DECODE_A_FROM_DEC, 
+        MOV_A_B, 
+        ENCODE_A_TO_DEC, 
+        MOV_A_R1, 
+        MOV_B_A, 
+        LD_C_IMM8, 0x00, 
+        BRANCH_A_GT_IMM8, 0x00, 0x03 /* notneg=+3 */, 
+        NEG_A, 
+        LD_C_IMM8, 0x01, 
+    // notneg:
+        ENCODE_A_TO_OCT, 
+        MOV_C_B, 
+        BRANCH_B_NE_IMM8, 0x01, 0x0C /* over=+12 */, 
+        LD_B_IMM32, 0xFF, 0xFF, 0x0F, 0x00, 
+        AND_A_B, 
+        LD_B_IMM32, 0x00, 0x00, 0xC0, 0x00, 
+        OR_A_B, 
+    // over:
+        MOV_A_R2, 
+        BRANCH, 0x11 /* done=+17 */, 
+    // OctalToDecimal:
+        INPUT_R1_OCT, 
+        BLINK_R1, 0x00, 
+        BRANCH_A_LT_IMM8, 0x00, 0x09 /* error=+9 */, 
+        DECODE_A_FROM_OCT, 
+        MOV_A_B, 
+        ENCODE_A_TO_OCT, 
+        MOV_A_R1, 
+        MOV_B_A, 
+        ENCODE_A_TO_DEC, 
+        MOV_A_R2, 
+        BRANCH, 0x02 /* done=+2 */, 
+    // error:
+        BLINK_OPRERR, 0x01, 
+    // done:
+        BRANCH, 0xFE /* done=-2 */, 
     // }
     // ASM_END:
 };

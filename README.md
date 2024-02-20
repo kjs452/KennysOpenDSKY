@@ -334,7 +334,8 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 | VERB | Description                                        |
 |------|----------------------------------------------------|
 | V06  | Display Selected Value                             |
-| V09  | Calculate                                          |
+| V09  | Calculate (Perform Math operation)                 |
+| V10  | Convert Radix                                      |
 | V16  | Monitor Selected Values                            |
 | V21  | Enter value (R1 only)                              |
 | V22  | Enter value (R2 only)                              |
@@ -354,13 +355,25 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 | N19  | RTC DATE, TIME, IMU TEMP                           |
 | N31  | Time from AGC initialization                       |
 | N32  | Time from Perigee                                  |
+| N34  | Timer count from event (HH, MM, SS.01)             |
+| N35  | Timer count to Event (HH, MM, SS.01)               |
+| N36  | RTC Time (HH, MM, SS.01)                           |
+| N37  | RTC Date (YYYY, MM, DD)                            |
+| N38  | GPS Time (HH, MM, SS.01)                           |
+| N39  | GPS Date (YYYY, MM, SS.01)                         |
+| N43  | GPS Longitude, Latutude (DD, MM  SS.01)            |
+| N44  | Orbital Parameters (Apocenter, Pericenter, time to free fall) |
+| N65  | MET (HH, MM, SS.01)                                |
+| N68  | Lunar Powered Decent                               |
+| N87  | IMU Accel values with random 1202 errors           |
+| N98  | Audio Track and Index Adj (TTTTT, NNNNN)           |
 
 ### Verb-Nouns
 | VERB-NOUN | Description                                        |
 |-----------|----------------------------------------------------|
 |V06 N17    | Display IMU linear accel values                    |
 |V06 N18    | Display IMU gyro accel values                      |
-|V16 N19    | Display RTC Date/Time and IMU temp                 |
+|V06 N19    | Display RTC Date/Time and IMU temp                 |
 |V06 N31    | Display time from AGC Init                         |
 |V06 N32    | display time to perigee                            |
 |V06 N36    | Display RTC time                                   |
@@ -369,10 +382,13 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 |V06 N38    | Display GPS time                                   |
 |V06 N39    | Display GPS date                                   |
 |           |                                                    |
-|V09 N01    | Add celestial zeta angles R3 = R1+R2               |
-|V09 N02    | Multiply Einstein gravitational cofactors R3 = R1*R2 |
-|V09 N03    | Divide Feynman croc scalars R3 = R1/R2             |
+|V09 N01    | Add stellar zeta angles. R3 = R1+R2                |
+|V09 N02    | Multiply Einstein gravitational cofactors. R3 = R1*R2 |
+|V09 N03    | Divide Feynman croc scalars. R3 = R1/R2            |
 |V09 N04    | Remainder R3 = R1 % R2                             |
+|           |                                                    |
+|V10 N01    | Decimal to octal conversion. R2 = Octal(R1)        |
+|V10 N02    | Octal to decimal conversion. R2 = Decimal(R1)      |
 |           |                                                    |
 |V16 N17    | Monitor IMU linear accel values                    |
 |V16 N18    | Monitor IMU Gyro accel values                      |
@@ -1035,7 +1051,7 @@ static const DISPATCH_ENTRY Verbs[] PROGMEM = {
 };
 ```
 
-To add a new verb add a new entry to this table. The identifier `LBL_VERB_03` is created
+To add a new verb, add a new entry to this table. The identifier `LBL_VERB_03` is created
 from the assembly files: `kennysagc.asm` and `kennysagc.h`. In this table you provide
 the BCD encoded verb number and the starting location for the VERB code.
 

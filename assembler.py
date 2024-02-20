@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 #
-# Kenny's OpenDSKY Apollo Guidance Computer Assembler
+# Kenny's Open DSKY Apollo Guidance Computer Assembler
 #
 # The assembler syntax is pretty simple:
 #
-# DEFINE STUFF 5		// ram direct address
+# DEFINE STUFF = 5		// ram direct address
 # label:
 # {
 #		MOVE_R1_A			// comment
@@ -17,8 +17,12 @@
 # }
 #
 # Directives:
-#		DATA8	1 2 3				// encode byte values into the Program[] array
-#		DATA16	34000 2000 -9000	// encode 16-bit values into the Program[] array
+#		DATA8	1					// encode byte values into the Program[] array
+#		DATA8	-20					// encode byte values into the Program[] array
+#		DATA8	3					// encode byte values into the Program[] array
+#		DATA16	34000				// encode 16-bit values into the Program[] array
+#		DATA16	-9000				// encode 16-bit values into the Program[] array
+#		DATA16	0x1f34				// encode 16-bit values into the Program[] array
 #
 # Labels:
 #
@@ -1060,7 +1064,7 @@ def main():
 		usage("Unable to open output file %s" % (outfilename))
 		sys.exit(1)
 
-	sys.stdout.write("Kenny's OpenDSKY Apollo Guidance Computer Assembler\n")
+	sys.stdout.write("Kenny's Open DSKY Apollo Guidance Computer Assembler\n")
 	if ENDIAN == 'BIG':
 		sys.stdout.write("Big-endian encoding will be used.\n")
 	else:
