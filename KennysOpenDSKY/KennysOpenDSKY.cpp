@@ -114,7 +114,7 @@ static uint8_t TIMSK1;
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <LedControl.h>
-#include <TinyGPS++.h>
+//#include <TinyGPS++.h>
 #include <Wire.h>
 #include <stdint.h>
 #include <EEPROM.h>
@@ -1705,7 +1705,7 @@ const uint16_t accdbm[12] PROGMEM = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 27
 static APOLLO_GUIDANCE_COMPUTER Agc;
 static Adafruit_NeoPixel neoPixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 static LedControl ledControl = LedControl(12, 10, 11, 4);
-static TinyGPSPlus gps;
+//static TinyGPSPlus gps;
 static uint8_t audioTrack;
 
 #ifdef CURSES_SIMULATOR
@@ -2742,16 +2742,16 @@ uint32_t timestamp_diff(uint8_t addr1, uint8_t addr2)
 	diff = diff % 60;
 	seconds = diff;
 
-	result = (hours / 100) << 24;
+	result = (uint32_t)(hours / 100) << 24;
 	hours = hours % 100;
 	result |= (uint32_t)(hours / 10) << 20;
 	result |= (uint32_t)(hours % 10) << 16;
 
-	result |= (uint16_t)((minutes / 10) << 12);
-	result |= (uint16_t)((minutes % 10) << 8);
+	result |= (uint16_t)(minutes / 10) << 12;
+	result |= (uint16_t)(minutes % 10) << 8;
 
-	result |= ((seconds / 10) << 4);
-	result |= ((seconds % 10) << 0);
+	result |= (seconds / 10) << 4;
+	result |= (seconds % 10) << 0;
 
 	if( neg ) {
 		result |= 0xC0000000;
