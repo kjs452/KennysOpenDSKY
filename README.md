@@ -106,6 +106,7 @@ Open DSKY hardware. However, I derived many ideas and code from these sources:
 + **Curses Simulator** - test and develop your code on your computer before uploading it to the Arduino.
 + Better keyboard debounce logic.
 + Allows for easy modifications to add custom apps to the DSKY.
++ Strives to have minimal dependencies on Arduino libraries.
 
 ## Files
 The main source code is in `KennysOpenDSKY.cpp` and `kennysagc.asm`.
@@ -284,6 +285,9 @@ The keys map to your keyboard thusly. Only lower case keys are accepted.
 + `r`   - RSET (Reset)
 + `q`   - Quit the DSKY simulator
 
+The simulated keyboard at the bottom will **highlight** the most recent key
+that was pressed by the user.
+
 The behavior of this program should be identical to the behavior it
 will have when run on the Arduino Open DSKY hardware. The GPS and IMU
 devices are simulated with *fake* data. The MP3 player only shows audio
@@ -303,6 +307,7 @@ It is used for debugging purposes. Also contains the memory sizes of some data s
 ### Persistent Data
 The file `./persist.txt` contains a simulated EEPROM storage and simulated RTC clock RAM.
 This allows the **curses simulator** to retain information between runs of the program.
+When this file does not exist then these memory areas are initialized to `0xFF`.
 
 ## DSKY Usage
 This section describes the general usage of the DSKY. The interface was modeled
@@ -318,7 +323,7 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 + **OPR ERR** - When **OPR ERR** light is blinking then the user should press **RSET** to reset
     this.
 
-+ You cannot launch a program using the **PRO** key. Instead you must enter `V37` `ENTR` and
++ You *cannot* launch a program using the **PRO** key. Instead you must enter `V37` `ENTR` and
     then type in a two digit program number which appears in the noun field. Then `ENTR` again
     to launch the program.
 
@@ -326,6 +331,8 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 
 + When octal input is expected, neither the `+` or `-` sign is allowed.
 	Only the digits `0` - `7` will be accepted.
+
++ Pressing **RSET** will clear all the caution and warning lights (except KEY REL).
 
 ### VERBs, NOUNs, and PROGRAMs
 This section documents the available VERB/NOUN combinations and the PROGRAM's.
@@ -1066,6 +1073,10 @@ To add a new program edit, `kennysagc.asm` and modify the subroutine `VERB_37`.
 In there is a table of program labeled `Programs` which you can extend.
 Now write your code as a seperate subroutine. This program can now be invoked
 by entering the correct `V37 Nxx` command.
+
+Programs run in **cpu core 0** concurrently with whatever is running in **cpu core 1**.
+**cpu core 1** runs the user entered VERBs/NOUNs. This allows for the running of two seperate
+"jobs"; one program in **cpu 0** and another program in **cpu 1**.
 
 ## Green Acrylic Modification
 This section describes my modification to the Open DSKY. I decided
