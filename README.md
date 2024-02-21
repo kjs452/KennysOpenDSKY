@@ -114,17 +114,17 @@ The main source code is in `KennysOpenDSKY.cpp` and `kennysagc.asm`.
 + `kennysagc.asm` - the assembly code for the verb/noun/prog programs.
 + `kennysagc.h` - the assembled code. produced by running `assembler.py`.
 + `KennysOpenDSKY.ino` - an empty file to satisfy the Arduino CLI sketch requirements.
-+ `KennysOpenDSKY.dump` - a dump of the AVR nano assembly code for the Arduino version
++ `KennysOpenDSKY.dump` - a dump of the AVR nano assembly code for the Arduino version.
 + `assembler.py` - Python 3 program which assembles the assembly code into byte codes.
 + `Makefile` - A simple makefile to compile on Linux and also compile/upload the
         sketch using the Arduino CLI tools.
-+ `dsky` - The **curses simulator** executable produced on linux
++ `dsky` - The **curses simulator** executable produced on linux.
 + `dsky_debug` - The **curses simulator** executable produced on linux with debugging symbols (-g).
 + `log.txt` - a log file for debugging when running the **curses simulator**.
 + `persist.txt` - emulates the EEPROM and RTC RAM area when using the **curses simulator**.
 + `audio` - directory containing the SD card audio files for the MP3 player.
 + `images` - directory containing images used for documentation purposes. Also contains a
-    `pdf` and `pages` document for use with the **Green Acrylic** modification.
+    `pdf` and `pages` document for use with the [**Green Acrylic Modification**](#green-acrylic-modification).
 
 ## Memory Usage
 The current build uses the following memory on the Arduino:
@@ -148,7 +148,7 @@ arduino:avr   1.8.6   /M/kjs/ARDUINO/.arduino15/packages/arduino/hardware/avr/1.
 
 ## Dependencies
 ### Arduino
-This section describes the third party libraries needed to compile
+This section describes the third party libraries and components needed to compile
 the sketch for Arduino.
 
 + **Wire** - standard arduino library. I2C communications.
@@ -1136,7 +1136,7 @@ Final assembly required me to use a dremel grinding tool to carve out plastic
 from the back in order to ensure the front cover fits snuggly onto the cicruit board.
 
 I didn't like the "sticker" which you use to cover over the beautiful 7-segment LED's, so I
-customized my device (See the section [Green Acrylic Modification](#green-acrylic-modification)).
+customized my device (see the section [Green Acrylic Modification](#green-acrylic-modification)).
 
 The electronics and provided circuit board were excellent. All the parts were well labeled.
 This kit makes for a great platform to play with the Arduino and program different devices:
