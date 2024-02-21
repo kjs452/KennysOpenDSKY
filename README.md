@@ -94,6 +94,9 @@ Open DSKY hardware. However, I derived many ideas and code from these sources:
     youtube video: <https://www.youtube.com/watch?v=zMDSz0iKxIs&t=1726s>
     This is an improvement over Scott Pavlovec's keyboard reading code.
 
++ **Ron Diamond** for his GPS reading code which removes the dependency on *TinyGPS++*.
+	<https://github.com/rondiamond/OpenDSKY>
+
 ## Features
 + A virtual machine and byte code interpreter.
 + Two threads of control: One thread is a background task, which
@@ -129,15 +132,14 @@ The current build uses the following memory on the Arduino:
 ```text
 $ make sketch
 arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
-Sketch uses 22292 bytes (72%) of program storage space. Maximum is 30720 bytes.
-Global variables use 1288 bytes (62%) of dynamic memory, leaving 760 bytes for local variables.
+Sketch uses 22122 bytes (72%) of program storage space. Maximum is 30720 bytes.
+Global variables use 1115 bytes (54%) of dynamic memory, leaving 933 bytes for local variables.
 Maximum is 2048 bytes.
 
 Used library      Version Path                                                                          
-Adafruit NeoPixel 1.12.0  /M/kjs/ARDUINO/Arduino/libraries/Adafruit_NeoPixel                            
-LedControl        1.0.6   /M/kjs/ARDUINO/Arduino/libraries/LedControl                                   
-TinyGPSPlus       1.0.3   /M/kjs/ARDUINO/Arduino/libraries/TinyGPSPlus                                  
-Wire              1.0     /M/kjs/ARDUINO/.arduino15/packages/arduino/hardware/avr/1.8.6/libraries/Wire  
+Adafruit NeoPixel 1.12.0  /M/kjs/ARDUINO/Arduino/libraries/Adafruit_NeoPixel
+LedControl        1.0.6   /M/kjs/ARDUINO/Arduino/libraries/LedControl
+Wire              1.0     /M/kjs/ARDUINO/.arduino15/packages/arduino/hardware/avr/1.8.6/libraries/Wire
 EEPROM            2.0     /M/kjs/ARDUINO/.arduino15/packages/arduino/hardware/avr/1.8.6/libraries/EEPROM
 
 Used platform Version Path                                                         
@@ -153,7 +155,6 @@ the sketch for Arduino.
 + **EEPROM** - standard arduino library for reading/writing the 2K eeprom memory.
 + **Adafruit NeoPixel** - library used to illuminate the neo pixels.
 + **LedControl** - library used to talk to 7-segment LEDs.
-+ **TinyGPS++** - library to read the GPS device and parse its output.
 + **Arduino CLI tools for linux** - I don't use the Arduino IDE. I use `arduino-cli` tool.
 + **python3** - this is needed to run `assembler.py`. The assembler is a simple text only
         python program which should work on most python installations.

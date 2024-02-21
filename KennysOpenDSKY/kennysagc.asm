@@ -15,9 +15,19 @@ DEFINE	TS1 = 12		// generic timestamp vairable 12 and 13.
 
 DEFINE	PROG_TMP1 = 14
 
-MAIN:
+// main for cpu 0
+MAIN_CPU0:
 {
-	BRANCH MAIN
+	RTC_TIMESTAMP_DIRECT	AGCINIT		// reset the "time since AGC power up"
+	// fall thru to MAIN_CPU1
+}
+
+// main for cpu 1	(cpu 0 comes here VERB_36)
+MAIN_CPU1:
+{
+	EMPTY_STACK
+loop:
+	BRANCH loop
 }
 
 //
@@ -296,6 +306,8 @@ VERB_05:
 {
 	EMPTY_STACK
 	LD_A_IMM32	0xAAAA0000		// cause the prev_verb and prev_noun to be cleared on return
+	LD_B_IMM16 MAIN_CPU1
+	OR_A_B
 	PUSH_A
 
 	LD_A_IMM32	0x00AAAAAA		// clear register fields
@@ -311,6 +323,8 @@ VERB_05:
 //
 VERB_36:
 {
+	LD_A_IMM8	MAIN_CPU1
+	RUN_PROG_A
 	EMPTY_STACK
 	LD_A_IMM32			0xAAAAAA
 	MOV_A_R1
@@ -396,7 +410,7 @@ doleds:
 VERB_69:
 {
 	RTC_TIMESTAMP_DIRECT	AGCINIT		// reset the "time since AGC power up"
-	CALL	VERB_36
+	CALL		VERB_36
 }
 
 PROG_00:

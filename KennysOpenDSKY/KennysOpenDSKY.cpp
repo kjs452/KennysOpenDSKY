@@ -32,7 +32,7 @@
 //	SECTION 5: 'Adafruit_NeoPixel' Mock
 //	SECTION 6: 'LedControl' Mock
 //	SECTION 7: 'Wire' and 'Serial' Mock
-//	SECTION 8: 'TinyGPSPlus' Mock
+//	SECTION 8: DELETED
 //	SECTION 9: MP3 Player Curses Routines
 //	SECTION 10: 'EEPROM' Mock
 //	SECTION 11: 'Random()' Mock Routines
@@ -114,7 +114,6 @@ static uint8_t TIMSK1;
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 #include <LedControl.h>
-//#include <TinyGPS++.h>
 #include <Wire.h>
 #include <stdint.h>
 #include <EEPROM.h>
@@ -1418,15 +1417,8 @@ static TwoWire Wire;		// Mock Wire object
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 8: 'TinyGPSPlus' Mock
+// SECTION 8: DELETED
 //
-#ifdef CURSES_SIMULATOR
-class TinyGPSPlus
-{
-public:
-
-};
-#endif
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1705,7 +1697,6 @@ const uint16_t accdbm[12] PROGMEM = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 27
 static APOLLO_GUIDANCE_COMPUTER Agc;
 static Adafruit_NeoPixel neoPixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 static LedControl ledControl = LedControl(12, 10, 11, 4);
-//static TinyGPSPlus gps;
 static uint8_t audioTrack;
 
 #ifdef CURSES_SIMULATOR
@@ -2518,7 +2509,7 @@ void agc_cpu_init(int c, CPU *cpu)
 {
 	memset(cpu, 0, sizeof(CPU));
 	cpu->SP = (c==0) ? CPU0_STACK : CPU1_STACK;		// each cpu has uses a different area in RAM for their stack
-	cpu->flags = 0;
+	cpu->PC = (c==0) ? LBL_MAIN_CPU0 : LBL_MAIN_CPU1;
 }
 
 static
@@ -2724,8 +2715,8 @@ uint32_t timestamp_diff(uint8_t addr1, uint8_t addr2)
 	s1 = ((tm1 & 0xf0) >> 4) * 10 + ((tm1 & 0x0f) >> 0);
 	s2 = ((tm2 & 0xf0) >> 4) * 10 + ((tm2 & 0x0f) >> 0);
 
-	totsec1 = d1*24*3600 + h1*3600 + m1*60 + s1;
-	totsec2 = d2*24*3600 + h2*3600 + m2*60 + s2;
+	totsec1 = (uint32_t)d1*24*3600 + (uint32_t)h1*3600 + m1*60 + s1;
+	totsec2 = (uint32_t)d2*24*3600 + (uint32_t)h2*3600 + m2*60 + s2;
 
 	diff = totsec2 - totsec1;
 
@@ -3441,16 +3432,17 @@ void agc_execute_cpu(uint8_t c)
 		Wire.write(0x00);
 		Wire.endTransmission(true);
 		Wire.requestFrom(RTC_ADDR, 7 , true);
-		tmp = Wire.read() & 0x7f;		// ss (exclude CH bit)
-		tmp |= (Wire.read() << 8);		// mm
-		tmp |= (Wire.read() << 16);		// hh
+		tmp = Wire.read() & 0x7f;				// ss (exclude CH bit)
+		tmp |= (uint16_t)Wire.read() << 8;		// mm
+		tmp |= (uint32_t)Wire.read() << 16;		// hh
 		Agc.RAM[op+1] = tmp;
-		Wire.read();					// dow
-		tmp = Wire.read();				// day
-		tmp |= (Wire.read() << 8);		// month
-		tmp |= (Wire.read() << 16);		// year
+
+		Wire.read();							// dow
+		tmp = Wire.read();						// day
+		tmp |= (uint16_t)Wire.read() << 8;		// month
+		tmp |= (uint32_t)Wire.read() << 16;		// year
 		Agc.RAM[op+0] = tmp;
-		goto done;
+		break;
 
 	case RTC_DAY_A:
 		op = 0x04; goto rtc_op_a;
