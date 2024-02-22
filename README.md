@@ -339,7 +339,9 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 
 ### Status (updated 2/22/2024)
 Not all verb/nouns in the list are implemented yet. This is my list of
-what I wish to implenent eventually.
+what I wish to implement eventually. These items come from the
+**Apollo 50th Anniversary** project. I will update this section as
+I finish items.
 
 The footnote **[1]** indicates items which have not been implemented yet.
 
@@ -353,7 +355,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 | V01  | test verb incrmeenting/decrementing values         |
 | V02  | test verb. enter R2 in decimal                     |
 | V03  | test verb. enter R3 in octal                       |
-| V03  | test verb                                          |
+| V04  | test verb. display some simple values              |
 | V05  | clears DSKY, end verb, cleans stack                |
 | V06  | Display Selected Value[^1]                         |
 | V09  | Calculate (Perform Math operation)                 |
