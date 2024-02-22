@@ -32,13 +32,13 @@
 //	SECTION 5: 'Adafruit_NeoPixel' Mock
 //	SECTION 6: 'LedControl' Mock
 //	SECTION 7: 'Wire' and 'Serial' Mock
-//	SECTION 8: DELETED
-//	SECTION 9: MP3 Player Curses Routines
-//	SECTION 10: 'EEPROM' Mock
-//	SECTION 11: 'Random()' Mock Routines
-//	SECTION 12: Globals Variables (Read-Only & Read/Write)
-//	  SUB-SECTION 12a: Read-Only globals (constants in PROGMEM)
-//	  SUB-SECTION 12b: Read-Write globals (variables in RAM)
+//	SECTION 8: MP3 Player Curses Routines
+//	SECTION 9: 'EEPROM' Mock
+//	SECTION 10: 'Random()' Mock Routines
+//	SECTION 11: Globals Variables (Read-Only & Read/Write)
+//	  SUB-SECTION 11a: Read-Only globals (constants in PROGMEM)
+//	  SUB-SECTION 11b: Read-Write globals (variables in RAM)
+//	SECTION 12: load/store mock RTC RAM and mock EEPROM data
 //	SECTION 13: Curses window start/end
 //	SECTION 14: DSKY redraw routines (arduino and curses)
 //	SECTION 15: Keyboard reading (arduino and curses)
@@ -46,7 +46,6 @@
 //	SECTION 17: Signal/ISR for Timing control (arduino and curses)
 //	SECTION 18: Sketch setup() routine
 //	SECTION 19: Sketch loop() routine
-//	SECTION 20: load/store mock RTC RAM and mock EEPROM data
 //	SECTION 21: MAIN() - calls setup() and loop()
 //
 // NOTES:
@@ -1417,12 +1416,7 @@ static TwoWire Wire;		// Mock Wire object
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 8: DELETED
-//
-
-//////////////////////////////////////////////////////////////////////
-//
-// SECTION 9: MP3 Player Curses Routines
+// SECTION 8: MP3 Player Curses Routines
 //
 // These routines render the audio track being played on
 // the bottom line of the curses window.
@@ -1504,7 +1498,7 @@ static void mp3_play(uint8_t track_number)
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 10: 'EEPROM' Mock
+// SECTION 9: 'EEPROM' Mock
 //
 #ifdef CURSES_SIMULATOR
 class EEPROMClass
@@ -1548,7 +1542,7 @@ static EEPROMClass EEPROM;	// Mock EEPROM object
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 11: 'Random()' Mock Routines
+// SECTION 10: 'Random()' Mock Routines
 //
 #ifdef CURSES_SIMULATOR
 static void randomSeed(uint8_t seed)
@@ -1566,13 +1560,13 @@ static uint32_t random(uint32_t val)
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 12: Globals Variables (Read-Only & Read/Write)
+// SECTION 11: Globals Variables (Read-Only & Read/Write)
 //
 //////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////
 //
-// SUB-SECTION 12a: Read-Only globals (constants in PROGMEM)
+// SUB-SECTION 11a: Read-Only globals (constants in PROGMEM)
 //
 
 //
@@ -1692,12 +1686,175 @@ const uint16_t accdbm[12] PROGMEM = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 27
 
 //////////////////////////////////////////////////////////////////////
 //
-// SUB-SECTION 12b: Read-Write globals (variables in RAM)
+// SUB-SECTION 11b: Read-Write globals (variables in RAM)
 //
 static APOLLO_GUIDANCE_COMPUTER Agc;
 static Adafruit_NeoPixel neoPixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 static LedControl ledControl = LedControl(12, 10, 11, 4);
 static uint8_t audioTrack;
+
+#ifdef CURSES_SIMULATOR
+//////////////////////////////////////////////////////////////////////
+//
+// SECTION 12: load/store mock RTC RAM and mock EEPROM data
+//
+//	The file to be read/written is: "./persist.txt"
+//	If the file doesn't exist then initialize persistent storage with 0xFF bytes.
+//
+
+static
+void read_persistent_storage()
+{
+	FILE *fp;
+	char line[200];
+	int b;		// byte value being composed
+	int d;		// current digit index being processed (0 or 1).
+	int digit;	// the digit being processed as a 4 bit value
+	int lineno;
+	char *p;
+	int absolute_address;
+	int i;
+
+	fp = fopen("./persist.txt", "r");
+	if( fp == NULL )
+	{
+		fprintf(logfp, "Unable to open ./persist.txt for reading (%s)\n", strerror(errno) );
+		fprintf(logfp, "populating RTC RAM and EEPROM with 0xFF\n");
+
+		//
+		// When the file doesn't exist initialize the two persistent storage areas with 0xFF.
+		//
+		for(i=0; i < 56; i++)
+		{
+			Wire.set_rtc_ram(i, 0xFF);
+		}
+
+		for(i=0; i < 2048; i++)
+		{
+			EEPROM.write(i, 0xFF);
+		}
+		return;
+	}
+
+	absolute_address = 0;
+	lineno = 0;
+	while( ! feof(fp) )
+	{
+		p = fgets(line, sizeof(line), fp);
+		if( p == NULL )		// EOF
+			break;
+
+		lineno += 1;
+
+		if( line[0] == ';' )		// skip comments
+			continue;
+
+		if( line[0] == '\n' )		// skip blank lines
+			continue;
+
+		d = 0;
+		b = 0;
+		p = line;
+		while( *p != '\n' ) {
+			if( *p >= '0' && *p <= '9' ) {
+				digit = *p - '0';
+			} else if( *p >= 'A' && *p <= 'F' ) {
+				digit = *p - 'A' + 10;
+			} else {
+				fprintf(logfp, "Parsing error line %d, expecting hex digit but got %d\n", lineno, *p);
+				fclose(fp);
+				return;
+			}
+
+			b = b*16 + digit;
+
+			d += 1;
+			p++;
+			if( d <= 1 )
+				continue;		// get 2nd nibble of hex byte
+
+			d = 0;
+
+			// got byte in 'b', now store it:
+
+			if( absolute_address < 56 ) {
+				Wire.set_rtc_ram(absolute_address, b);
+			} else if( absolute_address < 56 + 2048 ) {
+				EEPROM.update(absolute_address - 56, b);
+			} else {
+				fprintf(logfp, "reading persistent storage: Line %d, invalid address %04x (%02x)\n",
+							lineno, absolute_address, b);
+				fclose(fp);
+				return;
+			}
+
+			absolute_address += 1;
+			b = 0;
+
+			if( *p == ' ' ) {
+				p++;
+			} else if( *p == '\n' ) {
+				// no action
+			} else {
+				fprintf(logfp, "Parsing error line %d, expecting space or newline, got %d\n", lineno, *p);
+				fclose(fp);
+				return;
+			}
+		}
+	}
+
+	fclose(fp);
+}
+
+//
+// Write the contents of the mock real-time clock data and EEPROM to disk.
+//
+static
+void write_persistent_storage()
+{
+	FILE *fp;
+	int i, col;
+	uint8_t b;
+
+	fp = fopen("./persist.txt", "w");
+	if( fp == NULL )
+	{
+		fprintf(logfp, "Unable to open ./persist.txt for writing (%s)\n", strerror(errno) );
+		return;
+	}
+
+	// Write Real Time Clock RAM
+	fprintf(fp, "; Real Time Clock RAM 0x08 - 0x3F\n");
+
+	col = 0;
+	for(i=0; i < 56; i++)
+	{
+		b = Wire.get_rtc_ram(i);
+		fprintf(fp, "%02X ", b);
+		col++;
+		if( col == 16 ) {
+			col = 0;
+			fprintf(fp, "\n");
+		}
+	}
+	fprintf(fp, "\n");
+
+	fprintf(fp, "; EEPROM 0x000 - 0x3ff\n");
+	col = 0;
+	for(i=0; i < 2048; i++)
+	{
+		b = EEPROM.read(i);
+		fprintf(fp, "%02X ", b);
+		col++;
+		if( col == 16 ) {
+			col = 0;
+			fprintf(fp, "\n");
+		}
+	}
+
+	fclose(fp);
+}
+#endif
 
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
@@ -2479,7 +2636,7 @@ int8_t sampleKeyboard()
 static
 int8_t readKeyboard()
 {
-	static int8_t s0, s1;
+	int8_t s0, s1;
 
 	s0 = sampleKeyboard();
 	if( s0 == ERR ) {
@@ -4635,170 +4792,7 @@ void loop()
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 20: load/store mock RTC RAM and mock EEPROM data
-//
-//	The file to be read/written is: "./persist.txt"
-//	If the file doesn't exist then initialize persistent storage with 0xFF bytes.
-//
-
-static
-void read_persistent_storage()
-{
-	FILE *fp;
-	char line[200];
-	int b;		// byte value being composed
-	int d;		// current digit index being processed (0 or 1).
-	int digit;	// the digit being processed as a 4 bit value
-	int lineno;
-	char *p;
-	int absolute_address;
-	int i;
-
-	fp = fopen("./persist.txt", "r");
-	if( fp == NULL )
-	{
-		fprintf(logfp, "Unable to open ./persist.txt for reading (%s)\n", strerror(errno) );
-		fprintf(logfp, "populating RTC RAM and EEPROM with 0xFF\n");
-
-		//
-		// When the file doesn't exist initialize the two persistent storage areas with 0xFF.
-		//
-		for(i=0; i < 56; i++)
-		{
-			Wire.set_rtc_ram(i, 0xFF);
-		}
-
-		for(i=0; i < 2048; i++)
-		{
-			EEPROM.write(i, 0xFF);
-		}
-		return;
-	}
-
-	absolute_address = 0;
-	lineno = 0;
-	while( ! feof(fp) )
-	{
-		p = fgets(line, sizeof(line), fp);
-		if( p == NULL )		// EOF
-			break;
-
-		lineno += 1;
-
-		if( line[0] == ';' )		// skip comments
-			continue;
-
-		if( line[0] == '\n' )		// skip blank lines
-			continue;
-
-		d = 0;
-		b = 0;
-		p = line;
-		while( *p != '\n' ) {
-			if( *p >= '0' && *p <= '9' ) {
-				digit = *p - '0';
-			} else if( *p >= 'A' && *p <= 'F' ) {
-				digit = *p - 'A' + 10;
-			} else {
-				fprintf(logfp, "Parsing error line %d, expecting hex digit but got %d\n", lineno, *p);
-				fclose(fp);
-				return;
-			}
-
-			b = b*16 + digit;
-
-			d += 1;
-			p++;
-			if( d <= 1 )
-				continue;		// get 2nd nibble of hex byte
-
-			d = 0;
-
-			// got byte in 'b', now store it:
-
-			if( absolute_address < 56 ) {
-				Wire.set_rtc_ram(absolute_address, b);
-			} else if( absolute_address < 56 + 2048 ) {
-				EEPROM.update(absolute_address - 56, b);
-			} else {
-				fprintf(logfp, "reading persistent storage: Line %d, invalid address %04x (%02x)\n",
-							lineno, absolute_address, b);
-				fclose(fp);
-				return;
-			}
-
-			absolute_address += 1;
-			b = 0;
-
-			if( *p == ' ' ) {
-				p++;
-			} else if( *p == '\n' ) {
-				// no action
-			} else {
-				fprintf(logfp, "Parsing error line %d, expecting space or newline, got %d\n", lineno, *p);
-				fclose(fp);
-				return;
-			}
-		}
-	}
-
-	fclose(fp);
-}
-
-//
-// Write the contents of the mock real-time clock data and EEPROM to disk.
-//
-static
-void write_persistent_storage()
-{
-	FILE *fp;
-	int i, col;
-	uint8_t b;
-
-	fp = fopen("./persist.txt", "w");
-	if( fp == NULL )
-	{
-		fprintf(logfp, "Unable to open ./persist.txt for writing (%s)\n", strerror(errno) );
-		return;
-	}
-
-	// Write Real Time Clock RAM
-	fprintf(fp, "; Real Time Clock RAM 0x08 - 0x3F\n");
-
-	col = 0;
-	for(i=0; i < 56; i++)
-	{
-		b = Wire.get_rtc_ram(i);
-		fprintf(fp, "%02X ", b);
-		col++;
-		if( col == 16 ) {
-			col = 0;
-			fprintf(fp, "\n");
-		}
-	}
-	fprintf(fp, "\n");
-
-	fprintf(fp, "; EEPROM 0x000 - 0x3ff\n");
-	col = 0;
-	for(i=0; i < 2048; i++)
-	{
-		b = EEPROM.read(i);
-		fprintf(fp, "%02X ", b);
-		col++;
-		if( col == 16 ) {
-			col = 0;
-			fprintf(fp, "\n");
-		}
-	}
-
-	fclose(fp);
-}
-#endif
-
-#ifdef CURSES_SIMULATOR
-//////////////////////////////////////////////////////////////////////
-//
-// SECTION 21: MAIN() - calls setup() and loop()
+// SECTION 20: MAIN() - calls setup() and loop()
 //
 // This is only used in the linux/macos/windows CURSES SIMULATOR version.
 //

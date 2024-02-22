@@ -186,7 +186,7 @@ upload to your Open DSKY kit.
 
 To assemble the assembly code use:
 ```
-    $ ./assembler.py kennysagc.asm
+    $ assembler.py kennysagc.asm
 ```
 This will produce a file called `kennysagc.h` which is included by `KennysOpenDSKY.cpp`.
 
@@ -217,7 +217,7 @@ To compile on linux `gcc` is used. The program itself is written in simple C/C++
 
 To assemble the assembly code use:
 ```
-    $ ./assembler.py kennysagc.asm
+    $ assembler.py kennysagc.asm
 ```
 This produces a file caled `kennysagc.h` which is included by `KennysOpenDSKY.cpp`.
 
@@ -470,7 +470,7 @@ You will need python3 to recompile the assembly. This github repository
 however contains a pre-compiled version of the assembly.
 
 ```
-  $ ./assembly.py filename.asm
+  $ assembler.py filename.asm
   Kenny's OpenDSKY Apollo Guidance Computer Assembler
   Little-endian encoding will be used.
   Assembling 'filename.asm'.
@@ -1076,7 +1076,7 @@ by entering the correct `V37 Nxx` command.
 
 Programs run in **cpu core 0** concurrently with whatever is running in **cpu core 1**.
 **cpu core 1** runs the user entered VERBs/NOUNs. This allows for the running of two seperate
-"jobs"; one program in **cpu 0** and another program in **cpu 1**.
+"jobs"; one in **cpu 0** and another one in **cpu 1**.
 
 ## Green Acrylic Modification
 This section describes my modification to the Open DSKY. I decided
