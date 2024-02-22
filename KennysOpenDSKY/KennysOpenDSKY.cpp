@@ -46,7 +46,7 @@
 //	SECTION 17: Signal/ISR for Timing control (arduino and curses)
 //	SECTION 18: Sketch setup() routine
 //	SECTION 19: Sketch loop() routine
-//	SECTION 21: MAIN() - calls setup() and loop()
+//	SECTION 20: MAIN() - calls setup() and loop()
 //
 // NOTES:
 //	* When adding/removing VM instructions there are 4 places to edit:

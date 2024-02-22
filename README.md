@@ -337,6 +337,12 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 ### VERBs, NOUNs, and PROGRAMs
 This section documents the available VERB/NOUN combinations and the PROGRAM's.
 
+### Status (updated 2/22/2024)
+Not all verb/nouns in the list are implemented yet. This is my list of
+what I wish to implenent eventually.
+
+[^1]: Not implemented.
+
 ### Verbs
 
 | VERB | Description                                        |
@@ -345,24 +351,24 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 | V09  | Calculate (Perform Math operation)                 |
 | V10  | Convert Radix                                      |
 | V16  | Monitor Selected Values                            |
-| V21  | Enter value (R1 only)                              |
-| V22  | Enter value (R2 only)                              |
-| V25  | Enter values (R1 + R2 + R3)                        |
-| V26  | Load values from external source                   |
+| V21  | Enter value (R1 only)[^1]                          |
+| V22  | Enter value (R2 only)[^1]                          |
+| V25  | Enter values (R1 + R2 + R3)[^1]                    |
+| V26  | Load values from external source[^1]               |
 | V35  | LAMP TEST                                          |
 | V36  | Fresh Start                                        |
 | V37  | Execute Major PROGRAM                              |
 | V69  | Force Restart                                      |
-| V82  | Monitor Orbital Parameters                         |
+| V82  | Monitor Orbital Parameters[^1]                     |
 
 ### Nouns
 | NOUN | Description                                        |
 |------|----------------------------------------------------|
-| N17  | IMU Linear Acceleration values (XXXX, YYYY, ZZZZ)  |
-| N18  | IMU Gyro acceleration values (ROLL, PITCH, YAW)    |
+| N17  | IMU Linear Acceleration values (XXXX, YYYY, ZZZZ)[^1]  |
+| N18  | IMU Gyro acceleration values (ROLL, PITCH, YAW)[^1]|
 | N19  | RTC DATE, TIME, IMU TEMP                           |
 | N31  | Time from AGC initialization                       |
-| N32  | Time from Perigee                                  |
+| N32  | Time from Perigee[^1]                              |
 | N34  | Timer count from event (HH, MM, SS.01)             |
 | N35  | Timer count to Event (HH, MM, SS.01)               |
 | N36  | RTC Time (HH, MM, SS.01)                           |
