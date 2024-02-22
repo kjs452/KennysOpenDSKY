@@ -20,11 +20,12 @@ Kenny's Open DSKY Software
   + [Compiling for Windows/MacOS](#compiling-for-windowsmacos)
   + [Running the Curses Simulator](#running-the-curses-simulator)
     + [Keys](#keys)
-    + [log file](#log-file)
-    + [persistent data](#persistent-data)
+    + [Log File](#log-file)
+    + [Persistent Data](#persistent-data)
   + [DSKY Usage](#dsky-usage)
     + [General Notes:](#general-notes)
     + [VERBs, NOUNs, and PROGRAMs](#verbs-nouns-and-programs)
+    + [Status (updated 2/22/2024)](#status-updated-2222024)
     + [Verbs](#verbs)
     + [Nouns](#nouns)
     + [Verb-Nouns](#verb-nouns)
@@ -42,9 +43,10 @@ Kenny's Open DSKY Software
     + [Instructions](#instructions)
     + [Example](#example)
   + [Code Walk Through](#code-walk-through)
+    + [Display Refresh](#display-refresh)
     + [Add New Instructions](#add-new-instructions)
     + [Adding a new VERB](#adding-a-new-verb)
-    + [Display Refresh](#display-refresh)
+    + [Adding a new PROGRAM](#adding-a-new-program)
   + [Green Acrylic Modification](#green-acrylic-modification)
   + [Review of the Open DSKY Kit](#review-of-the-open-dsky-kit)
     + [Sticker 1](#sticker-1)
@@ -352,7 +354,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 
 | VERB | Description                                        |
 |------|----------------------------------------------------|
-| V01  | test verb incrmeenting/decrementing values         |
+| V01  | test verb incrmenting/decrementing values          |
 | V02  | test verb. enter R2 in decimal                     |
 | V03  | test verb. enter R3 in octal                       |
 | V04  | test verb. display some simple values              |
@@ -471,7 +473,7 @@ I.e. To run program P61 you would enter: `VERB 3 7 ENTR 6 1 ENTR`
 |------|--------------------------------------------------------------------|
 | P00  | Poo                                                                |
 | P01  | Apollo 11 Launch Simulation                                        |
-| P06  | Simulate putting AGC into standby mode                             |
+| P06  | Simulate putting AGC into standby mode[^1]                         |
 | P11  | Display IMU linear acceleration values (same as V16 N18)[^1]       |
 | P42  | "blinky" - randomly illuminate caution and warning lights          |
 | P61  | play short version of JFK "I believe"                              |
