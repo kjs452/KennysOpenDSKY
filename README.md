@@ -341,13 +341,21 @@ This section documents the available VERB/NOUN combinations and the PROGRAM's.
 Not all verb/nouns in the list are implemented yet. This is my list of
 what I wish to implenent eventually.
 
-[^1]: Not implemented.
+The footnote **[1]** indicates items which have not been implemented yet.
+
+[^1]: Not implemented yet.
+[^2]: Temperature in R3 hard coded to **70**.
 
 ### Verbs
 
 | VERB | Description                                        |
 |------|----------------------------------------------------|
-| V06  | Display Selected Value                             |
+| V01  | test verb incrmeenting/decrementing values         |
+| V02  | test verb. enter R2 in decimal                     |
+| V03  | test verb. enter R3 in octal                       |
+| V03  | test verb                                          |
+| V05  | clears DSKY, end verb, cleans stack                |
+| V06  | Display Selected Value[^1]                         |
 | V09  | Calculate (Perform Math operation)                 |
 | V10  | Convert Radix                                      |
 | V16  | Monitor Selected Values                            |
@@ -369,32 +377,32 @@ what I wish to implenent eventually.
 | N19  | RTC DATE, TIME, IMU TEMP                           |
 | N31  | Time from AGC initialization                       |
 | N32  | Time from Perigee[^1]                              |
-| N34  | Timer count from event (HH, MM, SS.01)             |
-| N35  | Timer count to Event (HH, MM, SS.01)               |
+| N34  | Timer count from event (HH, MM, SS.01)[^1]         |
+| N35  | Timer count to Event (HH, MM, SS.01)[^1]           |
 | N36  | RTC Time (HH, MM, SS.01)                           |
 | N37  | RTC Date (YYYY, MM, DD)                            |
-| N38  | GPS Time (HH, MM, SS.01)                           |
-| N39  | GPS Date (YYYY, MM, SS.01)                         |
-| N43  | GPS Longitude, Latutude (DD, MM  SS.01)            |
-| N44  | Orbital Parameters (Apocenter, Pericenter, time to free fall) |
-| N65  | MET (HH, MM, SS.01)                                |
-| N68  | Lunar Powered Decent                               |
-| N87  | IMU Accel values with random 1202 errors           |
-| N98  | Audio Track and Index Adj (TTTTT, NNNNN)           |
+| N38  | GPS Time (HH, MM, SS.01)[^1]                       |
+| N39  | GPS Date (YYYY, MM, SS.01)[^1]                     |
+| N43  | GPS Longitude, Latutude (DD, MM  SS.01)[^1]        |
+| N44  | Orbital Parameters (Apocenter, Pericenter, time to free fall)[^1] |
+| N65  | MET (HH, MM, SS.01)[^1]                            |
+| N68  | Lunar Powered Decent[^1]                           |
+| N87  | IMU Accel values with random 1202 errors[^1]       |
+| N98  | Audio Track and Index Adj (TTTTT, NNNNN)[^1]       |
 
 ### Verb-Nouns
 | VERB-NOUN | Description                                        |
 |-----------|----------------------------------------------------|
-|V06 N17    | Display IMU linear accel values                    |
-|V06 N18    | Display IMU gyro accel values                      |
+|V06 N17    | Display IMU linear accel values[^1]                |
+|V06 N18    | Display IMU gyro accel values[^1]                  |
 |V06 N19    | Display RTC Date/Time and IMU temp                 |
 |V06 N31    | Display time from AGC Init                         |
-|V06 N32    | display time to perigee                            |
+|V06 N32    | display time to perigee[^1]                        |
 |V06 N36    | Display RTC time                                   |
 |V06 N37    | display RTC date                                   |
-|V06 N65    | display met                                        |
-|V06 N38    | Display GPS time                                   |
-|V06 N39    | Display GPS date                                   |
+|V06 N65    | display met[^1]                                    |
+|V06 N38    | Display GPS time[^1]                               |
+|V06 N39    | Display GPS date[^1]                               |
 |           |                                                    |
 |V09 N01    | Add stellar zeta angles. R3 = R1+R2                |
 |V09 N02    | Multiply Einstein gravitational cofactors. R3 = R1*R2 |
@@ -404,43 +412,43 @@ what I wish to implenent eventually.
 |V10 N01    | Decimal to octal conversion. R2 = Octal(R1)        |
 |V10 N02    | Octal to decimal conversion. R2 = Decimal(R1)      |
 |           |                                                    |
-|V16 N17    | Monitor IMU linear accel values                    |
-|V16 N18    | Monitor IMU Gyro accel values                      |
-|V16 N19    | Monitor RTC Date/Time and IMU temp                 |
+|V16 N17    | Monitor IMU linear accel values[^1]                |
+|V16 N18    | Monitor IMU Gyro accel values[^1]                  |
+|V16 N19    | Monitor RTC Date/Time and IMU temp[^2]             |
 |V16 N31    | Monitor time from agc init                         |
-|V16 N34    | Monitor/Stop Time From event                       |
-|V16 N35    | Monitor/Stop timer count to event                  |
+|V16 N34    | Monitor/Stop Time From event[^1]                   |
+|V16 N35    | Monitor/Stop timer count to event[^1]              |
 |V16 N36    | Monitor RTC Time                                   |
 |V16 N37    | Monitor RTC Date                                   |
-|V16 N38    | Monitor GPS time                                   |
-|V16 N39    | Monitor GPS date                                   |
-|V16 N43    | Monitor GPS coordinates                            |
-|V16 N44    | Monitor Orbital Parameters                         |
-|V16 N65    | Monitor MET                                        |
-|V16 N68    | A11 Lunar Landing simulation                       |
-|V16 N87    | Monitor IMU linear accel values (with random 1202 alarms)  |
-|V16 N98    | Play selected audio clip R1=clip, R2=index adj factor      |
+|V16 N38    | Monitor GPS time[^1]                               |
+|V16 N39    | Monitor GPS date[^1]                               |
+|V16 N43    | Monitor GPS coordinates[^1]                        |
+|V16 N44    | Monitor Orbital Parameters[^1]                     |
+|V16 N65    | Monitor MET[^1]                                    |
+|V16 N68    | A11 Lunar Landing simulation[^1]                   |
+|V16 N87    | Monitor IMU linear accel values (with random 1202 alarms)[^1]  |
+|V16 N98    | Play selected audio clip R1=clip, R2=index adj factor[^1]  |
 |           |                                                    |
-|V21 N98    | select number of audio clip                        |
+|V21 N98    | select number of audio clip[^1]                    |
 |           |                                                    |
-|V22 N98    | Enter index adj factor                             |
+|V22 N98    | Enter index adj factor[^1]                         |
 |           |                                                    |
-|V25 N34    | Set/Start timer count from event                   |
-|V25 N35    | Set/Start timer count to event                     |
-|V25 N36    | Set RTC Clock Manually                             |
-|V25 N37    | Set RTC Date Manually                              |
+|V25 N34    | Set/Start timer count from event[^1]               |
+|V25 N35    | Set/Start timer count to event[^1]                 |
+|V25 N36    | Set RTC Clock Manually[^1]                         |
+|V25 N37    | Set RTC Date Manually[^1]                          |
 |           |                                                    |
-|V26 N36    | Set RTC Clock from GPS                             |
-|V26 N37    | Set RTC Date from GPS                              |
+|V26 N36    | Set RTC Clock from GPS[^1]                         |
+|V26 N37    | Set RTC Date from GPS[^1]                          |
 |           |                                                    |
 |V35        | Lamp test                                          |
 |           |                                                    |
 |V36        | Fresh Start                                        |
 |           |                                                    |
 |V37 N00    | P00 enter idle mode                                |
-|V37 N01    | P01 A11 Launch Simulation                          |
-|V37 N06    | P06 Simulates putting AGC into standby mode        |
-|V37 N11    | P11 Monitor IMU ACcel values                       |
+|V37 N01    | P01 A11 Launch Simulation[^1]                      |
+|V37 N06    | P06 Simulates putting AGC into standby mode[^1]    |
+|V37 N11    | P11 Monitor IMU Accel values[^1]                   |
 |V37 N42    | "blinky" - randomly illuminate caution and warning lights |
 |V37 N61    | P61 playback JFK i believe                         |
 |V37 N62    | P62 playback JFK We choose                         |
@@ -450,7 +458,7 @@ what I wish to implenent eventually.
 |           |                                                    |
 |V69        | Force restart                                      |
 |           |                                                    |
-|V82        | Monitor Orbital parameters                         |
+|V82        | Monitor Orbital parameters[^1]                     |
 
 ### Programs
 To launch a program type: `V37 ENTR`. The verb and noun fields will
