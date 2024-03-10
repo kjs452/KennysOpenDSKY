@@ -404,12 +404,12 @@ enum DSKY_STATE {
 // Used in the execution of BRANCH instructions and the do_cmp() function.
 //
 enum CMP_OP {
-	CMP_GT,
-	CMP_GE,
-	CMP_LT,
-	CMP_LE,
-	CMP_EQ,
-	CMP_NE,
+	CMP_GT,		// greater than
+	CMP_GE,		// greater than or equals
+	CMP_LT,		// less than
+	CMP_LE,		// less then or equals
+	CMP_EQ,		// equals
+	CMP_NE,		// not equals
 };
 
 //
@@ -660,7 +660,7 @@ enum AGC_INSTRUCTION
 	PUSH_DSKY,				// push DSKY state on stack
 	POP_DSKY,				// push DSKY state on stack
 	RANDOM_A,				// Populate A with a random 16-bit value
-	AGC_INSTRUCTIONS_LEN,	// number of instruction opcode must be <= 127
+	AGC_INSTRUCTIONS_LEN,	// number of instruction opcode must be <= 255
 };
 
 #ifdef DSKY_DEBUG

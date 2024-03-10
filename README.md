@@ -121,8 +121,8 @@ The main source code is in `KennysOpenDSKY.cpp` and `kennysagc.asm`.
 + `assembler.py` - Python 3 program which assembles the assembly code into byte codes.
 + `Makefile` - A simple makefile to compile on Linux and also compile/upload the
         sketch using the Arduino CLI tools.
-+ `dsky` - The **curses simulator** executable produced on linux.
-+ `dsky_debug` - The **curses simulator** executable produced on linux with debugging symbols (-g).
++ `dsky` - The **curses simulator** executable produced on Linux.
++ `dsky_debug` - The **curses simulator** executable produced on Linux with debugging symbols (-g).
 + `log.txt` - a log file for debugging when running the **curses simulator**.
 + `persist.txt` - emulates the EEPROM and RTC RAM area when using the **curses simulator**.
 + `audio` - directory containing the SD card audio files for the MP3 player.
@@ -158,22 +158,22 @@ the sketch for Arduino.
 + **EEPROM** - standard arduino library for reading/writing the 2K eeprom memory.
 + **Adafruit NeoPixel** - library used to illuminate the neo pixels.
 + **LedControl** - library used to talk to 7-segment LEDs.
-+ **Arduino CLI tools for linux** - I don't use the Arduino IDE. I use `arduino-cli` tool.
++ **Arduino CLI tools for Linux** - I don't use the Arduino IDE. I use `arduino-cli` tool.
 + **python3** - this is needed to run `assembler.py`. The assembler is a simple text only
         python program which should work on most python installations.
 
 ### Linux
 This section describes the notable libraries & components needed to compile
-the curses simulator on linux/MacOS/windows.
+the curses simulator on Linux/MacOS/windows.
 
 + **ncurses** - this is a library for drawing simple text based user interfaces. It
-        is widely available, and comes installed by default on most linux distros.
+        is widely available, and comes installed by default on most Linux distros.
 
-+ **sigaction()** - this is capability of most unixes. It is included on all linux operating
++ **sigaction()** - this is capability of most unixes. It is included on all Linux operating
             systems. Special porting may be needed for Windows or MacOS. It is used to
             implement the 100ms timer.
 
-+ **getrandom()** - this is a library function provdided by linux. It is used to provide
++ **getrandom()** - this is a library function provdided by Linux. It is used to provide
             random numbers to the code for blinking the **Uplink Acty**
             and **Comp Acty** lights. As well as the random number assembly instruction.
 
@@ -181,7 +181,7 @@ the curses simulator on linux/MacOS/windows.
         python program which should work on most python installations.
 
 ## Compiling for Arduino Nano
-I use the Arduino Command Line Interface. I run this under linux on a Raspberry Pi.
+I use the Arduino Command Line Interface. I run this under Linux on a Raspberry Pi.
 (See <https://github.com/arduino/arduino-cli>)
 The included ```Makefile``` shows the commands needed to compile the sketch and
 upload to your Open DSKY kit.
@@ -214,7 +214,7 @@ This uploads the sketch to your Arduino Nano:
 ```
 
 ## Compiling for Linux
-To compile on linux `gcc` is used. The program itself is written in simple C/C++.
+To compile on Linux `gcc` is used. The program itself is written in simple C/C++.
 (Does not use any fancy features of C++ beyond `class`).
 
 To assemble the assembly code use:
@@ -295,7 +295,7 @@ will have when run on the Arduino Open DSKY hardware. The GPS and IMU
 devices are simulated with *fake* data. The MP3 player only shows audio
 as a text line at the bottom of the window. The audio shows how many seconds
 remain in the audio clip. But no sound will play! The Real Time clock (RTC)
-is simulated but it uses the linux date and time to initialize itself. The
+is simulated but it uses the Linux date and time to initialize itself. The
 real time clock can be set by the user to a different date/time in the simulator.
 
 Also emulated is the EEPROM storage and the real time clock 56 byte RAM area.
@@ -303,7 +303,7 @@ These values will be stored in the file `persist.txt` so that they will
 be remembered between runs of the **curses simulator**.
 
 ### Log File
-When running the **curses simulator** the file `./logfile.txt` is produced.
+When running the **curses simulator** the file `./log.txt` is produced.
 It is used for debugging purposes. Also contains the memory sizes of some data structures.
 
 ### Persistent Data
@@ -336,6 +336,8 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 
 + Pressing **RSET** will clear all the caution and warning lights (except KEY REL).
 
++ The **CLR** key can be pressed while entering values to clear the current entry and start over.
+
 ### VERBs, NOUNs, and PROGRAMs
 This section documents the available VERB/NOUN combinations and the PROGRAM's.
 
@@ -354,7 +356,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 
 | VERB | Description                                        |
 |------|----------------------------------------------------|
-| V01  | test verb incrmenting/decrementing values          |
+| V01  | test verb incrementing/decrementing values         |
 | V02  | test verb. enter R2 in decimal                     |
 | V03  | test verb. enter R3 in octal                       |
 | V04  | test verb. display some simple values              |
@@ -647,7 +649,7 @@ These are the types of arguments instructions can have:
 + `<addr>` - An 8-bit unsigned value which refers to a RAM location.
 + `<addr16>` - A 16-bit address to a Program[] location. Used for CALL and GOTO instructions.
 
-In the assembly syntax, arguments are seperated by whitspace. Do not use commas or other
+In the assembly syntax, arguments are seperated by whitespace. Do not use commas or other
 punctuation in the assembly code.
 
 ### Numeric Literals
@@ -1129,7 +1131,7 @@ with the Open DSKY kit.
 ![alt text](images/gpm3.jpg "")
 
 NOTE: I used duct tape to adhere my green acrylic sheet to the table I was working on
-as well as the ruler so that is wouldn't move.
+as well as the ruler so that it wouldn't move.
 
 I cut in half the sticker that came with the Open DSKY kit. I retained the left hand side
 of the sticker for the caution and warning lights pane. But I threw away the right hand side.
