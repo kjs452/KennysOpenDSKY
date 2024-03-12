@@ -362,7 +362,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 | V03  | test verb. enter R3 in octal                       |
 | V04  | test verb. display some simple values              |
 | V05  | clears DSKY, end verb, cleans stack                |
-| V06  | Display Selected Value[^1]                         |
+| V06  | Display Selected Value                             |
 | V09  | Calculate (Perform Math operation)                 |
 | V10  | Convert Radix                                      |
 | V16  | Monitor Selected Values                            |

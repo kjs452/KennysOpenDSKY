@@ -1585,19 +1585,20 @@ static uint32_t random(uint32_t val)
 
 // Verb Table
 static const DISPATCH_ENTRY Verbs[] PROGMEM = {
-	{ 0x35, LBL_VERB_35 },
 	{ 0x01, LBL_VERB_01 },
-	{ 0x37, LBL_VERB_37 },
 	{ 0x02, LBL_VERB_02 },
 	{ 0x03, LBL_VERB_03 },
 	{ 0x04, LBL_VERB_04 },
 	{ 0x05, LBL_VERB_05 },
-	{ 0x16, LBL_VERB_16 },
-	{ 0x36, LBL_VERB_36 },
-	{ 0x69, LBL_VERB_69 },
+	{ 0x06, LBL_VERB_06 },
 	{ 0x09, LBL_VERB_09 },
 	{ 0x10, LBL_VERB_10 },
+	{ 0x16, LBL_VERB_16 },
 	{ 0x25, LBL_VERB_25 },
+	{ 0x35, LBL_VERB_35 },
+	{ 0x36, LBL_VERB_36 },
+	{ 0x37, LBL_VERB_37 },
+	{ 0x69, LBL_VERB_69 },
 };
 
 //

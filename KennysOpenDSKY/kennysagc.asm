@@ -15,6 +15,8 @@ DEFINE	TS1 = 12		// generic timestamp vairable 12 and 13.
 
 DEFINE	PROG_TMP1 = 14
 
+DEFINE	CONTMODE = 15	// monitor once or continiously (0=once, 1=continiously)
+
 // main for cpu 0
 MAIN_CPU0:
 {
@@ -557,7 +559,7 @@ Off_VEL:		LT_VEL	0				// 21
 
 
 //
-// VERB 16
+// VERB 16 & VERB 06
 //
 // This verb runs forever, it overwrites any running foreground task(s).
 //
@@ -579,7 +581,21 @@ Off_VEL:		LT_VEL	0				// 21
 // V16 N87		Monitor IMU linear accel values (with random 1202 alarms)
 // V16 N98		Play selected audio clicp R1=clip, R2=index adj factor
 //
+VERB_06:
+{
+	CLR_A
+	ST_A_DIRECT		CONTMODE		// 0 means once
+	BRANCH VERB_06_16
+}
+
 VERB_16:
+{
+	LD_A_IMM8			1			// 1 means monitor continiously
+	ST_A_DIRECT		CONTMODE
+	BRANCH VERB_06_16
+}
+
+VERB_06_16:
 {
 		EMPTY_STACK
 
@@ -654,16 +670,22 @@ Found:
 		MOV_A_C
 		ST_C_DIRECT		TMP1
 
-Forever:
-		LD_C_DIRECT		TMP1
-		CALL_CINDIRECT
+		LD_A_DIRECT			CONTMODE
+		BRANCH_A_NE_IMM8	0	Monitor
 
-		GOTO		Forever
+		LD_C_DIRECT			TMP1
+		CALL_CINDIRECT
+forever:
+		BRANCH				forever
+
+Monitor:
+		LD_C_DIRECT			TMP1
+		CALL_CINDIRECT
+		BRANCH				Monitor
 
 NotFound:
 		BLINK_OPRERR		1
 		RET
-
 }
 
 Query_IMU_Accel:
