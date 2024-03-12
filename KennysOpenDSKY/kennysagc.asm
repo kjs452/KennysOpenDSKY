@@ -299,6 +299,26 @@ VERB_04:
 		RET
 }
 
+Help:
+{
+		LD_A_IMM8		23
+		CALL Help2
+		RET
+}
+
+Help2:
+{
+		LD_B_IMM32		-65000
+		CALL	Help3
+		RET
+}
+
+Help3:
+{
+		LD_C_IMM32		32510
+		RET
+}
+
 //
 // This verb clears the foreground task and clears the DSKY
 //
@@ -535,25 +555,6 @@ Off_VEL:		LT_VEL	0				// 21
 				RET
 }
 
-Help:
-{
-		LD_A_IMM8		23
-		CALL Help2
-		RET
-}
-
-Help2:
-{
-		LD_B_IMM32		-65000
-		CALL	Help3
-		RET
-}
-
-Help3:
-{
-		LD_C_IMM32		32510
-		RET
-}
 
 //
 // VERB 16
@@ -966,6 +967,175 @@ error:
 
 done:
 		BRANCH	done
+}
+
+//
+// V25 N36		Set RTC Time (HH, MM, SS)
+// V25 N37		Set RTC Date (YYYY, MM, DD)
+//
+// TMP1		address of populate function
+// TMP2		address of set function
+//
+VERB_25:
+{
+		MOV_NOUN_A
+		BRANCH_A_EQ_IMM8	0x36	ptime
+		BRANCH_A_EQ_IMM8	0x37	pdate
+		BRANCH				error
+
+ptime:	CALL				PopulateTime
+		BRANCH				over
+pdate:	CALL				PopulateDate
+
+over:
+		BLINK_R1		1
+		INPUT_R1
+		BRANCH_A_LT_IMM8	0		error
+		BLINK_R1		0
+		DECODE_A_FROM_DEC
+		MOV_A_B
+		ENCODE_A_TO_DEC
+		MOV_A_R1
+
+		MOV_NOUN_A
+		BRANCH_A_EQ_IMM8	0x36	CheckHH
+		BRANCH_A_EQ_IMM8	0x37	CheckYYYY
+
+doR2:
+		BLINK_R2		1
+		INPUT_R2
+		BRANCH_A_LT_IMM8	0		error
+		BLINK_R2		0
+		DECODE_A_FROM_DEC
+		MOV_A_B
+		ENCODE_A_TO_DEC
+		MOV_A_R2
+
+		MOV_NOUN_A
+		BRANCH_A_EQ_IMM8	0x36	CheckMM
+		BRANCH_A_EQ_IMM8	0x37	CheckMON
+
+doR3:
+		BLINK_R3		1
+		INPUT_R3
+		BRANCH_A_LT_IMM8	0		error
+		BLINK_R3		0
+		DECODE_A_FROM_DEC
+		MOV_A_B
+		ENCODE_A_TO_DEC
+		MOV_A_R3
+
+		MOV_NOUN_A
+		BRANCH_A_EQ_IMM8	0x36	CheckSS
+		BRANCH_A_EQ_IMM8	0x37	CheckDAY
+
+set:
+		MOV_NOUN_A
+		BRANCH_A_EQ_IMM8	0x36	stime
+		BRANCH_A_EQ_IMM8	0x37	sdate
+
+stime:	CALL			SetTime
+		GOTO			success
+
+sdate:	CALL			SetDate
+		GOTO			success
+
+error:
+		BLINK_OPRERR	1
+x:		BRANCH			x
+
+CheckHH:
+		BRANCH_B_LT_IMM8	0	error
+		BRANCH_B_GT_IMM8	23	error
+		BRANCH				doR2
+CheckMM:
+		BRANCH_B_LT_IMM8	0	error
+		BRANCH_B_GT_IMM8	59	error
+		BRANCH				doR3
+CheckSS:
+		BRANCH_B_LT_IMM8	0	error
+		BRANCH_B_GT_IMM8	59	error
+		GOTO				set
+CheckYYYY:
+		BRANCH_B_LT_IMM16	2000	error
+		BRANCH_B_GT_IMM16	2099	error
+		BRANCH				doR2
+CheckMON:
+		BRANCH_B_LT_IMM8	0	error
+		BRANCH_B_GT_IMM8	12	error
+		BRANCH				doR3
+CheckDAY:
+		BRANCH_B_LT_IMM8	1	error
+		BRANCH_B_GT_IMM8	31	error
+		GOTO				set
+
+PopulateTime:
+		RTC_HH_A
+		OR_A_IMM32		0xB00000
+		MOV_A_R1
+		RTC_MM_A
+		OR_A_IMM32		0xB00000
+		MOV_A_R2
+		RTC_SS_A
+		OR_A_IMM32		0xB00000
+		MOV_A_R3
+		RET
+
+PopulateDate:
+		RTC_YEAR_A
+		OR_A_IMM32		0xB02000
+		MOV_A_R1
+		RTC_MON_A
+		OR_A_IMM32		0xB00000
+		MOV_A_R2
+		RTC_DAY_A
+		OR_A_IMM32		0xB00000
+		MOV_A_R3
+		RET
+
+SetDate:
+		LD_C_IMM8			4		// 4=day 5=month 6=year
+		MOV_R3_A					// day
+		RTC_A_MEM_CINDIRECT
+		INC_C
+
+		MOV_R2_A					// month
+		RTC_A_MEM_CINDIRECT
+		INC_C
+
+		MOV_R1_A					// year
+		AND_A_IMM32			0xFF
+		RTC_A_MEM_CINDIRECT
+		RET
+
+SetTime:
+		// clear seconds to avoid incrementing minutes
+		// in the middle of the set operation
+		CLR_C
+		SWAP_A_B
+		CLR_A
+		RTC_A_MEM_CINDIRECT			// seconds
+		SWAP_A_B
+
+		LD_C_IMM8			2		// 2=hours 1=minutes 0=seconds
+		MOV_R1_A					// hours
+		RTC_A_MEM_CINDIRECT
+		DEC_C
+
+		MOV_R2_A					// minutes
+		RTC_A_MEM_CINDIRECT
+		DEC_C
+
+		MOV_R3_A					// second (do seconds last for more accuracy!)
+		RTC_A_MEM_CINDIRECT
+		RET
+
+		// jump to the corresponding V16 N36 (time), V16 N37 (date)
+success:
+		EMPTY_STACK
+		LD_A_IMM8		0x16
+		MOV_A_VERB
+		GOTO			VERB_16
 }
 
 ASM_END:

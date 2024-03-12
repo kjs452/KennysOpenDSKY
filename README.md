@@ -341,7 +341,7 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 ### VERBs, NOUNs, and PROGRAMs
 This section documents the available VERB/NOUN combinations and the PROGRAM's.
 
-### Status (updated 2/22/2024)
+### Status (updated 3/11/2024)
 Not all verb/nouns in the list are implemented yet. This is my list of
 what I wish to implement eventually. These items come from the
 **Apollo 50th Anniversary** project. I will update this section as
@@ -367,7 +367,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 | V16  | Monitor Selected Values                            |
 | V21  | Enter value (R1 only)[^1]                          |
 | V22  | Enter value (R2 only)[^1]                          |
-| V25  | Enter values (R1 + R2 + R3)[^1]                    |
+| V25  | Enter values (R1 + R2 + R3)                        |
 | V26  | Load values from external source[^1]               |
 | V35  | LAMP TEST                                          |
 | V36  | Fresh Start                                        |
@@ -441,8 +441,8 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |           |                                                              |
 |V25 N34    | Set/Start timer count from event[^1]                         |
 |V25 N35    | Set/Start timer count to event[^1]                           |
-|V25 N36    | Set RTC Clock Manually[^1]                                   |
-|V25 N37    | Set RTC Date Manually[^1]                                    |
+|V25 N36    | Set RTC Clock Manually                                       |
+|V25 N37    | Set RTC Date Manually                                        |
 |           |                                                              |
 |V26 N36    | Set RTC Clock from GPS[^1]                                   |
 |V26 N37    | Set RTC Date from GPS[^1]                                    |
@@ -872,8 +872,8 @@ Here are all the assembly instructions:
 | RTC_SS_A           |           | Read RTC and place SECONDS field into A register (BCD encoded)       |
 | RTC_MEM_A          | addr      | Read RTC RAM address addr and place into A register                  |
 | RTC_A_MEM          | addr      | Write LSB of A register into RTC RAM address addr                    |
-| RTC_MEM_A_CDIRECT  | addr      | Read RTC RAM address addr+C and place into A register                |
-| RTC_A_MEM_CDIRECT  | addr      | Write LSB of A register into RTC RAM address addr+C                  |
+| RTC_MEM_A_CINDIRECT|           | Read RTC RAM address [C] and place into A register                   |
+| RTC_A_MEM_CINDIRECT|           | Write LSB of A register into RTC RAM address [C]                     |
 | IMU_ACCX_A         |           | Move IMU Acceleration X value into A                                 |
 | IMU_ACCY_A         |           | Move IMU Acceleration Y value into A                                 |
 | IMU_ACCZ_A         |           | Move IMU Acceleration Z value into A                                 |

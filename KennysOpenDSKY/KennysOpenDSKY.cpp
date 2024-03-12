@@ -621,10 +621,10 @@ enum AGC_INSTRUCTION
 	RTC_HH_A,
 	RTC_MM_A,
 	RTC_SS_A,
-	RTC_MEM_A,			// <addr>		56 byte memory
-	RTC_A_MEM,			// <addr>		56 byte memory
-	RTC_MEM_A_CDIRECT,	// <addr>		56 byte memory	<addr>+C
-	RTC_A_MEM_CDIRECT,	// <addr>		56 byte memory	<addr>+C
+	RTC_MEM_A,				// <addr>		56 byte memory
+	RTC_A_MEM,				// <addr>		56 byte memory
+	RTC_MEM_A_CINDIRECT,	// <addr>		56 byte memory	C
+	RTC_A_MEM_CINDIRECT,	// <addr>		56 byte memory	C
 	IMU_ACCX_A,
 	IMU_ACCY_A,
 	IMU_ACCZ_A,
@@ -858,8 +858,8 @@ static const char *Mnemonics[] = {
 	"RTC_SS_A",
 	"RTC_MEM_A",			// <addr>		56 byte memory
 	"RTC_A_MEM",			// <addr>		56 byte memory
-	"RTC_MEM_A_CDIRECT",	// <addr>	56 byte memory	<addr>+C
-	"RTC_A_MEM_CDIRECT",	// <addr>	56 byte memory	<addr>+C
+	"RTC_MEM_A_CINDIRECT",	// <addr>	56 byte memory	C
+	"RTC_A_MEM_CINDIRECT",	// <addr>	56 byte memory	C
 	"IMU_ACCX_A",
 	"IMU_ACCY_A",
 	"IMU_ACCZ_A",
@@ -1181,6 +1181,9 @@ public:
 
 	static void write(uint8_t val)
 	{
+#ifdef DSKY_DEBUG
+		fprintf(logfp, "TwoWire.Write() m_needAddr=%d m_addr=%02x val=%02x\n", m_needAddr, m_addr, val);
+#endif
 		if( m_needAddr )
 		{
 			m_needAddr = false;
@@ -1594,6 +1597,7 @@ static const DISPATCH_ENTRY Verbs[] PROGMEM = {
 	{ 0x69, LBL_VERB_69 },
 	{ 0x09, LBL_VERB_09 },
 	{ 0x10, LBL_VERB_10 },
+	{ 0x25, LBL_VERB_25 },
 };
 
 //
@@ -2636,7 +2640,7 @@ int8_t sampleKeyboard()
 static
 int8_t readKeyboard()
 {
-	int8_t s0, s1;
+	static int8_t s0, s1;
 
 	s0 = sampleKeyboard();
 	if( s0 == ERR ) {
@@ -3625,10 +3629,14 @@ void agc_execute_cpu(uint8_t c)
 	case RTC_A_MEM:
 		break;
 
-	case RTC_MEM_A_CDIRECT:
+	case RTC_MEM_A_CINDIRECT:
 		break;
 
-	case RTC_A_MEM_CDIRECT:
+	case RTC_A_MEM_CINDIRECT:
+		Wire.beginTransmission(RTC_ADDR);
+		Wire.write(cpu->regs[2] & 0xff);		// RTC address in C
+		Wire.write(cpu->regs[0] & 0xff);		// write byte in A to RTC address
+		Wire.endTransmission(true);
 		break;
 
 	case IMU_ACCX_A:
@@ -3806,7 +3814,7 @@ mov_reg1_rx:
 	goto done;
 
 mov_rx_reg2:
-	cpu->regs[reg2] = ((uint32_t)rx[0] << 16) | ((uint32_t)rx[1] << 8) | (rx[0] << 0);
+	cpu->regs[reg2] = ((uint32_t)rx[0] << 16) | ((uint32_t)rx[1] << 8) | (rx[2] << 0);
 	goto done;
 
 mov_reg1_reg2:
@@ -4382,11 +4390,13 @@ void apollo_guidance_computer()
 
 			case S_IR2:
 				regp = agc_get_reg(Agc.input_reg);
+				regp[0] = regp[1] = regp[2] = 0xAA;		// clear entry field
 				regp[0] = 0xBA;
 				break;
 
 			case S_IR3:
 				regp = agc_get_reg(Agc.input_reg);
+				regp[0] = regp[1] = regp[2] = 0xAA;		// clear entry field
 				regp[0] = 0xCA;
 				break;
 
@@ -4424,8 +4434,8 @@ void apollo_guidance_computer()
 			case S_IO2:
 				if( digit <= 7 ) {
 					regp = agc_get_reg(Agc.input_reg);
-					regp[0] = 0xA0;
-					regp[0] = (regp[0] & 0xf0) | (digit);
+					regp[0] = regp[1] = regp[2] = 0xAA;		// clear entry field
+					regp[0] = 0xA0 | (digit);
 				} else {
 					Agc.dsky.blink |= BLINKF_OPRERR;
 					Agc.state = S_IE;

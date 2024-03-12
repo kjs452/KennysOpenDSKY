@@ -33,22 +33,22 @@ enum ASM_SYMBOLS {
 	LBL_VERB_02 = 221,    // LABEL
 	LBL_VERB_03 = 261,    // LABEL
 	LBL_VERB_04 = 309,    // LABEL
-	LBL_VERB_05 = 333,    // LABEL
-	LBL_VERB_36 = 353,    // LABEL
-	LBL_VERB_69 = 470,    // LABEL
-	LBL_PROG_00 = 475,    // LABEL
-	LBL_PROG_01 = 475,    // LABEL
-	LBL_PROG_02 = 475,    // LABEL
-	LBL_PROG_60 = 475,    // LABEL
-	LBL_PROG_61 = 478,    // LABEL
-	LBL_PROG_62 = 483,    // LABEL
-	LBL_PROG_68 = 488,    // LABEL
-	LBL_PROG_69 = 493,    // LABEL
-	LBL_PROG_70 = 498,    // LABEL
-	LBL_PROG_42 = 503,    // LABEL
-	LBL_Help = 594,    // LABEL
-	LBL_Help2 = 600,    // LABEL
-	LBL_Help3 = 609,    // LABEL
+	LBL_Help = 333,    // LABEL
+	LBL_Help2 = 339,    // LABEL
+	LBL_Help3 = 348,    // LABEL
+	LBL_VERB_05 = 354,    // LABEL
+	LBL_VERB_36 = 374,    // LABEL
+	LBL_VERB_69 = 491,    // LABEL
+	LBL_PROG_00 = 496,    // LABEL
+	LBL_PROG_01 = 496,    // LABEL
+	LBL_PROG_02 = 496,    // LABEL
+	LBL_PROG_60 = 496,    // LABEL
+	LBL_PROG_61 = 499,    // LABEL
+	LBL_PROG_62 = 504,    // LABEL
+	LBL_PROG_68 = 509,    // LABEL
+	LBL_PROG_69 = 514,    // LABEL
+	LBL_PROG_70 = 519,    // LABEL
+	LBL_PROG_42 = 524,    // LABEL
 	LBL_VERB_16 = 615,    // LABEL
 	LBL_Query_IMU_Accel = 701,    // LABEL
 	LBL_Query_Gyro_Accel = 717,    // LABEL
@@ -68,7 +68,8 @@ enum ASM_SYMBOLS {
 	LBL_Query_AudioClipPlaying = 866,    // LABEL
 	LBL_VERB_09 = 866,    // LABEL
 	LBL_VERB_10 = 941,    // LABEL
-	LBL_ASM_END = 1020,    // LABEL
+	LBL_VERB_25 = 1020,    // LABEL
+	LBL_ASM_END = 1252,    // LABEL
 };
 
 static const uint8_t Program[] PROGMEM = {
@@ -111,25 +112,25 @@ static const uint8_t Program[] PROGMEM = {
         BRANCH, 0xF1 /* Next=-15 */, 
     // Programs:
         0x00, 
-        0xDB, 0x01 /* PROG_00=475 */, 
+        0xF0, 0x01 /* PROG_00=496 */, 
         0x01, 
-        0xDB, 0x01 /* PROG_01=475 */, 
+        0xF0, 0x01 /* PROG_01=496 */, 
         0x02, 
-        0xDB, 0x01 /* PROG_02=475 */, 
+        0xF0, 0x01 /* PROG_02=496 */, 
         0x60, 
-        0xDB, 0x01 /* PROG_60=475 */, 
+        0xF0, 0x01 /* PROG_60=496 */, 
         0x61, 
-        0xDE, 0x01 /* PROG_61=478 */, 
+        0xF3, 0x01 /* PROG_61=499 */, 
         0x62, 
-        0xE3, 0x01 /* PROG_62=483 */, 
+        0xF8, 0x01 /* PROG_62=504 */, 
         0x68, 
-        0xE8, 0x01 /* PROG_68=488 */, 
+        0xFD, 0x01 /* PROG_68=509 */, 
         0x69, 
-        0xED, 0x01 /* PROG_69=493 */, 
+        0x02, 0x02 /* PROG_69=514 */, 
         0x70, 
-        0xF2, 0x01 /* PROG_70=498 */, 
+        0x07, 0x02 /* PROG_70=519 */, 
         0x42, 
-        0xF7, 0x01 /* PROG_42=503 */, 
+        0x0C, 0x02 /* PROG_42=524 */, 
         0xFF, 
     // Found:
         SWAP_A_B, 
@@ -307,7 +308,7 @@ static const uint8_t Program[] PROGMEM = {
         PUSH_A, 
         PUSH_B, 
         PUSH_C, 
-        CALL, 0x52, 0x02 /* Help=594 */, 
+        CALL, 0x4D, 0x01 /* Help=333 */, 
         ENCODE_A_TO_DEC, 
         MOV_A_R1, 
         MOV_B_A, 
@@ -325,6 +326,23 @@ static const uint8_t Program[] PROGMEM = {
         WAIT4, 
         WAIT4, 
         WAIT4, 
+        RET, 
+    // }
+    // Help:
+    // {
+        LD_A_IMM8, 0x17, 
+        CALL, 0x53, 0x01 /* Help2=339 */, 
+        RET, 
+    // }
+    // Help2:
+    // {
+        LD_B_IMM32, 0x18, 0x02, 0xFF, 0xFF, 
+        CALL, 0x5C, 0x01 /* Help3=348 */, 
+        RET, 
+    // }
+    // Help3:
+    // {
+        LD_C_IMM32, 0xFE, 0x7E, 0x00, 0x00, 
         RET, 
     // }
     //
@@ -398,7 +416,7 @@ static const uint8_t Program[] PROGMEM = {
         LT_VEL, 0x01, 
         WAIT5, 
         LD_A_IMM32, 0x88, 0x88, 0xB8, 0x00, 
-        CALL, 0xCF, 0x01 /* doleds=463 */, 
+        CALL, 0xE4, 0x01 /* doleds=484 */, 
         WAIT5, 
         WAIT5, 
         WAIT5, 
@@ -409,7 +427,7 @@ static const uint8_t Program[] PROGMEM = {
         UPLINK_PROB_IMM8, 0x00, 
         LT_NO_ATT, 0x01, 
         LD_A_IMM32, 0xAA, 0xAA, 0xAA, 0x00, 
-        CALL, 0xCF, 0x01 /* doleds=463 */, 
+        CALL, 0xE4, 0x01 /* doleds=484 */, 
     // forever:
         BRANCH, 0xFE /* forever=-2 */, 
     // doleds:
@@ -427,14 +445,14 @@ static const uint8_t Program[] PROGMEM = {
     // VERB_69:
     // {
         RTC_TIMESTAMP_DIRECT, AGCINIT, 
-        CALL, 0x61, 0x01 /* VERB_36=353 */, 
+        CALL, 0x76, 0x01 /* VERB_36=374 */, 
     // }
     // PROG_00:
     // PROG_01:
     // PROG_02:
     // PROG_60:
     // {
-        GOTO, 0xDB, 0x01 /* PROG_00=475 */, 
+        GOTO, 0xF0, 0x01 /* PROG_00=496 */, 
     // }
     // P61 playback JFK i believe
     // PROG_61:
@@ -494,11 +512,11 @@ static const uint8_t Program[] PROGMEM = {
         MOD_A_B, 
         LD_B_IMM8, 0x03, 
         MUL_A_B, 
-        LD_B_IMM16, 0x10, 0x02 /* LampList=528 */, 
+        LD_B_IMM16, 0x25, 0x02 /* LampList=549 */, 
         ADD_B_A, 
         MOV_B_C, 
         CALL_CINDIRECT, 
-        GOTO, 0xF7, 0x01 /* PROG_42=503 */, 
+        GOTO, 0x0C, 0x02 /* PROG_42=524 */, 
     // LampList:
     // On_NOATT:
         LT_NO_ATT, 0x01, 
@@ -565,23 +583,6 @@ static const uint8_t Program[] PROGMEM = {
         RET, 
     // Off_VEL:
         LT_VEL, 0x00, 
-        RET, 
-    // }
-    // Help:
-    // {
-        LD_A_IMM8, 0x17, 
-        CALL, 0x58, 0x02 /* Help2=600 */, 
-        RET, 
-    // }
-    // Help2:
-    // {
-        LD_B_IMM32, 0x18, 0x02, 0xFF, 0xFF, 
-        CALL, 0x61, 0x02 /* Help3=609 */, 
-        RET, 
-    // }
-    // Help3:
-    // {
-        LD_C_IMM32, 0xFE, 0x7E, 0x00, 0x00, 
         RET, 
     // }
     //
@@ -927,6 +928,157 @@ static const uint8_t Program[] PROGMEM = {
         BLINK_OPRERR, 0x01, 
     // done:
         BRANCH, 0xFE /* done=-2 */, 
+    // }
+    //
+    // V25 N36		Set RTC Time (HH, MM, SS)
+    // V25 N37		Set RTC Date (YYYY, MM, DD)
+    //
+    // TMP1		address of populate function
+    // TMP2		address of set function
+    //
+    // VERB_25:
+    // {
+        MOV_NOUN_A, 
+        BRANCH_A_EQ_IMM8, 0x36, 0x05 /* ptime=+5 */, 
+        BRANCH_A_EQ_IMM8, 0x37, 0x07 /* pdate=+7 */, 
+        BRANCH, 0x54 /* error=+84 */, 
+    // ptime:
+        CALL, 0x91, 0x04 /* PopulateTime=1169 */, 
+        BRANCH, 0x03 /* over=+3 */, 
+    // pdate:
+        CALL, 0xA7, 0x04 /* PopulateDate=1191 */, 
+    // over:
+        BLINK_R1, 0x01, 
+        INPUT_R1, 
+        BRANCH_A_LT_IMM8, 0x00, 0x46 /* error=+70 */, 
+        BLINK_R1, 0x00, 
+        DECODE_A_FROM_DEC, 
+        MOV_A_B, 
+        ENCODE_A_TO_DEC, 
+        MOV_A_R1, 
+        MOV_NOUN_A, 
+        BRANCH_A_EQ_IMM8, 0x36, 0x40 /* CheckHH=+64 */, 
+        BRANCH_A_EQ_IMM8, 0x37, 0x56 /* CheckYYYY=+86 */, 
+    // doR2:
+        BLINK_R2, 0x01, 
+        INPUT_R2, 
+        BRANCH_A_LT_IMM8, 0x00, 0x33 /* error=+51 */, 
+        BLINK_R2, 0x00, 
+        DECODE_A_FROM_DEC, 
+        MOV_A_B, 
+        ENCODE_A_TO_DEC, 
+        MOV_A_R2, 
+        MOV_NOUN_A, 
+        BRANCH_A_EQ_IMM8, 0x36, 0x35 /* CheckMM=+53 */, 
+        BRANCH_A_EQ_IMM8, 0x37, 0x4D /* CheckMON=+77 */, 
+    // doR3:
+        BLINK_R3, 0x01, 
+        INPUT_R3, 
+        BRANCH_A_LT_IMM8, 0x00, 0x20 /* error=+32 */, 
+        BLINK_R3, 0x00, 
+        DECODE_A_FROM_DEC, 
+        MOV_A_B, 
+        ENCODE_A_TO_DEC, 
+        MOV_A_R3, 
+        MOV_NOUN_A, 
+        BRANCH_A_EQ_IMM8, 0x36, 0x2A /* CheckSS=+42 */, 
+        BRANCH_A_EQ_IMM8, 0x37, 0x42 /* CheckDAY=+66 */, 
+    // set:
+        MOV_NOUN_A, 
+        BRANCH_A_EQ_IMM8, 0x36, 0x03 /* stime=+3 */, 
+        BRANCH_A_EQ_IMM8, 0x37, 0x06 /* sdate=+6 */, 
+    // stime:
+        CALL, 0xCD, 0x04 /* SetTime=1229 */, 
+        GOTO, 0xDD, 0x04 /* success=1245 */, 
+    // sdate:
+        CALL, 0xBD, 0x04 /* SetDate=1213 */, 
+        GOTO, 0xDD, 0x04 /* success=1245 */, 
+    // error:
+        BLINK_OPRERR, 0x01, 
+    // x:
+        BRANCH, 0xFE /* x=-2 */, 
+    // CheckHH:
+        BRANCH_B_LT_IMM8, 0x00, 0xF9 /* error=-7 */, 
+        BRANCH_B_GT_IMM8, 0x17, 0xF6 /* error=-10 */, 
+        BRANCH, 0xBB /* doR2=-69 */, 
+    // CheckMM:
+        BRANCH_B_LT_IMM8, 0x00, 0xF1 /* error=-15 */, 
+        BRANCH_B_GT_IMM8, 0x3B, 0xEE /* error=-18 */, 
+        BRANCH, 0xC6 /* doR3=-58 */, 
+    // CheckSS:
+        BRANCH_B_LT_IMM8, 0x00, 0xE9 /* error=-23 */, 
+        BRANCH_B_GT_IMM8, 0x3B, 0xE6 /* error=-26 */, 
+        GOTO, 0x46, 0x04 /* set=1094 */, 
+    // CheckYYYY:
+        BRANCH_B_LT_IMM16, 0xD0, 0x07, 0xDF /* error=-33 */, 
+        BRANCH_B_GT_IMM16, 0x33, 0x08, 0xDB /* error=-37 */, 
+        BRANCH, 0xA0 /* doR2=-96 */, 
+    // CheckMON:
+        BRANCH_B_LT_IMM8, 0x00, 0xD6 /* error=-42 */, 
+        BRANCH_B_GT_IMM8, 0x0C, 0xD3 /* error=-45 */, 
+        BRANCH, 0xAB /* doR3=-85 */, 
+    // CheckDAY:
+        BRANCH_B_LT_IMM8, 0x01, 0xCE /* error=-50 */, 
+        BRANCH_B_GT_IMM8, 0x1F, 0xCB /* error=-53 */, 
+        GOTO, 0x46, 0x04 /* set=1094 */, 
+    // PopulateTime:
+        RTC_HH_A, 
+        OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
+        MOV_A_R1, 
+        RTC_MM_A, 
+        OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
+        MOV_A_R2, 
+        RTC_SS_A, 
+        OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
+        MOV_A_R3, 
+        RET, 
+    // PopulateDate:
+        RTC_YEAR_A, 
+        OR_A_IMM32, 0x00, 0x20, 0xB0, 0x00, 
+        MOV_A_R1, 
+        RTC_MON_A, 
+        OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
+        MOV_A_R2, 
+        RTC_DAY_A, 
+        OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
+        MOV_A_R3, 
+        RET, 
+    // SetDate:
+        LD_C_IMM8, 0x04, 
+        MOV_R3_A, 
+        RTC_A_MEM_CINDIRECT, 
+        INC_C, 
+        MOV_R2_A, 
+        RTC_A_MEM_CINDIRECT, 
+        INC_C, 
+        MOV_R1_A, 
+        AND_A_IMM32, 0xFF, 0x00, 0x00, 0x00, 
+        RTC_A_MEM_CINDIRECT, 
+        RET, 
+    // SetTime:
+    // clear seconds to avoid incrementing minutes
+    // in the middle of the set operation
+        CLR_C, 
+        SWAP_A_B, 
+        CLR_A, 
+        RTC_A_MEM_CINDIRECT, 
+        SWAP_A_B, 
+        LD_C_IMM8, 0x02, 
+        MOV_R1_A, 
+        RTC_A_MEM_CINDIRECT, 
+        DEC_C, 
+        MOV_R2_A, 
+        RTC_A_MEM_CINDIRECT, 
+        DEC_C, 
+        MOV_R3_A, 
+        RTC_A_MEM_CINDIRECT, 
+        RET, 
+    // jump to the corresponding V16 N36 (time), V16 N37 (date)
+    // success:
+        EMPTY_STACK, 
+        LD_A_IMM8, 0x16, 
+        MOV_A_VERB, 
+        GOTO, 0x67, 0x02 /* VERB_16=615 */, 
     // }
     // ASM_END:
 };
