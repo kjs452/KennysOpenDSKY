@@ -25,7 +25,7 @@ Kenny's Open DSKY Software
   + [DSKY Usage](#dsky-usage)
     + [General Notes:](#general-notes)
     + [VERBs, NOUNs, and PROGRAMs](#verbs-nouns-and-programs)
-    + [Status (updated 2/22/2024)](#status-updated-2222024)
+    + [Status](#status-updated-2222024)
     + [Verbs](#verbs)
     + [Nouns](#nouns)
     + [Verb-Nouns](#verb-nouns)
@@ -341,7 +341,8 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 ### VERBs, NOUNs, and PROGRAMs
 This section documents the available VERB/NOUN combinations and the PROGRAM's.
 
-### Status (updated 3/11/2024)
+### Status
+**(updated 3/11/2024)**
 Not all verb/nouns in the list are implemented yet. This is my list of
 what I wish to implement eventually. These items come from the
 **Apollo 50th Anniversary** project. I will update this section as
