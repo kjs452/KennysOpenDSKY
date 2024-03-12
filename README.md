@@ -25,7 +25,7 @@ Kenny's Open DSKY Software
   + [DSKY Usage](#dsky-usage)
     + [General Notes:](#general-notes)
     + [VERBs, NOUNs, and PROGRAMs](#verbs-nouns-and-programs)
-    + [Status](#status-updated-2222024)
+    + [Status](#status)
     + [Verbs](#verbs)
     + [Nouns](#nouns)
     + [Verb-Nouns](#verb-nouns)
