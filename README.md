@@ -135,7 +135,7 @@ The current build uses the following memory on the Arduino:
 ```text
 $ make sketch
 arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
-Sketch uses 22490 bytes (73%) of program storage space. Maximum is 30720 bytes.
+Sketch uses 22468 bytes (73%) of program storage space. Maximum is 30720 bytes.
 Global variables use 1115 bytes (54%) of dynamic memory, leaving 933 bytes for local variables.
 Maximum is 2048 bytes.
 
@@ -342,7 +342,7 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 This section documents the available VERB/NOUN combinations and the PROGRAM's.
 
 ### Status
-**(updated 3/11/2024)**
+**(updated 3/13/2024)**
 Not all verb/nouns in the list are implemented yet. This is my list of
 what I wish to implement eventually. These items come from the
 **Apollo 50th Anniversary** project. I will update this section as
@@ -454,7 +454,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |           |                                                              |
 |V37 N00    | P00 enter idle mode                                          |
 |V37 N01    | P01 A11 Launch Simulation[^1]                                |
-|V37 N06    | P06 Simulates putting AGC into standby mode[^1]              |
+|V37 N06    | P06 Simulates putting AGC into standby mode                  |
 |V37 N11    | P11 Monitor IMU Accel values[^1]                             |
 |V37 N42    | "blinky" - randomly illuminate caution and warning lights    |
 |V37 N61    | P61 playback JFK i believe                                   |
@@ -476,7 +476,7 @@ I.e. To run program P61 you would enter: `VERB 3 7 ENTR 6 1 ENTR`
 |------|--------------------------------------------------------------------|
 | P00  | Poo                                                                |
 | P01  | Apollo 11 Launch Simulation                                        |
-| P06  | Simulate putting AGC into standby mode[^1]                         |
+| P06  | Simulate putting AGC into standby mode                             |
 | P11  | Display IMU linear acceleration values (same as V16 N18)[^1]       |
 | P42  | "blinky" - randomly illuminate caution and warning lights          |
 | P61  | play short version of JFK "I believe"                              |
@@ -634,9 +634,7 @@ The instruction mnemonics use these suffixes to indicate the addressing modes/ar
 + `_IMM16` - Takes an immediate 16-bit value
 + `_IMM32` - Takes an immediate 32-bit value
 + `_DIRECT` - Takes an 8-bit value which represents a RAM memory location
-+ `_CDIRECT` - Takes an 8-bit address constant and adds it to the C register
-                to form the effective address. `C+<addr>`
-+ `_INDIRECT_C` - The C register contains the address to RAM[C] or Program[C].
++ `_CINDIRECT` - The C register contains the address to RAM[C] or Program[C].
 + `_U`          - the instruction operates in the unsigned domain
 + `_OCT`        - the instruction operates using Octal radix instead of decimal
 
@@ -704,26 +702,22 @@ Here are all the assembly instructions:
 | LD_A_DIRECT       | addr       | Load into the A register the contents of RAM at addr                 |
 | LD_B_DIRECT       | addr       | Load into the B register the contents of RAM at addr                 |
 | LD_C_DIRECT       | addr       | Load into the C register the contents of RAM at addr                 |
-| LD_A_IMM32        | imm32      | Load into the A register the immediate 32-bit value given by imm32    |
-| LD_B_IMM32        | imm32      | Load into the B register the immediate 32-bit value given by imm32    |
-| LD_C_IMM32        | imm32      | Load into the C register the immediate 32-bit value given by imm32    |
-| LD_A_IMM16        | imm16      | Load into the A register the immediate 16-bit value given by imm16    |
-| LD_B_IMM16        | imm16      | Load into the B register the immediate 16-bit value given by imm16    |
-| LD_C_IMM16        | imm16      | Load into the C register the immediate 16-bit value given by imm16    |
-| LD_A_IMM8         | imm8       | Load into the A register the immediate 8-bit value given by imm8      |
-| LD_B_IMM8         | imm8       | Load into the B register the immediate 8-bit value given by imm8      |
-| LD_C_IMM8         | imm8       | Load into the C register the immediate 8-bit value given by imm8      |
-| LD_A_CDIRECT      | addr       | Load A register with contents of RAM at address C+addr               |
-| LD_B_CDIRECT      | addr       | Load B register with contents of RAM at address C+addr               |
-| LD_A_INDIRECT_C   |            | Load A register with contents of RAM at address given by C           |
-| LD_B_INDIRECT_C   |            | Load B register with contents of RAM at address given by C           |
+| LD_A_IMM32        | imm32      | Load into the A register the immediate 32-bit value given by imm32   |
+| LD_B_IMM32        | imm32      | Load into the B register the immediate 32-bit value given by imm32   |
+| LD_C_IMM32        | imm32      | Load into the C register the immediate 32-bit value given by imm32   |
+| LD_A_IMM16        | imm16      | Load into the A register the immediate 16-bit value given by imm16   |
+| LD_B_IMM16        | imm16      | Load into the B register the immediate 16-bit value given by imm16   |
+| LD_C_IMM16        | imm16      | Load into the C register the immediate 16-bit value given by imm16   |
+| LD_A_IMM8         | imm8       | Load into the A register the immediate 8-bit value given by imm8     |
+| LD_B_IMM8         | imm8       | Load into the B register the immediate 8-bit value given by imm8     |
+| LD_C_IMM8         | imm8       | Load into the C register the immediate 8-bit value given by imm8     |
+| LD_A_CINDIRECT    |            | Load A register with contents of RAM at address given by C           |
+| LD_B_CINDIRECT    |            | Load B register with contents of RAM at address given by C           |
 | ST_A_DIRECT       | addr       | Store A register to the RAM location given by addr                   |
 | ST_B_DIRECT       | addr       | Store B register to the RAM location given by addr                   |
 | ST_C_DIRECT       | addr       | Store C register to the RAM location given by addr                   |
-| ST_A_CDIRECT      | addr       | Store A register to the RAM location given by C+addr                 |
-| ST_B_CDIRECT      | addr       | Store B register to the RAM location given by C+addr                 |
-| ST_A_INDIRECT_C   |            | Store A register to the RAM location given by C                      |
-| ST_B_INDIRECT_C   |            | Store B register to the RAM location given by C                      |
+| ST_A_CINDIRECT    |            | Store A register to the RAM location given by C                      |
+| ST_B_CINDIRECT    |            | Store B register to the RAM location given by C                      |
 | CLR_A             |            | Clear the A register to a value of 0                                 |
 | CLR_B             |            | Clear the B register to a value of 0                                 |
 | CLR_C             |            | Clear the C register to a value of 0                                 |
@@ -871,8 +865,6 @@ Here are all the assembly instructions:
 | RTC_HH_A           |           | Read RTC and place HOURS field into A register (BCD encoded)         |
 | RTC_MM_A           |           | Read RTC and place MINUTES field into A register (BCD encoded)       |
 | RTC_SS_A           |           | Read RTC and place SECONDS field into A register (BCD encoded)       |
-| RTC_MEM_A          | addr      | Read RTC RAM address addr and place into A register                  |
-| RTC_A_MEM          | addr      | Write LSB of A register into RTC RAM address addr                    |
 | RTC_MEM_A_CINDIRECT|           | Read RTC RAM address [C] and place into A register                   |
 | RTC_A_MEM_CINDIRECT|           | Write LSB of A register into RTC RAM address [C]                     |
 | IMU_ACCX_A         |           | Move IMU Acceleration X value into A                                 |
@@ -884,8 +876,8 @@ Here are all the assembly instructions:
 | IMU_TEMP_A         |           | Move IMU Temp value into A                                           |
 | MP3_PLAY_A         |           | play track number indicated by register A                            |
 | MP3_STOP           |           | stop playing any track. (play the silence clip)                      |
-| EEPROM_WRITE_A_CDIRECT |       | write A register byte to EEPROM[C]                                   |
-| EEPROM_READ_A_CDIRECT  |       | read into A register byte from EEPROM[C]                             |
+| EEPROM_WRITE_A_CINDIRECT |     | write A register byte to EEPROM[C]                                   |
+| EEPROM_READ_A_CINDIRECT  |     | read into A register byte from EEPROM[C]                             |
 | WAIT1              |           | pause CPU until 100ms timer triggers, then proceed to next instr.    |
 | WAIT2              |           | pause CPU until 200ms timer triggers, then proceed to next instr.    |
 | WAIT3              |           | pause CPU until 300ms timer triggers, then proceed to next instr.    |
@@ -898,14 +890,17 @@ Here are all the assembly instructions:
 | INPUT_R1_OCT       |  | Read an octal value into R1. A=value good. A=-1 Bad                           |
 | INPUT_R2_OCT       |  | Read an octal value into R2. A=value good. A=-1 Bad                           |
 | INPUT_R3_OCT       |  | Read an octal value into R3. A=value good. A=-1 Bad                           |
-| PROG8_A_INDIRECT_C |           | A = Program[C] read byte from program memory                         |
-| PROG16_A_INDIRECT_C|           | A = Program[C] read 16-bit word from program memory C, C+1           |
-| PROG32_A_INDIRECT_C|           | A = Program[C] read 32-bit word from program memory C, C+1, C+2, C+3 |
+| INPUT_PROCEED      |  | Wait for PRO key (Proceed) to be pressed. A=0 PRO pressed. A=-1 Cancelled     |
+| INPUT_REQ_PROCEED  |  | Wait for PRO key (Proceed) to be pressed. A=0 PRO pressed.                    |
+| PROG8_A_CINDIRECT  |           | A = Program[C] read byte from program memory                         |
+| PROG16_A_CINDIRECT |           | A = Program[C] read 16-bit word from program memory C, C+1           |
+| PROG32_A_CINDIRECT |           | A = Program[C] read 32-bit word from program memory C, C+1, C+2, C+3 |
 | ADD_A_IMM8         | imm8      | Add signed byte imm8 to A register                                   |
 | ADD_B_IMM8         | imm8      | Add signed byte imm8 to B register                                   |
 | ADD_C_IMM8         | imm8      | Add signed byte imm8 to C register                                   |
 | EMPTY_STACK        |           | Reset the stack to be empty for the CPU core                         |
 | RUN_PROG_A         | | cause cpu core 0 to run program located at 16-bit address in A. Reset stack    |
+| RUN_MINOR_A        | | cause cpu core 1 to run program located at 16-bit address in A. Reset stack    |
 | CALL_CINDIRECT     |           | call a subroutine whose address is in the C register                 |
 | PUSH_DSKY          |           | push DSKY state on stack                                             |
 | POP_DSKY           |           | pop DSKY state on stack                                              |
@@ -934,11 +929,11 @@ VERB_37:
 
             LD_C_IMM16  Programs
 
-Next:       PROG8_A_INDIRECT_C
+Next:       PROG8_A_CINDIRECTC
             BRANCH_A_EQ_IMM8    -1      NotFound
             INC_C
             ST_A_DIRECT         PROG_TMP1
-            PROG16_A_INDIRECT_C
+            PROG16_A_CINDIRECT
             ADD_C_IMM8          2
             BRANCH_B_EQ_DIRECT  PROG_TMP1   Found
             BRANCH  Next

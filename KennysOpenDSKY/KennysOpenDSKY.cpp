@@ -398,6 +398,11 @@ enum DSKY_STATE {
 	S_IO5,		// got 4th digit.
 	S_IO6,		// got 5th digit.
 	S_IOA,		// accept
+
+	S_IP1,		// input (PRO) proceed key
+	S_IPA,		// PRO key pressed
+
+	S_IPR,		// required (PRO) proceed key
 };
 
 //
@@ -463,17 +468,13 @@ enum AGC_INSTRUCTION
 	LD_A_IMM8,			// #00
 	LD_B_IMM8,			// #00
 	LD_C_IMM8,			// #00
-	LD_A_CDIRECT,		// <addr>		load A with C+<addr>
-	LD_B_CDIRECT,		// <addr>		load B with C+<addr>
-	LD_A_INDIRECT_C,	// 		load A with (C)
-	LD_B_INDIRECT_C,	//		load B with (C)
+	LD_A_CINDIRECT,		// 		load A with (C)
+	LD_B_CINDIRECT,		//		load B with (C)
 	ST_A_DIRECT,		// <addr>
 	ST_B_DIRECT,		// <addr>
 	ST_C_DIRECT,		// <addr>
-	ST_A_CDIRECT,		// <addr>	store A to  C+<addr>
-	ST_B_CDIRECT,		// <addr>	store B to  C+<addr>
-	ST_A_INDIRECT_C,	//			store A to (C)
-	ST_B_INDIRECT_C,	//			store B to (C)
+	ST_A_CINDIRECT,		//			store A to (C)
+	ST_B_CINDIRECT,		//			store B to (C)
 	CLR_A,
 	CLR_B,
 	CLR_C,
@@ -621,8 +622,6 @@ enum AGC_INSTRUCTION
 	RTC_HH_A,
 	RTC_MM_A,
 	RTC_SS_A,
-	RTC_MEM_A,				// <addr>		56 byte memory
-	RTC_A_MEM,				// <addr>		56 byte memory
 	RTC_MEM_A_CINDIRECT,	// <addr>		56 byte memory	C
 	RTC_A_MEM_CINDIRECT,	// <addr>		56 byte memory	C
 	IMU_ACCX_A,
@@ -634,13 +633,13 @@ enum AGC_INSTRUCTION
 	IMU_TEMP_A,
 	MP3_PLAY_A,				// play track indicated by register A
 	MP3_STOP,				// stop playing any track.
-	EEPROM_WRITE_A_CDIRECT,	// write A register byte to EEPROM[C]
-	EEPROM_READ_A_CDIRECT,	// read into A register byte from EEPROM[C]
-	WAIT1,					// wait for wait flag to become 1, don't advance PC until it becomes 1.
-	WAIT2,
-	WAIT3,
-	WAIT4,
-	WAIT5,
+	EEPROM_WRITE_A_CINDIRECT,	// write A register byte to EEPROM[C]
+	EEPROM_READ_A_CINDIRECT,	// read into A register byte from EEPROM[C]
+	WAIT1,					// 100ms wait for wait flag to become 1, don't advance PC until it becomes 1.
+	WAIT2,					// 200ms
+	WAIT3,					// 300ms
+	WAIT4,					// 1s
+	WAIT5,					// 2s
 	INPUT_NOUN,
 	INPUT_R1,
 	INPUT_R2,
@@ -648,14 +647,17 @@ enum AGC_INSTRUCTION
 	INPUT_R1_OCT,	// read an octal value from keyboard and put into R1	A=result 0=good key=bad
 	INPUT_R2_OCT,	// read an octal value from keyboard and put into R2	A=result 0=good key=bad
 	INPUT_R3_OCT,	// read an octal value from keyboard and put into R3	A=result 0=good key=bad
-	PROG8_A_INDIRECT_C,		// A = Program[C]		byte
-	PROG16_A_INDIRECT_C,	// A = Program[C]		short (little endian)
-	PROG32_A_INDIRECT_C,	// A = Program[C]		int (little endian)
+	INPUT_PROCEED,	// ask user to press PRO key (proceed)	A=0 proceed, A=-1 cancelled
+	INPUT_REQ_PROCEED,	// required proceed pressA=1 proceed, A=0
+	PROG8_A_CINDIRECT,		// A = Program[C]		byte
+	PROG16_A_CINDIRECT,		// A = Program[C]		short (little endian)
+	PROG32_A_CINDIRECT,		// A = Program[C]		int (little endian)
 	ADD_A_IMM8,				// #00
 	ADD_B_IMM8,				// #00		B = B + IMM8
 	ADD_C_IMM8,				// #00
 	EMPTY_STACK,			// reset stack to being empty
-	RUN_PROG_A,				// Run major mode program in 'A'
+	RUN_PROG_A,				// Run major mode program whose 16-bit address is in 'A'
+	RUN_MINOR_A,			// Run minor mode whose 16-bit address is in 'A'
 	CALL_CINDIRECT,			// call a routine using C register
 	PUSH_DSKY,				// push DSKY state on stack
 	POP_DSKY,				// push DSKY state on stack
@@ -698,17 +700,13 @@ static const char *Mnemonics[] = {
 	"LD_A_IMM8",			// #00
 	"LD_B_IMM8",			// #00
 	"LD_C_IMM8",			// #00
-	"LD_A_CDIRECT",		// <addr>		load A with C+<addr>
-	"LD_B_CDIRECT",		// <addr>		load B with C+<addr>
-	"LD_A_INDIRECT_C",	// 		load A with (C)
-	"LD_B_INDIRECT_C",	//		load B with (C)
-	"ST_A_DIRECT",		// <addr>
-	"ST_B_DIRECT",		// <addr>
-	"ST_C_DIRECT",		// <addr>
-	"ST_A_CDIRECT",		// <addr>	store A to  C+<addr>
-	"ST_B_CDIRECT",		// <addr>	store B to  C+<addr>
-	"ST_A_INDIRECT_C",	//			store A to (C)
-	"ST_B_INDIRECT_C",	//			store B to (C)
+	"LD_A_CINDIRECT",		// 		load A with (C)
+	"LD_B_CINDIRECT",		//		load B with (C)
+	"ST_A_DIRECT",			// <addr>
+	"ST_B_DIRECT",			// <addr>
+	"ST_C_DIRECT",			// <addr>
+	"ST_A_CINDIRECT",		//			store A to (C)
+	"ST_B_CINDIRECT",		//			store B to (C)
 	"CLR_A",
 	"CLR_B",
 	"CLR_C",
@@ -856,8 +854,6 @@ static const char *Mnemonics[] = {
 	"RTC_HH_A",
 	"RTC_MM_A",
 	"RTC_SS_A",
-	"RTC_MEM_A",			// <addr>		56 byte memory
-	"RTC_A_MEM",			// <addr>		56 byte memory
 	"RTC_MEM_A_CINDIRECT",	// <addr>	56 byte memory	C
 	"RTC_A_MEM_CINDIRECT",	// <addr>	56 byte memory	C
 	"IMU_ACCX_A",
@@ -869,8 +865,8 @@ static const char *Mnemonics[] = {
 	"IMU_TEMP_A",
 	"MP3_PLAY_A",				// play track indicated by register A
 	"MP3_STOP",				// stop playing any track.
-	"EEPROM_WRITE_A_CDIRECT",	// <2byteaddr>			<2byteaddr>+C
-	"EEPROM_READ_A_CDIRECT",	// <2byteaddr>			<2byteaddr>+C
+	"EEPROM_WRITE_A_CINDIRECT",	// <2byteaddr>			<2byteaddr>+C
+	"EEPROM_READ_A_CINDIRECT",	// <2byteaddr>			<2byteaddr>+C
 	"WAIT1",					// wait for wait flag to become 1, don't advance PC until it becomes 1.
 	"WAIT2",
 	"WAIT3",
@@ -883,14 +879,17 @@ static const char *Mnemonics[] = {
 	"INPUT_R1_OCT",	// read an octal value from keyboard and put into R1	A=result 0=good key=bad
 	"INPUT_R2_OCT",	// read an octal value from keyboard and put into R2	A=result 0=good key=bad
 	"INPUT_R3_OCT",	// read an octal value from keyboard and put into R3	A=result 0=good key=bad
-	"PROG8_A_INDIRECT_C",		// A = Program[C]		byte
-	"PROG16_A_INDIRECT_C",	// A = Program[C]		short (little endian)
-	"PROG32_A_INDIRECT_C",	// A = Program[C]		int (little endian)
+	"INPUT_PROCEED",
+	"INPUT_REQ_PROCEED",
+	"PROG8_A_CINDIRECT",		// A = Program[C]		byte
+	"PROG16_A_CINDIRECT",		// A = Program[C]		short (little endian)
+	"PROG32_A_CINDIRECT",		// A = Program[C]		int (little endian)
 	"ADD_A_IMM8",				// #00
 	"ADD_B_IMM8",				// #00		B = B + IMM8
 	"ADD_C_IMM8",				// #00
 	"EMPTY_STACK",			// reset stack to being empty
 	"RUN_PROG_A",				// Run major mode program in 'A'
+	"RUN_MINOR_A",				// Run minor mode in 'A'
 	"CALL_CINDIRECT",			// call a routine using C register
 	"PUSH_DSKY",				// push DSKY state on stack
 	"POP_DSKY",				// push DSKY state on stack
@@ -1628,7 +1627,8 @@ static const DISPATCH_ENTRY Verbs[] PROGMEM = {
 //	S_NI1		INPUT_NOUN									input noun
 //	S_IR1		INPUT_R1, INPUT_R2, INPUT_R3, 				input register (decimal)
 //	S_IO1		INPUT_R1_OCT, INPUT_R2_OCT, INPUT_R3_OCT	input register (octal)
-//	S_PR1		PROCEED_PROMPT								wait for PRO key press
+//	S_IP1		INPUT_PROCEED								wait for PRO key press
+//	S_IRP		INPUT_REQ_PROCEED							wait for PRO key press
 //
 
 static const uint8_t StateMachine[][10] PROGMEM = {
@@ -1661,26 +1661,30 @@ static const uint8_t StateMachine[][10] PROGMEM = {
 /* NIA */		S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,
 
 /* IR1 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_NOP,	S_NOP,	S_IR2,	S_IR3,	S_NOP,
-/* IR2 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IE,	S_NOP,	S_NOP,	S_NOP,	S_IR4, // +
-/* IR3 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IE,	S_NOP,	S_NOP,	S_NOP,	S_IR4, // -
-/* IR4 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IRA,	S_NOP,	S_NOP,	S_NOP,	S_IR5, // d1
-/* IR5 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IRA,	S_NOP,	S_NOP,	S_NOP,	S_IR6, // d2
-/* IR6 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IRA,	S_NOP,	S_NOP,	S_NOP,	S_IR7, // d3
-/* IR7 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IRA,	S_NOP,	S_NOP,	S_NOP,	S_IR8, // d4
-/* IR8 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IRA,	S_NOP,	S_NOP,	S_NOP,	S_NOP, // d5
-/* IRA */		S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP, // accept
+/* IR2 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IE,	S_NOP,	S_NOP,	S_NOP,	S_IR4,
+/* IR3 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IE,	S_NOP,	S_NOP,	S_NOP,	S_IR4,
+/* IR4 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IRA,	S_NOP,	S_NOP,	S_NOP,	S_IR5,
+/* IR5 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IRA,	S_NOP,	S_NOP,	S_NOP,	S_IR6,
+/* IR6 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IRA,	S_NOP,	S_NOP,	S_NOP,	S_IR7,
+/* IR7 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IRA,	S_NOP,	S_NOP,	S_NOP,	S_IR8,
+/* IR8 */		S_IV,	S_IN,	S_NOP,	S_IR1,	S_NOP,	S_IRA,	S_NOP,	S_NOP,	S_NOP,	S_NOP,
+/* IRA */		S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,
 
 /* Input		VERB	NOUN	PRO		CLR		KREL	ENTR	RSET	PLUS	MINUS	DIGIT	*/
 /*              =======	=======	=======	=======	=======	=======	=======	=======	=======	======= */
 
 /* IO1 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IE,	S_NOP,	S_IE,	S_IE,	S_IO2,
-/* IO2 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IOA,	S_NOP,	S_IE,	S_IE,	S_IO3, // d1
-/* IO3 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IOA,	S_NOP,	S_IE,	S_IE,	S_IO4, // d2
-/* IO4 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IOA,	S_NOP,	S_IE,	S_IE,	S_IO5, // d3
-/* IO5 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IOA,	S_NOP,	S_IE,	S_IE,	S_IO6, // d4
-/* IO6 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IOA,	S_NOP,	S_IE,	S_IE,	S_NOP, // d5
-/* IOA */		S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP, // accept
+/* IO2 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IOA,	S_NOP,	S_IE,	S_IE,	S_IO3,
+/* IO3 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IOA,	S_NOP,	S_IE,	S_IE,	S_IO4,
+/* IO4 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IOA,	S_NOP,	S_IE,	S_IE,	S_IO5,
+/* IO5 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IOA,	S_NOP,	S_IE,	S_IE,	S_IO6,
+/* IO6 */		S_IV,	S_IN,	S_NOP,	S_IO1,	S_NOP,	S_IOA,	S_NOP,	S_IE,	S_IE,	S_NOP,
+/* IOA */		S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,
 
+/* IP1 */		S_IV,	S_IN,	S_IPA,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,
+/* IPA */		S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,
+
+/* IPR */		S_NOP,	S_NOP,	S_IPA,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,	S_NOP,
 };
 
 //
@@ -3091,16 +3095,10 @@ void agc_execute_cpu(uint8_t c)
 	case LD_C_IMM8:
 		reg1 = 2; goto ld_reg1_imm8;
 
-	case LD_A_CDIRECT:
-		reg1 = 0; goto ld_reg1_cdirect;
-
-	case LD_B_CDIRECT:
-		reg1 = 1; goto ld_reg1_cdirect;
-
-	case LD_A_INDIRECT_C:
+	case LD_A_CINDIRECT:
 		reg1 = 0; goto ld_reg1_indirect_c;
 
-	case LD_B_INDIRECT_C:
+	case LD_B_CINDIRECT:
 		reg1 = 1; goto ld_reg1_indirect_c;
 
 	case ST_A_DIRECT:
@@ -3112,16 +3110,10 @@ void agc_execute_cpu(uint8_t c)
 	case ST_C_DIRECT:
 		reg1 = 2; goto st_reg1_direct;
 
-	case ST_A_CDIRECT:
-		reg1 = 0; goto st_reg1_cdirect;
-
-	case ST_B_CDIRECT:
-		reg1 = 1; goto st_reg1_cdirect;
-
-	case ST_A_INDIRECT_C:
+	case ST_A_CINDIRECT:
 		reg1 = 0; goto st_reg1_indirect_c;
 
-	case ST_B_INDIRECT_C:
+	case ST_B_CINDIRECT:
 		reg1 = 1; goto st_reg1_indirect_c;
 
 	case CLR_A:
@@ -3624,12 +3616,6 @@ void agc_execute_cpu(uint8_t c)
 	case RTC_SS_A:
 		op = 0x00; goto rtc_op_a;
 
-	case RTC_MEM_A:
-		break;
-
-	case RTC_A_MEM:
-		break;
-
 	case RTC_MEM_A_CINDIRECT:
 		break;
 
@@ -3669,11 +3655,11 @@ void agc_execute_cpu(uint8_t c)
 		jfk(1);
 		break;
 
-	case EEPROM_WRITE_A_CDIRECT:
+	case EEPROM_WRITE_A_CINDIRECT:
 		EEPROM.update(cpu->regs[2], cpu->regs[0]);
 		break;
 
-	case EEPROM_READ_A_CDIRECT:
+	case EEPROM_READ_A_CINDIRECT:
 		cpu->regs[0] = EEPROM.read(cpu->regs[2]);
 		break;
 
@@ -3742,16 +3728,22 @@ void agc_execute_cpu(uint8_t c)
 		reg1 = 2; op = S_IO1; goto input_reg1_op;
 		break;
 
-	case PROG8_A_INDIRECT_C:
+	case INPUT_PROCEED:
+		reg1 = 0; op = S_IP1; goto input_reg1_op;		// reg1 not used in this context
+
+	case INPUT_REQ_PROCEED:
+		reg1 = 0; op = S_IPR; goto input_reg1_op;		// reg1 not used in this context
+
+	case PROG8_A_CINDIRECT:
 		cpu->regs[0] = ProgramAcc8(cpu->regs[2]);
 		break;
 
-	case PROG16_A_INDIRECT_C:
+	case PROG16_A_CINDIRECT:
 		// arduino compiler is little endian, assembler must make sure to pack values that way
 		cpu->regs[0] = ProgramAcc16(cpu->regs[2]);
 		break;
 
-	case PROG32_A_INDIRECT_C:
+	case PROG32_A_CINDIRECT:
 		// arduino compiler is little endian, assembler must make sure to pack values that way
 		cpu->regs[0] = ProgramAcc32(cpu->regs[2]);
 		break;
@@ -3779,9 +3771,11 @@ void agc_execute_cpu(uint8_t c)
 	case RUN_PROG_A:
 		Agc.cpu[0].PC = cpu->regs[0];
 		Agc.cpu[0].SP = CPU0_STACK;
-		Agc.cpu[0].regs[0] = 0;
-		Agc.cpu[0].regs[1] = 0;
-		Agc.cpu[0].regs[2] = 0;
+		break;
+
+	case RUN_MINOR_A:
+		Agc.cpu[1].PC = cpu->regs[0];
+		Agc.cpu[1].SP = CPU1_STACK;
 		break;
 
 	case CALL_CINDIRECT:
@@ -3867,22 +3861,12 @@ ld_reg1_imm8:
 	cpu->PC += 1;
 	goto done;
 
-ld_reg1_cdirect:
-	tmp = ProgramAcc8(cpu->PC++);
-	cpu->regs[reg1] = Agc.RAM[cpu->regs[2] + tmp];
-	goto done;
-
 ld_reg1_indirect_c:
 	cpu->regs[reg1] = Agc.RAM[cpu->regs[2]];
 	goto done;
 
 st_reg1_direct:
 	Agc.RAM[ProgramAccU8(cpu->PC++)] = cpu->regs[reg1];
-	goto done;
-
-st_reg1_cdirect:
-	tmp = ProgramAcc8(cpu->PC++);
-	Agc.RAM[cpu->regs[2] + tmp] = cpu->regs[reg1];
 	goto done;
 
 st_reg1_indirect_c:
@@ -4482,6 +4466,17 @@ void apollo_guidance_computer()
 			case S_IOA:
 				agc_accept_input(regp[0], regp[1], regp[2]);
 				Agc.state = S_ST;
+				break;
+
+			case S_IP1:
+				break;
+
+			case S_IPA:
+				agc_accept_input(0, 0, 0);
+				Agc.state = S_ST;
+				break;
+
+			case S_IPR:
 				break;
 			}
 		}

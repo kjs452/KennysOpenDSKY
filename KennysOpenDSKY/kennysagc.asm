@@ -17,14 +17,14 @@ DEFINE	PROG_TMP1 = 14
 
 DEFINE	CONTMODE = 15	// monitor once or continiously (0=once, 1=continiously)
 
-// main for cpu 0
+// idle loop for for cpu 0
 MAIN_CPU0:
 {
 	RTC_TIMESTAMP_DIRECT	AGCINIT		// reset the "time since AGC power up"
-	// fall thru to MAIN_CPU1
+	// NOTE: this falls thru to MAIN_CPU1
 }
 
-// main for cpu 1	(cpu 0 comes here VERB_36)
+// idle loop for cpu 1	(cpu 0 comes here VERB_36)
 MAIN_CPU1:
 {
 	EMPTY_STACK
@@ -50,11 +50,11 @@ VERB_37:
 
 			LD_C_IMM16	Programs
 
-Next:		PROG8_A_INDIRECT_C
+Next:		PROG8_A_CINDIRECT
 			BRANCH_A_EQ_IMM8	-1		NotFound
 			INC_C
 			ST_A_DIRECT			PROG_TMP1
-			PROG16_A_INDIRECT_C
+			PROG16_A_CINDIRECT
 			ADD_C_IMM8			2
 			BRANCH_B_EQ_DIRECT	PROG_TMP1	Found
 			BRANCH	Next
@@ -79,6 +79,8 @@ Programs:	DATA8		0x00
 			DATA16		PROG_70
 			DATA8		0x42
 			DATA16		PROG_42
+			DATA8		0x06
+			DATA16		PROG_06
 			DATA8		-1
 
 Found:
@@ -557,6 +559,133 @@ Off_VEL:		LT_VEL	0				// 21
 				RET
 }
 
+//
+// simulate Kevin Bacon / Gary Sinise Agc shutdown / Agc startup
+//
+// 1) 
+//	V 50	V 25		Blinking
+//	R1 = +00062
+//	R2 = +00000
+//	R3 = +00000
+//
+PROG_06:
+{
+		// begin standby
+		LD_A_IMM16		MAIN_CPU1		// idle loop for cpu 1
+		RUN_MINOR_A
+		EMPTY_STACK
+		UPLINK_PROB_IMM8	0
+		COMPACTY_PROB_IMM8	0
+
+		LD_A_IMM8	0x50
+		MOV_A_VERB
+		LD_A_IMM8	0x25
+		MOV_A_NOUN
+		BLINK_VERB		1
+		BLINK_NOUN		1
+		BLINK_PROG		1
+
+		LD_A_IMM32	0xB00062
+		MOV_A_R1
+		LD_A_IMM32	0xB00000
+		MOV_A_R2
+		LD_A_IMM32	0xB00000
+		MOV_A_R3
+
+		INPUT_PROCEED
+		BRANCH_A_LT_IMM8		0	cancel
+
+		// Turn everything off, except STBY light
+		LT_ALL		0
+		LT_STBY		1
+		WAIT3
+		WAIT3
+		CALL		clr
+
+		INPUT_REQ_PROCEED			// required proceed
+
+		LT_STBY				0
+		WAIT4
+		UPLINK_PROB_IMM8	255
+		WAIT4
+		LT_TEMP				1
+		WAIT4
+		LT_NO_ATT			1
+		WAIT4
+		LT_PROG_ALRM		1
+		WAIT4
+		LT_STBY				1
+		WAIT4
+		LT_TRACKER			1
+		WAIT4
+		LT_OPR_ERR			1
+		WAIT4
+		WAIT4
+
+		LT_ALL				0
+		UPLINK_PROB_IMM8	0
+
+		WAIT3
+		LD_A_IMM8			3
+rloop:	LT_RESTART			1
+		WAIT3
+		WAIT3
+		LT_RESTART			0
+		WAIT3
+		WAIT3
+		DEC_A
+		BRANCH_A_GE_IMM8	0		rloop
+
+		WAIT3
+		LT_PROG				1
+		WAIT3
+		LT_NOUN				1
+		WAIT3
+		LT_VERB				1
+		WAIT3
+		COMPACTY_PROB_IMM8	255
+		WAIT3
+
+		LD_A_IMM8		0x16
+		MOV_A_VERB
+		LD_A_IMM8		0x20
+		MOV_A_NOUN
+		LD_A_IMM8		0x46
+		MOV_A_PROG
+
+		LD_A_IMM32		0xC00000
+		MOV_A_R1
+
+		LD_A_IMM32		0xB00180
+		MOV_A_R2
+
+		LD_A_IMM32		0xB00000
+		MOV_A_R3
+
+		UPLINK_PROB_IMM8	10
+		COMPACTY_PROB_IMM8	100
+
+		BRANCH			forever
+
+cancel:	CALL			clr
+		BRANCH			forever
+
+forever:
+		BRANCH		forever
+
+clr:
+		BLINK_NOUN		0
+		BLINK_VERB		0
+		BLINK_PROG		0
+		LD_A_IMM32		0xAAAAAA
+		MOV_A_NOUN
+		MOV_A_VERB
+		MOV_A_R1
+		MOV_A_R2
+		MOV_A_R3
+		MOV_A_PROG
+		RET
+}
 
 //
 // VERB 16 & VERB 06
@@ -584,7 +713,7 @@ Off_VEL:		LT_VEL	0				// 21
 VERB_06:
 {
 	CLR_A
-	ST_A_DIRECT		CONTMODE		// 0 means once
+	ST_A_DIRECT		CONTMODE		// 0 means monitor once
 	BRANCH VERB_06_16
 }
 
@@ -606,11 +735,11 @@ VERB_06_16:
 		MOV_A_B
 
 		LD_C_IMM16					NounTable
-Next:	PROG8_A_INDIRECT_C
+Next:	PROG8_A_CINDIRECT
 		BRANCH_A_EQ_IMM8	-1		NotFound
 		INC_C
 		ST_A_DIRECT			TMP1
-		PROG16_A_INDIRECT_C
+		PROG16_A_CINDIRECT
 		BRANCH_B_EQ_DIRECT	TMP1	Found
 		ADD_C_IMM8			2
 		BRANCH	Next
