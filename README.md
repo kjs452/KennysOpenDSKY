@@ -135,7 +135,7 @@ The current build uses the following memory on the Arduino:
 ```text
 $ make sketch
 arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
-Sketch uses 22468 bytes (73%) of program storage space. Maximum is 30720 bytes.
+Sketch uses 22612 bytes (73%) of program storage space. Maximum is 30720 bytes.
 Global variables use 1115 bytes (54%) of dynamic memory, leaving 933 bytes for local variables.
 Maximum is 2048 bytes.
 
@@ -342,7 +342,7 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 This section documents the available VERB/NOUN combinations and the PROGRAM's.
 
 ### Status
-**(updated 3/13/2024)**
+**(updated 3/14/2024)**
 Not all verb/nouns in the list are implemented yet. This is my list of
 what I wish to implement eventually. These items come from the
 **Apollo 50th Anniversary** project. I will update this section as
@@ -366,8 +366,8 @@ The footnote **[1]** indicates items which have not been implemented yet.
 | V09  | Calculate (Perform Math operation)                 |
 | V10  | Convert Radix                                      |
 | V16  | Monitor Selected Values                            |
-| V21  | Enter value (R1 only)[^1]                          |
-| V22  | Enter value (R2 only)[^1]                          |
+| V21  | Enter value (R1 only)                              |
+| V22  | Enter value (R2 only)                              |
 | V25  | Enter values (R1 + R2 + R3)                        |
 | V26  | Load values from external source[^1]               |
 | V35  | LAMP TEST                                          |
@@ -395,7 +395,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 | N65  | MET (HH, MM, SS.01)[^1]                                           |
 | N68  | Lunar Powered Decent[^1]                                          |
 | N87  | IMU Accel values with random 1202 errors[^1]                      |
-| N98  | Audio Track and Index Adj (TTTTT, NNNNN)[^1]                      |
+| N98  | Audio Track and Index Adj (TTTTT, NNNNN)                          |
 
 ### Verb-Nouns
 | VERB-NOUN | Description                                                  |
@@ -436,9 +436,9 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |V16 N87    | Monitor IMU linear accel values (with random 1202 alarms)[^1]|
 |V16 N98    | Play selected audio clip R1=clip, R2=index adj factor[^1]    |
 |           |                                                              |
-|V21 N98    | select number of audio clip[^1]                              |
+|V21 N98    | Select audio clip number to play                             |
 |           |                                                              |
-|V22 N98    | Enter index adj factor[^1]                                   |
+|V22 N98    | Enter index adj. factor                                      |
 |           |                                                              |
 |V25 N34    | Set/Start timer count from event[^1]                         |
 |V25 N35    | Set/Start timer count to event[^1]                           |

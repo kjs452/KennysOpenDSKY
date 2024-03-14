@@ -1,3 +1,5 @@
+
+// general variables for minor mode
 DEFINE	TMP1 = 0
 DEFINE	TMP2 = 1
 DEFINE	TMP3 = 2
@@ -10,26 +12,42 @@ DEFINE	V01_R3 = 7
 DEFINE	RTC_SEC = 8
 DEFINE	RTC_S100 = 9
 
-DEFINE	AGCINIT = 10	// timestamp for AGC Initialization (10 and 11)
-DEFINE	TS1 = 12		// generic timestamp vairable 12 and 13.
+DEFINE	AGCINIT = 10			// timestamp for AGC Initialization (10 and 11)
+DEFINE	TS1 = 12				// generic timestamp vairable 12 and 13.
 
-DEFINE	PROG_TMP1 = 14
+DEFINE	PROG_TMP1 = 14			// general variable for major mode PROGs
 
-DEFINE	CONTMODE = 15	// monitor once or continiously (0=once, 1=continiously)
+DEFINE	CONTMODE = 15			// monitor once or continiously (0=once, 1=continiously)
+
+DEFINE	SELCLIP = 16			// selected clip to play
+DEFINE	ADJFACT = 17			// adjustment factor
+DEFINE	CLIP_HAS_PLAYED = 18	// 0=clip hasn't played yet in V06 N98 (or V16 N98), 1=has played
 
 // idle loop for for cpu 0
 MAIN_CPU0:
 {
+	CALL	Init
 	RTC_TIMESTAMP_DIRECT	AGCINIT		// reset the "time since AGC power up"
 	// NOTE: this falls thru to MAIN_CPU1
 }
 
-// idle loop for cpu 1	(cpu 0 comes here VERB_36)
+// idle loop for cpu 1	(cpu 0 comes here on VERB_36)
 MAIN_CPU1:
 {
 	EMPTY_STACK
 loop:
 	BRANCH loop
+}
+
+//
+// Initialization stuff
+//
+Init:
+{
+	LD_A_IMM8				1
+	ST_A_DIRECT				SELCLIP		// set selected clip to be "1"
+	RTC_TIMESTAMP_DIRECT	AGCINIT		// reset the "time since AGC power up"
+	RET
 }
 
 //
@@ -433,7 +451,7 @@ doleds:
 //
 VERB_69:
 {
-	RTC_TIMESTAMP_DIRECT	AGCINIT		// reset the "time since AGC power up"
+	CALL		Init
 	CALL		VERB_36
 }
 
@@ -720,13 +738,16 @@ VERB_06:
 VERB_16:
 {
 	LD_A_IMM8			1			// 1 means monitor continiously
-	ST_A_DIRECT		CONTMODE
+	ST_A_DIRECT			CONTMODE
 	BRANCH VERB_06_16
 }
 
 VERB_06_16:
 {
 		EMPTY_STACK
+
+		CLR_A												// special hack for N98
+		ST_A_DIRECT				CLIP_HAS_PLAYED
 
 		UPLINK_PROB_IMM8		10
 		COMPACTY_PROB_IMM8		10
@@ -736,6 +757,7 @@ VERB_06_16:
 
 		LD_C_IMM16					NounTable
 Next:	PROG8_A_CINDIRECT
+		AND_A_IMM32			0xff		// ensure byte is unsigned
 		BRANCH_A_EQ_IMM8	-1		NotFound
 		INC_C
 		ST_A_DIRECT			TMP1
@@ -990,6 +1012,28 @@ Query_IMU_1202:
 
 Query_AudioClipPlaying:
 {
+		LD_A_DIRECT			CLIP_HAS_PLAYED
+		BRANCH_A_NE_IMM8	0	done
+
+		INC_A
+		ST_A_DIRECT			CLIP_HAS_PLAYED		// set to 1
+
+		LD_A_DIRECT			SELCLIP
+		MOV_A_B
+		ENCODE_A_TO_DEC
+		MOV_A_R1
+
+		LD_A_DIRECT			ADJFACT
+		ENCODE_A_TO_DEC
+		MOV_A_R2
+
+		LD_A_IMM32			0xAAAAAA
+		MOV_A_R3
+
+		MOV_B_A
+		MP3_PLAY_A
+
+done:	RET
 }
 
 VERB_09:
@@ -1118,6 +1162,80 @@ error:
 
 done:
 		BRANCH	done
+}
+
+//
+// Enter R1 which is a clip number.	V21 N98
+//
+VERB_21:
+{
+		MOV_NOUN_A
+		BRANCH_A_NE_IMM16	0x98	error
+
+		LD_A_IMM32		0xAAAAAA
+		MOV_A_R2
+		MOV_A_R3
+		LD_A_DIRECT		SELCLIP
+		ENCODE_A_TO_DEC
+		MOV_A_R1
+		BLINK_R1		1
+		INPUT_R1
+		BLINK_R1		0
+		BRANCH_A_LT_IMM8	0	error
+		DECODE_A_FROM_DEC
+		MOV_A_B
+		ENCODE_A_TO_DEC
+		MOV_A_R1
+		MOV_B_A
+		BRANCH_A_LT_IMM8	1	error		// valid track numbers 1 through 17
+		BRANCH_A_GT_IMM8	17	error		// update this code to reflect new SD card
+
+		ST_A_DIRECT			SELCLIP
+
+		LD_A_IMM8			0x16
+		MOV_A_VERB
+		GOTO				VERB_16
+
+error:
+		BLINK_OPRERR	1
+x:		BRANCH			x
+}
+
+//
+// Enter R2 which is an index adjustment factor. V21 N98
+//
+VERB_22:
+{
+		MOV_NOUN_A
+		BRANCH_A_NE_IMM16	0x98	error
+
+		LD_A_IMM32		0xAAAAAA
+		MOV_A_R1
+		MOV_A_R3
+		LD_A_DIRECT		ADJFACT
+		ENCODE_A_TO_DEC
+		MOV_A_R2
+		BLINK_R2		1
+		INPUT_R2
+		BLINK_R2		0
+		BRANCH_A_LT_IMM8	0	error
+		DECODE_A_FROM_DEC
+		MOV_A_B
+		ENCODE_A_TO_DEC
+		MOV_A_R2
+		MOV_B_A
+		BRANCH_A_LT_IMM8	0	error		// valid adjustment factor is 0 through 16
+		BRANCH_A_GT_IMM8	16	error		// update this code to reflect new SD card
+
+		ST_A_DIRECT			ADJFACT
+
+		LD_A_IMM8			0x16
+		MOV_A_VERB
+		GOTO				VERB_16
+
+error:
+		BLINK_OPRERR	1
+x:		BRANCH			x
 }
 
 //

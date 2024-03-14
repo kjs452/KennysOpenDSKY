@@ -1593,6 +1593,8 @@ static const DISPATCH_ENTRY Verbs[] PROGMEM = {
 	{ 0x09, LBL_VERB_09 },
 	{ 0x10, LBL_VERB_10 },
 	{ 0x16, LBL_VERB_16 },
+	{ 0x21, LBL_VERB_21 },
+	{ 0x22, LBL_VERB_22 },
 	{ 0x25, LBL_VERB_25 },
 	{ 0x35, LBL_VERB_35 },
 	{ 0x36, LBL_VERB_36 },
