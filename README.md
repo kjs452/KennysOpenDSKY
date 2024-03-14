@@ -434,7 +434,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |V16 N65    | Monitor MET[^1]                                              |
 |V16 N68    | A11 Lunar Landing simulation[^1]                             |
 |V16 N87    | Monitor IMU linear accel values (with random 1202 alarms)[^1]|
-|V16 N98    | Play selected audio clip R1=clip, R2=index adj factor[^1]    |
+|V16 N98    | Play selected audio clip R1=clip, R2=index adj factor        |
 |           |                                                              |
 |V21 N98    | Select audio clip number to play                             |
 |           |                                                              |
