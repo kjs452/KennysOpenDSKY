@@ -135,7 +135,7 @@ The current build uses the following memory on the Arduino:
 ```text
 $ make sketch
 arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
-Sketch uses 22612 bytes (73%) of program storage space. Maximum is 30720 bytes.
+Sketch uses 24848 bytes (80%) of program storage space. Maximum is 30720 bytes.
 Global variables use 1115 bytes (54%) of dynamic memory, leaving 933 bytes for local variables.
 Maximum is 2048 bytes.
 
@@ -351,7 +351,6 @@ I finish items.
 The footnote **[1]** indicates items which have not been implemented yet.
 
 [^1]: Not implemented yet.
-[^2]: Temperature in R3 hard coded to **70**.
 
 ### Verbs
 
@@ -379,8 +378,8 @@ The footnote **[1]** indicates items which have not been implemented yet.
 ### Nouns
 | NOUN | Description                                                       |
 |------|-------------------------------------------------------------------|
-| N17  | IMU Linear Acceleration values (XXXX, YYYY, ZZZZ)[^1]             |
-| N18  | IMU Gyro acceleration values (ROLL, PITCH, YAW)[^1]               |
+| N17  | IMU Linear Acceleration values (XXXX, YYYY, ZZZZ)                 |
+| N18  | IMU Gyro acceleration values (ROLL, PITCH, YAW)                   |
 | N19  | RTC DATE, TIME, IMU TEMP                                          |
 | N31  | Time from AGC initialization                                      |
 | N32  | Time from Perigee[^1]                                             |
@@ -400,8 +399,8 @@ The footnote **[1]** indicates items which have not been implemented yet.
 ### Verb-Nouns
 | VERB-NOUN | Description                                                  |
 |-----------|--------------------------------------------------------------|
-|V06 N17    | Display IMU linear accel values[^1]                          |
-|V06 N18    | Display IMU gyro accel values[^1]                            |
+|V06 N17    | Display IMU linear accel values                              |
+|V06 N18    | Display IMU gyro accel values                                |
 |V06 N19    | Display RTC Date/Time and IMU temp                           |
 |V06 N31    | Display time from AGC Init                                   |
 |V06 N32    | display time to perigee[^1]                                  |
@@ -419,9 +418,9 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |V10 N01    | Decimal to octal conversion. R2 = Octal(R1)                  |
 |V10 N02    | Octal to decimal conversion. R2 = Decimal(R1)                |
 |           |                                                              |
-|V16 N17    | Monitor IMU linear accel values[^1]                          |
-|V16 N18    | Monitor IMU Gyro accel values[^1]                            |
-|V16 N19    | Monitor RTC Date/Time and IMU temp[^2]                       |
+|V16 N17    | Monitor IMU linear accel values                              |
+|V16 N18    | Monitor IMU Gyro accel values                                |
+|V16 N19    | Monitor RTC Date/Time and IMU temp                           |
 |V16 N31    | Monitor time from agc init                                   |
 |V16 N34    | Monitor/Stop Time From event[^1]                             |
 |V16 N35    | Monitor/Stop timer count to event[^1]                        |
@@ -455,7 +454,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |V37 N00    | P00 enter idle mode                                          |
 |V37 N01    | P01 A11 Launch Simulation[^1]                                |
 |V37 N06    | P06 Simulates putting AGC into standby mode                  |
-|V37 N11    | P11 Monitor IMU Accel values[^1]                             |
+|V37 N11    | P11 Monitor IMU Accel values                                 |
 |V37 N42    | "blinky" - randomly illuminate caution and warning lights    |
 |V37 N61    | P61 playback JFK i believe                                   |
 |V37 N62    | P62 playback JFK We choose                                   |
@@ -477,7 +476,7 @@ I.e. To run program P61 you would enter: `VERB 3 7 ENTR 6 1 ENTR`
 | P00  | Poo                                                                |
 | P01  | Apollo 11 Launch Simulation                                        |
 | P06  | Simulate putting AGC into standby mode                             |
-| P11  | Display IMU linear acceleration values (same as V16 N18)[^1]       |
+| P11  | Display IMU linear acceleration values (same as V16 N18)           |
 | P42  | "blinky" - randomly illuminate caution and warning lights          |
 | P61  | play short version of JFK "I believe"                              |
 | P62  | play short version of JFK "we choose"                              |
@@ -867,15 +866,8 @@ Here are all the assembly instructions:
 | RTC_SS_A           |           | Read RTC and place SECONDS field into A register (BCD encoded)       |
 | RTC_MEM_A_CINDIRECT|           | Read RTC RAM address [C] and place into A register                   |
 | RTC_A_MEM_CINDIRECT|           | Write LSB of A register into RTC RAM address [C]                     |
-| IMU_ACCX_A         |           | Move IMU Acceleration X value into A                                 |
-| IMU_ACCY_A         |           | Move IMU Acceleration Y value into A                                 |
-| IMU_ACCZ_A         |           | Move IMU Acceleration Z value into A                                 |
-| IMU_PITCH_A        |           | Move IMU Pitch value into A                                          |
-| IMU_ROLL_A         |           | Move IMU Roll value into A                                           |
-| IMU_YAW_A          |           | Move IMU Yaw value into A                                            |
-| IMU_TEMP_A         |           | Move IMU Temp value into A                                           |
+| IMU_READ_DIRECT    | addr      | store IMU data into (addr+0) ... (addr+6) locations                  |
 | MP3_PLAY_A         |           | play track number indicated by register A                            |
-| MP3_STOP           |           | stop playing any track. (play the silence clip)                      |
 | EEPROM_WRITE_A_CINDIRECT |     | write A register byte to EEPROM[C]                                   |
 | EEPROM_READ_A_CINDIRECT  |     | read into A register byte from EEPROM[C]                             |
 | WAIT1              |           | pause CPU until 100ms timer triggers, then proceed to next instr.    |
@@ -1196,7 +1188,7 @@ they provide an extra button if you screw one of them up.
 
 Make sure the GPS unit is flush with the circuit board when you solder it on.
 
-All the components came in indiviual plastic and were labeled. There was a inventory sheet
+All the components came in individual plastic and were labeled. There was a inventory sheet
 showing all the components. The kit arrived in good packaging. I definately felt the kit was worth the $600.
 
 There are good online schematics. The sample source code is pretty gross, but also pretty easy

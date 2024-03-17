@@ -23,11 +23,18 @@ DEFINE	SELCLIP = 16			// selected clip to play
 DEFINE	ADJFACT = 17			// adjustment factor
 DEFINE	CLIP_HAS_PLAYED = 18	// 0=clip hasn't played yet in V06 N98 (or V16 N98), 1=has played
 
+DEFINE	ImuGyroX = 19			// use this address for IMU_READ_DIRECT
+DEFINE	ImuGyroY = 20
+DEFINE	ImuGyroZ = 21
+DEFINE	ImuAccX = 22
+DEFINE	ImuAccY = 23
+DEFINE	ImuAccZ = 24
+DEFINE	ImuTemp = 25
+
 // idle loop for for cpu 0
 MAIN_CPU0:
 {
 	CALL	Init
-	RTC_TIMESTAMP_DIRECT	AGCINIT		// reset the "time since AGC power up"
 	// NOTE: this falls thru to MAIN_CPU1
 }
 
@@ -61,10 +68,10 @@ VERB_37:
 			BLINK_NOUN	1
 
 			INPUT_NOUN
+			BRANCH_A_LT_IMM8	0	Error
 			LD_B_IMM16	0x00FF
 			AND_A_B
 			MOV_A_B
-			BRANCH_B_LT_IMM8	0	Error
 
 			LD_C_IMM16	Programs
 
@@ -83,6 +90,8 @@ Programs:	DATA8		0x00
 			DATA16		PROG_01
 			DATA8		0x02
 			DATA16		PROG_02
+			DATA8		0x11
+			DATA16		PROG_11
 			DATA8		0x60
 			DATA16		PROG_60
 			DATA8		0x61
@@ -109,8 +118,8 @@ Found:
 			RUN_PROG_A
 			BRANCH Done
 
-NotFound:
 Error:
+NotFound:
 			BLINK_OPRERR	1
 
 Done:
@@ -234,7 +243,7 @@ OVER3:	ST_A_DIRECT	V01_R3
 		ENCODE_A_TO_DEC
 		MOV_A_R3
 
-		GOTO	LOOP
+		BRANCH	LOOP
 }
 
 VERB_02:
@@ -254,9 +263,8 @@ VERB_02:
 		INPUT_R2
 		BRANCH_A_LT_IMM8	0		bad
 		DECODE_A_FROM_DEC
-//		ENCODE_A_TO_DEC
 		ENCODE_A_TO_UDEC
-		GOTO			good
+		BRANCH			good
 bad:	LD_A_IMM32		0xAAAAAA
 good:	MOV_A_R2
 		BLINK_R2		0
@@ -287,7 +295,7 @@ VERB_03:
 		BRANCH_A_LT_IMM8	0	bad
 		DECODE_A_FROM_OCT
 		ENCODE_A_TO_OCT
-		GOTO			good
+		BRANCH			good
 bad:	LD_A_DIRECT		TMP1
 good:	MOV_A_R3
 		BLINK_NOUN	0
@@ -460,7 +468,13 @@ PROG_01:
 PROG_02:
 PROG_60:
 {
-		GOTO PROG_00
+		BRANCH PROG_00
+}
+
+PROG_11:
+{
+again:	CALL	Query_IMU_Accel
+		BRANCH	again
 }
 
 // P61 playback JFK i believe
@@ -527,7 +541,7 @@ waiting:	WAIT4							// wait 1 second
 			MOV_B_C
 			CALL_CINDIRECT
 
-			GOTO PROG_42
+			BRANCH PROG_42
 
 LampList:						// LampList consists of 21 3-byte functions
 
@@ -757,8 +771,8 @@ VERB_06_16:
 
 		LD_C_IMM16					NounTable
 Next:	PROG8_A_CINDIRECT
-		AND_A_IMM32			0xff		// ensure byte is unsigned
 		BRANCH_A_EQ_IMM8	-1		NotFound
+		AND_A_IMM32			0xff		// ensure byte is unsigned
 		INC_C
 		ST_A_DIRECT			TMP1
 		PROG16_A_CINDIRECT
@@ -841,24 +855,42 @@ NotFound:
 
 Query_IMU_Accel:
 {
-	LD_B_IMM16		-12
-	MOV_B_A
+	IMU_READ_DIRECT		ImuGyroX
+
+	LD_A_DIRECT			ImuAccX
 	ENCODE_A_TO_DEC
 	MOV_A_R1
-	INC_B
-	MOV_B_A
+
+	LD_A_DIRECT			ImuAccY
 	ENCODE_A_TO_DEC
 	MOV_A_R2
-	INC_B
-	INC_B
-	MOV_B_A
+
+	LD_A_DIRECT			ImuAccZ
 	ENCODE_A_TO_DEC
 	MOV_A_R3
+
+	WAIT3
 	RET
 }
 
 Query_Gyro_Accel:
 {
+	IMU_READ_DIRECT		ImuGyroX
+
+	LD_A_DIRECT			ImuGyroX
+	ENCODE_A_TO_DEC
+	MOV_A_R1
+
+	LD_A_DIRECT			ImuGyroY
+	ENCODE_A_TO_DEC
+	MOV_A_R2
+
+	LD_A_DIRECT			ImuGyroZ
+	ENCODE_A_TO_DEC
+	MOV_A_R3
+
+	WAIT3
+	RET
 }
 
 Query_RTC_DateTimeTemp:
@@ -883,10 +915,13 @@ Query_RTC_DateTimeTemp:
 	OR_A_B
 	MOV_A_R2
 
-	LD_A_IMM8		70
+	IMU_READ_DIRECT		ImuGyroX
+
+	LD_A_DIRECT			ImuTemp
 	ENCODE_A_TO_DEC
 	MOV_A_R3
 
+	WAIT5
 	WAIT5
 	RET
 }

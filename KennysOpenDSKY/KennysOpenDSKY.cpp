@@ -31,10 +31,10 @@
 //	SECTION 4: Miscellaneous Arduino Mocks
 //	SECTION 5: 'Adafruit_NeoPixel' Mock
 //	SECTION 6: 'LedControl' Mock
+//	SECTION ZZ: 'Random()' Mock Routines
 //	SECTION 7: 'Wire' and 'Serial' Mock
 //	SECTION 8: MP3 Player Curses Routines
 //	SECTION 9: 'EEPROM' Mock
-//	SECTION 10: 'Random()' Mock Routines
 //	SECTION 11: Globals Variables (Read-Only & Read/Write)
 //	  SUB-SECTION 11a: Read-Only globals (constants in PROGMEM)
 //	  SUB-SECTION 11b: Read-Write globals (variables in RAM)
@@ -42,6 +42,7 @@
 //	SECTION 13: Curses window start/end
 //	SECTION 14: DSKY redraw routines (arduino and curses)
 //	SECTION 15: Keyboard reading (arduino and curses)
+//	SECTION XX: IMU Reading routine
 //	SECTION 16: Apollo Guidance Computer routines
 //	SECTION 17: Signal/ISR for Timing control (arduino and curses)
 //	SECTION 18: Sketch setup() routine
@@ -624,15 +625,8 @@ enum AGC_INSTRUCTION
 	RTC_SS_A,
 	RTC_MEM_A_CINDIRECT,	// <addr>		56 byte memory	C
 	RTC_A_MEM_CINDIRECT,	// <addr>		56 byte memory	C
-	IMU_ACCX_A,
-	IMU_ACCY_A,
-	IMU_ACCZ_A,
-	IMU_PITCH_A,
-	IMU_ROLL_A,
-	IMU_YAW_A,
-	IMU_TEMP_A,
+	IMU_READ_DIRECT,		// <addr>		store IMU data into <addr+0> ... <addr+6> locations
 	MP3_PLAY_A,				// play track indicated by register A
-	MP3_STOP,				// stop playing any track.
 	EEPROM_WRITE_A_CINDIRECT,	// write A register byte to EEPROM[C]
 	EEPROM_READ_A_CINDIRECT,	// read into A register byte from EEPROM[C]
 	WAIT1,					// 100ms wait for wait flag to become 1, don't advance PC until it becomes 1.
@@ -856,15 +850,8 @@ static const char *Mnemonics[] = {
 	"RTC_SS_A",
 	"RTC_MEM_A_CINDIRECT",	// <addr>	56 byte memory	C
 	"RTC_A_MEM_CINDIRECT",	// <addr>	56 byte memory	C
-	"IMU_ACCX_A",
-	"IMU_ACCY_A",
-	"IMU_ACCZ_A",
-	"IMU_PITCH_A",
-	"IMU_ROLL_A",
-	"IMU_YAW_A",
-	"IMU_TEMP_A",
+	"IMU_READ_DIRECT",
 	"MP3_PLAY_A",				// play track indicated by register A
-	"MP3_STOP",				// stop playing any track.
 	"EEPROM_WRITE_A_CINDIRECT",	// <2byteaddr>			<2byteaddr>+C
 	"EEPROM_READ_A_CINDIRECT",	// <2byteaddr>			<2byteaddr>+C
 	"WAIT1",					// wait for wait flag to become 1, don't advance PC until it becomes 1.
@@ -1006,6 +993,18 @@ void digitalWrite(uint8_t pin, uint8_t sig)
 static void delay(uint16_t ms)
 {
 }
+
+int16_t map(int16_t x, int16_t in_min, int16_t in_max, int16_t out_min, int16_t out_max)
+{
+	return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+static
+int16_t constrain(int16_t value, int16_t lower, int16_t upper)
+{
+	return (value < lower) ? lower : ( (value > upper) ? upper : value);
+}
+
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -1050,6 +1049,24 @@ public:
 	{
 	}
 };
+#endif
+
+//////////////////////////////////////////////////////////////////////
+//
+// SECTION ZZ: 'Random()' Mock Routines
+//
+#ifdef CURSES_SIMULATOR
+static void randomSeed(uint8_t seed)
+{
+}
+
+static uint32_t random(uint32_t val)
+{
+	uint32_t x;
+	getrandom(&x, sizeof(x), GRND_RANDOM);
+	x = x % val;
+	return x;
+}
 #endif
 
 #ifdef CURSES_SIMULATOR
@@ -1198,7 +1215,9 @@ public:
 		uint8_t byte;
 
 		byte = readByte(m_device, m_addr);
-		// fprintf(logfp, "ReadByte(%02X) = %02X\n", m_addr, byte);
+#ifdef DSKY_DEBUG
+		fprintf(logfp, "ReadByte(%02X) = %02X\n", m_addr, byte);
+#endif
 		m_addr++;
 		return byte;
 	}
@@ -1216,7 +1235,7 @@ private:
 
 	static uint8_t readByte(uint8_t device, uint8_t addr)
 	{
-		if( device == 0x68 )			// RTC
+		if( device == RTC_ADDR )
 		{
 			addr = addr & 0x3F;
 
@@ -1257,52 +1276,52 @@ private:
 				return RTC_RAM[addr - 0x08];
 			}
 		}
-		else if( device == 0x69 )		// IMU
+		else if( device == MPU_ADDR )		// IMU
 		{
-			addr = addr & 0x0f;
+			addr = addr & 0xff;
 			switch( addr )
 			{
 			case 0x3B:	// (ACCEL_XOUT_H)
-				break;
+				return random(0x7f);
 
 			case 0x3C:	// (ACCEL_XOUT_L)
-				break;
+				return random(0x7f);
 
 			case 0x3D:	// (ACCEL_YOUT_H)
-				break;
+				return random(0x7f);
 
 			case 0x3E:	// (ACCEL_YOUT_L)
-				break;
+				return random(0x7f);
 
 			case 0x3F:	// (ACCEL_ZOUT_H)
-				break;
+				return random(0x7f);
 
 			case 0x40:	// (ACCEL_ZOUT_L)
-				break;
+				return random(0x7f);
 
 			case 0x41:	// (TEMP_OUT_H)
-				break;
+				return random(0x7f);
 
 			case 0x42:	// (TEMP_OUT_L)
-				break;
+				return random(0x7f);
 
 			case 0x43:	// (GYRO_XOUT_H)
-				break;
+				return random(0x7f);
 
 			case 0x44:	// (GYRO_XOUT_L)
-				break;
+				return random(0x7f);
 
 			case 0x45:	// (GYRO_YOUT_H)
-				break;
+				return random(0x7f);
 
 			case 0x46:	// (GYRO_YOUT_L)
-				break;
+				return random(0x7f);
 
 			case 0x47:	// (GYRO_ZOUT_H)
-				break;
+				return random(0x7f);
 
 			case 0x48:	// (GYRO_ZOUT_L)
-				break;
+				return random(0x7f);
 			}
 
 		}
@@ -1540,24 +1559,6 @@ private:
 
 static EEPROMClass EEPROM;	// Mock EEPROM object
 
-#endif
-
-//////////////////////////////////////////////////////////////////////
-//
-// SECTION 10: 'Random()' Mock Routines
-//
-#ifdef CURSES_SIMULATOR
-static void randomSeed(uint8_t seed)
-{
-}
-
-static uint32_t random(uint32_t val)
-{
-	uint32_t x;
-	getrandom(&x, sizeof(x), GRND_RANDOM);
-	x = x % val;
-	return x;
-}
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -2670,6 +2671,118 @@ int8_t readKeyboard()
 
 //////////////////////////////////////////////////////////////////////
 //
+// SECTION XX: IMU Reading routine
+//
+// IMU https://github.com/griegerc/arduino-gy521/blob/master/gy521-read-angle/gy521-read-angle.ino
+//
+const int16_t	ACCEL_OFFSET		PROGMEM = 200;
+const int16_t	GYRO_OFFSET			PROGMEM = 151;		// 151
+const int16_t	GYRO_SENSITITY		PROGMEM = 131;		// 131 is sensivity of gyro from data sheet
+//const float		GYRO_SCALE			PROGMEM = 0.2;		//  0.02 by default - tweak as required
+const float		GYRO_TEMP_DRIFT		PROGMEM = 0.02;		//  0.02 by default - tweak as required
+const int16_t	GYRO_GRANGE			PROGMEM = 2;		// Gforce Range
+const int16_t	ACCEL_SCALE			PROGMEM = 16384;	// Scalefactor of Accelerometer
+const float		LOOP_TIME			PROGMEM = 0.15;		// 0.1 = 100ms
+
+// change this to your system until gyroCorrX displays 0 if the DSKY sits still
+const int16_t	GYRO_OFFSET_X		PROGMEM = 2;
+
+// change this to your system until gyroCorrY displays 0 if the DSKY sits still
+const int16_t	GYRO_OFFSET_Y		PROGMEM = 0;
+
+// change this to your system until gyroCorrZ displays 0 if the DSKY sits still
+const int16_t	GYRO_OFFSET_Z		PROGMEM = 0;
+
+// change this to your system until accAngleX displays 0 if the DSKY sits still
+const int16_t	ACC_OFFSET_X		PROGMEM = 2;
+
+// change this to your system until accAngleY displays 0 if the DSKY sits still
+const int16_t	ACC_OFFSET_Y		PROGMEM = 3;
+
+// change this to your system until accAngleZ displays 0 if the DSKY sits still
+const int16_t	ACC_OFFSET_Z		PROGMEM = 0;
+
+static
+void readIMU(uint8_t addr)
+{
+	int16_t accValueX;
+	int16_t accValueY;
+	int16_t accValueZ;
+	int16_t gyroValueX;
+	int16_t gyroValueY;
+	int16_t gyroValueZ;
+	int16_t temp;
+
+	int16_t accCorrX;
+	int16_t accCorrY;
+	int16_t accCorrZ;
+
+	float accAngleX;
+	float accAngleY;
+	float accAngleZ;
+
+	float gyroAngleX;
+	float gyroAngleY;
+	float gyroAngleZ; 
+	float gyroCorrX;
+	float gyroCorrY;
+	float gyroCorrZ;
+
+	Wire.beginTransmission(MPU_ADDR);
+	Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
+	Wire.endTransmission(false);
+	Wire.requestFrom(MPU_ADDR, 14, true);  // request a total of 14 registers
+  
+	accValueX =  (Wire.read() << 8) | Wire.read();	// 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
+	accValueY =  (Wire.read() << 8) | Wire.read();	// 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
+	accValueZ =  (Wire.read() << 8) | Wire.read();	// 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+	temp =       (Wire.read() << 8) | Wire.read();	// 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+	gyroValueX = (Wire.read() << 8) | Wire.read();	// 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
+	gyroValueY = (Wire.read() << 8) | Wire.read();	// 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
+	gyroValueZ = (Wire.read() << 8) | Wire.read();	// 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
+
+	temp = (temp / 340.00 + 36.53);		// equation for temperature in degrees C from datasheet
+
+	accCorrX = accValueX - ACCEL_OFFSET;
+	accCorrX = map(accCorrX, -ACCEL_SCALE, ACCEL_SCALE, -90, 90);
+	accAngleX = constrain(accCorrX, -90, 90);
+
+	// our IMU sits upside down in the DSKY, so we have to flip the angle
+	accAngleX = -accAngleX;
+	accAngleX = accAngleX + ACC_OFFSET_X;
+
+	accCorrY = accValueY - ACCEL_OFFSET;
+	accCorrY = map(accCorrY, -ACCEL_SCALE, ACCEL_SCALE, -90, 90);
+
+	accAngleY = constrain(accCorrY, -90, 90);
+	accAngleY = accAngleY + ACC_OFFSET_Y;
+
+	accCorrZ = accValueZ - ACCEL_OFFSET;
+	accCorrZ = map(accCorrZ, -ACCEL_SCALE, ACCEL_SCALE, -90, 90);
+	accAngleZ = constrain(accCorrZ, -90, 90);
+
+	// our IMU sits upside down in the DSKY, so we have to flip the angle
+	accAngleZ = -accAngleZ;
+	accAngleZ = accAngleZ + ACC_OFFSET_Z;
+
+	gyroCorrX = ((float)gyroValueX / GYRO_SENSITITY) + GYRO_OFFSET_X;
+	gyroAngleX = (gyroCorrX * GYRO_GRANGE) * -LOOP_TIME;
+	gyroCorrY = ((float)gyroValueY / GYRO_SENSITITY) + GYRO_OFFSET_Y;
+	gyroAngleY = (gyroCorrY * GYRO_GRANGE) * -LOOP_TIME;
+	gyroCorrZ = ((float)gyroValueZ / GYRO_SENSITITY) + GYRO_OFFSET_Z;
+	gyroAngleZ = (gyroCorrZ * GYRO_GRANGE) * -LOOP_TIME;
+
+	Agc.RAM[addr+0] = (int16_t)(gyroAngleX * 100);		// IMU_GYROX
+	Agc.RAM[addr+1] = (int16_t)(gyroAngleY * 100);		// IMU_GYROY
+	Agc.RAM[addr+2] = (int16_t)(gyroAngleZ * 100);		// IMU_GYROZ
+	Agc.RAM[addr+3] = (int16_t)(accAngleX * 100);		// IMU_ACCX
+	Agc.RAM[addr+4] = (int16_t)(accAngleY * 100);		// IMU_ACCY
+	Agc.RAM[addr+5] = (int16_t)(accAngleZ * 100);		// IMU_ACCZ
+	Agc.RAM[addr+6] = temp;								// IMU_TEMP
+}
+
+//////////////////////////////////////////////////////////////////////
+//
 // SECTION 16: Apollo Guidance Computer routines
 //
 static
@@ -3628,33 +3741,12 @@ void agc_execute_cpu(uint8_t c)
 		Wire.endTransmission(true);
 		break;
 
-	case IMU_ACCX_A:
-		break;
-
-	case IMU_ACCY_A:
-		break;
-
-	case IMU_ACCZ_A:
-		break;
-
-	case IMU_PITCH_A:
-		break;
-
-	case IMU_ROLL_A:
-		break;
-
-	case IMU_YAW_A:
-		break;
-
-	case IMU_TEMP_A:
+	case IMU_READ_DIRECT:
+		readIMU(ProgramAccU8(cpu->PC++));
 		break;
 
 	case MP3_PLAY_A:
 		jfk(cpu->regs[0] & 0xff);
-		break;
-
-	case MP3_STOP:
-		jfk(1);
 		break;
 
 	case EEPROM_WRITE_A_CINDIRECT:
