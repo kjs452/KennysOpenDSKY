@@ -31,10 +31,10 @@
 //	SECTION 4: Miscellaneous Arduino Mocks
 //	SECTION 5: 'Adafruit_NeoPixel' Mock
 //	SECTION 6: 'LedControl' Mock
-//	SECTION ZZ: 'Random()' Mock Routines
-//	SECTION 7: 'Wire' and 'Serial' Mock
-//	SECTION 8: MP3 Player Curses Routines
-//	SECTION 9: 'EEPROM' Mock
+//	SECTION 7: 'Random()' Mock Routines
+//	SECTION 8: 'Wire' and 'Serial' Mock
+//	SECTION 9: MP3 Player Curses Routines
+//	SECTION 10: 'EEPROM' Mock
 //	SECTION 11: Globals Variables (Read-Only & Read/Write)
 //	  SUB-SECTION 11a: Read-Only globals (constants in PROGMEM)
 //	  SUB-SECTION 11b: Read-Write globals (variables in RAM)
@@ -42,12 +42,12 @@
 //	SECTION 13: Curses window start/end
 //	SECTION 14: DSKY redraw routines (arduino and curses)
 //	SECTION 15: Keyboard reading (arduino and curses)
-//	SECTION XX: IMU Reading routine
-//	SECTION 16: Apollo Guidance Computer routines
-//	SECTION 17: Signal/ISR for Timing control (arduino and curses)
-//	SECTION 18: Sketch setup() routine
-//	SECTION 19: Sketch loop() routine
-//	SECTION 20: MAIN() - calls setup() and loop()
+//	SECTION 16: IMU Reading routine
+//	SECTION 17: Apollo Guidance Computer routines
+//	SECTION 18: Signal/ISR for Timing control (arduino and curses)
+//	SECTION 19: Sketch setup() routine
+//	SECTION 20: Sketch loop() routine
+//	SECTION 21: MAIN() - calls setup() and loop()
 //
 // NOTES:
 //	* When adding/removing VM instructions there are 4 places to edit:
@@ -1053,7 +1053,7 @@ public:
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION ZZ: 'Random()' Mock Routines
+// SECTION 7: 'Random()' Mock Routines
 //
 #ifdef CURSES_SIMULATOR
 static void randomSeed(uint8_t seed)
@@ -1072,7 +1072,7 @@ static uint32_t random(uint32_t val)
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 7: 'Wire' and 'Serial' Mock
+// SECTION 8: 'Wire' and 'Serial' Mock
 //
 // Emulates the RTC and IMU devices
 // This is a minimal mock 'Wire' class that can simulate the RTC and IMU devices.
@@ -1282,46 +1282,46 @@ private:
 			switch( addr )
 			{
 			case 0x3B:	// (ACCEL_XOUT_H)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x3C:	// (ACCEL_XOUT_L)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x3D:	// (ACCEL_YOUT_H)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x3E:	// (ACCEL_YOUT_L)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x3F:	// (ACCEL_ZOUT_H)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x40:	// (ACCEL_ZOUT_L)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x41:	// (TEMP_OUT_H)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x42:	// (TEMP_OUT_L)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x43:	// (GYRO_XOUT_H)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x44:	// (GYRO_XOUT_L)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x45:	// (GYRO_YOUT_H)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x46:	// (GYRO_YOUT_L)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x47:	// (GYRO_ZOUT_H)
-				return random(0x7f);
+				return random(0xff);
 
 			case 0x48:	// (GYRO_ZOUT_L)
-				return random(0x7f);
+				return random(0xff);
 			}
 
 		}
@@ -1437,7 +1437,7 @@ static TwoWire Wire;		// Mock Wire object
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 8: MP3 Player Curses Routines
+// SECTION 9: MP3 Player Curses Routines
 //
 // These routines render the audio track being played on
 // the bottom line of the curses window.
@@ -1519,7 +1519,7 @@ static void mp3_play(uint8_t track_number)
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 9: 'EEPROM' Mock
+// SECTION 10: 'EEPROM' Mock
 //
 #ifdef CURSES_SIMULATOR
 class EEPROMClass
@@ -2671,7 +2671,7 @@ int8_t readKeyboard()
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION XX: IMU Reading routine
+// SECTION 16: IMU Reading routine
 //
 // IMU https://github.com/griegerc/arduino-gy521/blob/master/gy521-read-angle/gy521-read-angle.ino
 //
@@ -2783,7 +2783,7 @@ void readIMU(uint8_t addr)
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 16: Apollo Guidance Computer routines
+// SECTION 17: Apollo Guidance Computer routines
 //
 static
 void agc_cpu_init(int c, CPU *cpu)
@@ -4698,7 +4698,7 @@ void apollo_guidance_computer()
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 17: Signal/ISR for Timing control (arduino and curses)
+// SECTION 18: Signal/ISR for Timing control (arduino and curses)
 //
 // signal handler 100ms
 //	Set the CPU_TIMERx flag for both cpu's
@@ -4814,7 +4814,7 @@ ISR(TIMER1_COMPA_vect)
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 18: Sketch setup() routine
+// SECTION 19: Sketch setup() routine
 //
 static
 void setup()
@@ -4878,7 +4878,7 @@ void setup()
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 19: Sketch loop() routine
+// SECTION 20: Sketch loop() routine
 //
 static
 void loop()
@@ -4892,7 +4892,7 @@ void loop()
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 20: MAIN() - calls setup() and loop()
+// SECTION 21: MAIN() - calls setup() and loop()
 //
 // This is only used in the linux/macos/windows CURSES SIMULATOR version.
 //

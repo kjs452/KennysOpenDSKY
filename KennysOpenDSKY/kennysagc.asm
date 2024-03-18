@@ -473,6 +473,13 @@ PROG_60:
 
 PROG_11:
 {
+		WAIT5				// wait for cpu1 to return from V37 N11
+		WAIT5
+		LD_A_IMM8	0xAA
+		MOV_A_NOUN
+		MOV_A_VERB
+		LD_A_IMM16		MAIN_CPU1	// end whatever is running in cpu1
+		RUN_MINOR_A
 again:	CALL	Query_IMU_Accel
 		BRANCH	again
 }
@@ -1043,6 +1050,31 @@ Query_Major_Mode:
 
 Query_IMU_1202:
 {
+		CALL		Query_Gyro_Accel
+		RANDOM_A
+		BRANCH_A_GT_IMM16		1000	noalrm
+
+		LD_A_IMM32	0xAAAAAA
+		MOV_A_R3
+		MOV_A_R2
+		BLINK_R1		1
+		LD_B_IMM32	0xAA1201
+		RANDOM_A
+		BRANCH_A_GT_IMM16		16000	skip
+		INC_B					// 1201 becomes 1202
+skip:	SWAP_A_B
+		MOV_A_R1
+
+		LD_A_IMM8		2
+		MP3_PLAY_A				// alarm track (track no. = 2)
+		LT_PROG_ALRM	1
+		INPUT_REQ_PROCEED
+		LT_PROG_ALRM	0
+		BLINK_R1		0
+		LD_A_IMM8		1
+		MP3_PLAY_A				// silence track (track no. = 1)
+
+noalrm:	RET
 }
 
 Query_AudioClipPlaying:

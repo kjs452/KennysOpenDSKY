@@ -135,7 +135,7 @@ The current build uses the following memory on the Arduino:
 ```text
 $ make sketch
 arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
-Sketch uses 24848 bytes (80%) of program storage space. Maximum is 30720 bytes.
+Sketch uses 24902 bytes (81%) of program storage space. Maximum is 30720 bytes.
 Global variables use 1115 bytes (54%) of dynamic memory, leaving 933 bytes for local variables.
 Maximum is 2048 bytes.
 
@@ -393,7 +393,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 | N44  | Orbital Parameters (Apocenter, Pericenter, time to free fall)[^1] |
 | N65  | MET (HH, MM, SS.01)[^1]                                           |
 | N68  | Lunar Powered Decent[^1]                                          |
-| N87  | IMU Accel values with random 1202 errors[^1]                      |
+| N87  | IMU Accel values with random 1202 errors                          |
 | N98  | Audio Track and Index Adj (TTTTT, NNNNN)                          |
 
 ### Verb-Nouns
@@ -432,7 +432,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |V16 N44    | Monitor Orbital Parameters[^1]                               |
 |V16 N65    | Monitor MET[^1]                                              |
 |V16 N68    | A11 Lunar Landing simulation[^1]                             |
-|V16 N87    | Monitor IMU linear accel values (with random 1202 alarms)[^1]|
+|V16 N87    | Monitor IMU linear accel values (with random 1202 alarms)    |
 |V16 N98    | Play selected audio clip R1=clip, R2=index adj factor        |
 |           |                                                              |
 |V21 N98    | Select audio clip number to play                             |
