@@ -1069,6 +1069,9 @@ skip:	SWAP_A_B
 		LT_PROG_ALRM	1
 		INPUT_REQ_PROCEED
 		LT_PROG_ALRM	0
+		LD_A_IMM32	0xAAAAAA
+		MOV_A_R1
+		MOV_A_R2
 		LD_A_IMM8		1
 		MP3_PLAY_A				// silence track (track no. = 1)
 
