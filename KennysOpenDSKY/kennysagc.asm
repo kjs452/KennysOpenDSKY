@@ -1052,25 +1052,23 @@ Query_IMU_1202:
 {
 		CALL		Query_Gyro_Accel
 		RANDOM_A
-		BRANCH_A_GT_IMM16		1000	noalrm
+		BRANCH_A_GT_IMM16		1500	noalrm
 
 		LD_A_IMM32	0xAAAAAA
 		MOV_A_R3
-		MOV_A_R2
-		BLINK_R1		1
 		LD_B_IMM32	0xAA1201
 		RANDOM_A
 		BRANCH_A_GT_IMM16		16000	skip
 		INC_B					// 1201 becomes 1202
 skip:	SWAP_A_B
 		MOV_A_R1
+		MOV_A_R2
 
 		LD_A_IMM8		2
 		MP3_PLAY_A				// alarm track (track no. = 2)
 		LT_PROG_ALRM	1
 		INPUT_REQ_PROCEED
 		LT_PROG_ALRM	0
-		BLINK_R1		0
 		LD_A_IMM8		1
 		MP3_PLAY_A				// silence track (track no. = 1)
 

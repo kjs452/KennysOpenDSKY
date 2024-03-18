@@ -135,7 +135,7 @@ The current build uses the following memory on the Arduino:
 ```text
 $ make sketch
 arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
-Sketch uses 24902 bytes (81%) of program storage space. Maximum is 30720 bytes.
+Sketch uses 24898 bytes (81%) of program storage space. Maximum is 30720 bytes.
 Global variables use 1115 bytes (54%) of dynamic memory, leaving 933 bytes for local variables.
 Maximum is 2048 bytes.
 
