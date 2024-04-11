@@ -81,8 +81,9 @@ Open DSKY hardware. However, I derived many ideas and code from these sources:
         the **Apollo 50th Anniversary** project which came pre-installed with the Open DSKY kit.
     (Apollo Education Experience Program, Cumming Georgia).
     Thank you **Bill Walker** for an incredible software creation and user manual.
-    Website 1: <http://apolloexperience.com>.
-    Website 2: <https://www.gofundme.com/apollo-education-experience-project>
+    **Github:** <https://www.gofundme.com/apollo-education-experience-project>.
+    **Website 1:** <http://apolloexperience.com>.
+    **Website 2:** <https://www.gofundme.com/apollo-education-experience-project>.
 
 + The audio clips provided here are taken from the **Apollo 50th Anniversary** project SD card.
 
@@ -97,7 +98,7 @@ Open DSKY hardware. However, I derived many ideas and code from these sources:
     This is an improvement over Scott Pavlovec's keyboard reading code.
 
 + **Ron Diamond** for his GPS reading code which removes the dependency on *TinyGPS++*.
-	<https://github.com/rondiamond/OpenDSKY>
+    <https://github.com/rondiamond/OpenDSKY>
 
 ## Features
 + A virtual machine and byte code interpreter.
@@ -135,7 +136,7 @@ The current build uses the following memory on the Arduino:
 ```text
 $ make sketch
 arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
-Sketch uses 24906 bytes (81%) of program storage space. Maximum is 30720 bytes.
+Sketch uses 25054 bytes (81%) of program storage space. Maximum is 30720 bytes.
 Global variables use 1115 bytes (54%) of dynamic memory, leaving 933 bytes for local variables.
 Maximum is 2048 bytes.
 
@@ -332,7 +333,7 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 + When decimal input is expected, the `+` or `-` sign is required for the first input key.
 
 + When octal input is expected, neither the `+` or `-` sign is allowed.
-	Only the digits `0` - `7` will be accepted.
+    Only the digits `0` - `7` will be accepted.
 
 + Pressing **RSET** will clear all the caution and warning lights (except KEY REL).
 
@@ -342,7 +343,7 @@ by my experimentation with a faithful DSKY simulator (See <https://svtsim.com/mo
 This section documents the available VERB/NOUN combinations and the PROGRAM's.
 
 ### Status
-**(updated 3/17/2024)**
+**(updated 4/10/2024)**
 Not all verb/nouns in the list are implemented yet. This is my list of
 what I wish to implement eventually. These items come from the
 **Apollo 50th Anniversary** project. I will update this section as
@@ -356,10 +357,10 @@ The footnote **[1]** indicates items which have not been implemented yet.
 
 | VERB | Description                                        |
 |------|----------------------------------------------------|
-| V01  | test verb incrementing/decrementing values         |
+| V01  | view memory                                        |
 | V02  | test verb. enter R2 in decimal                     |
 | V03  | test verb. enter R3 in octal                       |
-| V04  | test verb. display some simple values              |
+| V04  | test verb incrementing/decrementing values         |
 | V05  | clears DSKY, end verb, cleans stack                |
 | V06  | Display Selected Value                             |
 | V09  | Calculate (Perform Math operation)                 |
@@ -399,6 +400,8 @@ The footnote **[1]** indicates items which have not been implemented yet.
 ### Verb-Nouns
 | VERB-NOUN | Description                                                  |
 |-----------|--------------------------------------------------------------|
+|V01 N02    | View memory (R3=Address 0000-4067, R1=Value 000-377) octal   |
+|           |                                                              |
 |V06 N17    | Display IMU linear accel values                              |
 |V06 N18    | Display IMU gyro accel values                                |
 |V06 N19    | Display RTC Date/Time and IMU temp                           |
@@ -435,6 +438,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |V16 N87    | Monitor IMU linear accel values (with random 1202 alarms)    |
 |V16 N98    | Play selected audio clip R1=clip, R2=index adj factor        |
 |           |                                                              |
+|V21 N02    | Edit Memory (R3=address 0000-4067, R1=Value 000-377) octal   |
 |V21 N98    | Select audio clip number to play                             |
 |           |                                                              |
 |V22 N98    | Enter index adj. factor                                      |
@@ -483,6 +487,17 @@ I.e. To run program P61 you would enter: `VERB 3 7 ENTR 6 1 ENTR`
 | P68  | play short version of Apollo 8 genesis clip                        |
 | P69  | play Apollo 11 the eagle has landed clip                           |
 | P70  | play short version of Apollo 13 "problem" clip                     |
+
+### Read Persistent Memory (V01N02)
+Enter octal address in R3. The byte value for the address will be displayed in R1.
+The 2K EEPROM memory area is accessed using the address range 0000 - 3777 (octal).
+The 56 byte RTC RAM area is accessed using the address range 4000 - 4067.
+
+### Write Persistent Memory (V21N02)
+Enter octal address in R3. Then enter a byte value (0-377 octal) in R1.
+The byte value for the address will be written to the memory area.
+The 2K EEPROM memory area is accessed using the address range 0000 - 3777 (octal).
+The 56 byte RTC RAM area is accessed using the address range 4000 - 4067.
 
 ## Using the Assembler
 The program ``assembler.py`` is a simple one pass assembler written in python.

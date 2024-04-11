@@ -201,49 +201,77 @@ VERB_35:
 	RET
 }
 
+// view memory
+//	0000 - 3777		2K EEPROM
+//	4000 - 4067		RTC RAM (0 to 55)
 VERB_01:
 {
 		EMPTY_STACK
-		CLR_A
-		ST_A_DIRECT	V01_R1
-		ST_A_DIRECT	V01_R2
-		LD_A_IMM8	-20
-		ST_A_DIRECT	V01_R3
+		MOV_NOUN_A
+		BRANCH_A_NE_IMM8	0x02	error
 
-LOOP:
-		WAIT3
-		LD_A_DIRECT	V01_R1
-		BRANCH_A_LE_IMM16	10000	L01
-		CLR_A
-		BRANCH OVER1
-L01:	INC_A
-OVER1:	ST_A_DIRECT	V01_R1
-		ENCODE_A_TO_DEC
+		CALL				EnterAddressR3
+		BRANCH_B_LT_IMM8	0		error
+		BRANCH_B_LE_IMM16	2047	eeprom		// EEPROM memory	(0000 - 3777 octal)
+		BRANCH				rtc					// RTC memory		(4000 - 4067 octal)
+
+eeprom:
+		MOV_B_C
+		EEPROM_READ_A_CINDIRECT
+		BRANCH				continue
+rtc:
+		LD_A_IMM16			2040				// adjust address 2048-8
+		SUB_B_A
+		MOV_B_C
+
+		RTC_MEM_A_CINDIRECT
+
+continue:
+		ENCODE_A_TO_OCT
 		MOV_A_R1
+		BRANCH			done
 
-		BRANCH_NOT_TIMER4	LOOP
+error:	BLINK_OPRERR	1
 
-		LD_A_DIRECT	V01_R2
-		BRANCH_A_LE_IMM16		3000	L02
-		CLR_A
-		BRANCH OVER2
-L02:	INC_A
-OVER2:	ST_A_DIRECT	V01_R2
-		ENCODE_A_TO_DEC
+done:	BLINK_VERB		0
+		BLINK_NOUN		0
+x:		BRANCH		x
+}
+
+//
+// Prompt for octal address in R3.
+// This code used by: V21-N02 and V01-N02
+//
+//	Modifies:
+//		- Registers A, B
+//		- Starts VERB and NOUN fields blinking
+//		- clears R1, R2, R3
+//	
+//	Returns address in B (decoded from BCD octal)
+//		Returns -1 in B for error.
+//
+EnterAddressR3:
+{
+		BLINK_VERB		1
+		BLINK_NOUN		1
+		LD_A_IMM32		0xAAAAAA
+		MOV_A_R1
 		MOV_A_R2
-
-		BRANCH_NOT_TIMER5	LOOP
-
-		LD_A_DIRECT	V01_R3
-		BRANCH_A_LE_IMM16		3000	L03
-		CLR_A
-		BRANCH OVER3
-L03:	INC_A
-OVER3:	ST_A_DIRECT	V01_R3
-		ENCODE_A_TO_DEC
 		MOV_A_R3
 
-		BRANCH	LOOP
+		INPUT_R3_OCT
+		BRANCH_A_LT_IMM8	0	error
+		DECODE_A_FROM_OCT
+		MOV_A_B
+		ENCODE_A_TO_OCT			// reformat
+		MOV_A_R3
+
+		BRANCH_B_GT_IMM16	2103	error		// address to large
+		RET
+
+error:
+		LD_B_IMM8		-1
+		RET
 }
 
 VERB_02:
@@ -303,50 +331,52 @@ good:	MOV_A_R3
 		RET
 }
 
+//
+// three seperate incrementing and decrementing numbers
+//
 VERB_04:
 {
-		PUSH_A
-		PUSH_B
-		PUSH_C
-		CALL	Help
+		EMPTY_STACK
+		CLR_A
+		ST_A_DIRECT	V01_R1
+		ST_A_DIRECT	V01_R2
+		LD_A_IMM8	-20
+		ST_A_DIRECT	V01_R3
+
+LOOP:
+		WAIT3
+		LD_A_DIRECT	V01_R1
+		BRANCH_A_LE_IMM16	10000	L01
+		CLR_A
+		BRANCH OVER1
+L01:	INC_A
+OVER1:	ST_A_DIRECT	V01_R1
 		ENCODE_A_TO_DEC
 		MOV_A_R1
-		MOV_B_A
+
+		BRANCH_NOT_TIMER4	LOOP
+
+		LD_A_DIRECT	V01_R2
+		BRANCH_A_LE_IMM16		3000	L02
+		CLR_A
+		BRANCH OVER2
+L02:	INC_A
+OVER2:	ST_A_DIRECT	V01_R2
 		ENCODE_A_TO_DEC
 		MOV_A_R2
-		MOV_C_A
+
+		BRANCH_NOT_TIMER5	LOOP
+
+		LD_A_DIRECT	V01_R3
+		BRANCH_A_LE_IMM16		3000	L03
+		CLR_A
+		BRANCH OVER3
+L03:	INC_A
+OVER3:	ST_A_DIRECT	V01_R3
 		ENCODE_A_TO_DEC
 		MOV_A_R3
-		POP_C
-		POP_B
-		POP_A
-		WAIT4
-		WAIT4
-		WAIT4
-		WAIT4
-		WAIT4
-		WAIT4
-		RET
-}
 
-Help:
-{
-		LD_A_IMM8		23
-		CALL Help2
-		RET
-}
-
-Help2:
-{
-		LD_B_IMM32		-65000
-		CALL	Help3
-		RET
-}
-
-Help3:
-{
-		LD_C_IMM32		32510
-		RET
+		BRANCH	LOOP
 }
 
 //
@@ -1238,8 +1268,11 @@ done:
 VERB_21:
 {
 		MOV_NOUN_A
-		BRANCH_A_NE_IMM16	0x98	error
+		BRANCH_A_EQ_IMM16	0x98	skip
+		BRANCH_A_EQ_IMM16	0x02	VERB_21_N02
+		BRANCH				error
 
+skip:
 		LD_A_IMM32		0xAAAAAA
 		MOV_A_R2
 		MOV_A_R3
@@ -1266,6 +1299,49 @@ VERB_21:
 
 error:
 		BLINK_OPRERR	1
+x:		BRANCH			x
+}
+
+//
+// Write memory. Enter octal address into R3
+// Then enter octal value 0-377 into R1.
+//
+VERB_21_N02:
+{
+		EMPTY_STACK
+
+		CALL			EnterAddressR3
+		BRANCH_B_LT_IMM8	0		error
+
+		INPUT_R1_OCT
+		DECODE_A_FROM_OCT
+		MOV_A_C
+		ENCODE_A_TO_OCT
+		MOV_A_R1
+
+		MOV_C_A
+		BRANCH_A_GT_IMM16	0xff	error		// Error if octal value was outside range 0-377
+
+		BRANCH_B_LE_IMM16	2047	eeprom		// EEPROM memory	(0000 - 3777 octal)
+		BRANCH				rtc					// RTC memory		(4000 - 4067 octal)
+
+eeprom:
+		MOV_B_C
+		EEPROM_WRITE_A_CINDIRECT
+		BRANCH				done
+rtc:
+		PUSH_A
+		LD_A_IMM16			2040				// adjust address 2048-8
+		SUB_B_A
+		POP_A
+		MOV_B_C
+		RTC_A_MEM_CINDIRECT
+		BRANCH			done
+
+error:	BLINK_OPRERR	1
+
+done:	BLINK_VERB		0
+		BLINK_NOUN		0
 x:		BRANCH			x
 }
 

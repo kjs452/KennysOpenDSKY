@@ -3732,6 +3732,10 @@ void agc_execute_cpu(uint8_t c)
 		op = 0x00; goto rtc_op_a;
 
 	case RTC_MEM_A_CINDIRECT:
+		Wire.beginTransmission(RTC_ADDR);
+		Wire.write(cpu->regs[2] & 0xff);		// RTC address in C
+		Wire.endTransmission(true);
+		cpu->regs[0] = Wire.read();
 		break;
 
 	case RTC_A_MEM_CINDIRECT:
@@ -3869,7 +3873,6 @@ void agc_execute_cpu(uint8_t c)
 
 	case RUN_MINOR_A:
 		Agc.cpu[1].PC = cpu->regs[0];
-		Agc.cpu[1].SP = CPU1_STACK;
 		break;
 
 	case CALL_CINDIRECT:
@@ -4384,6 +4387,15 @@ void apollo_guidance_computer()
 			case S_IV:
 				agc_reject_input();
 				Agc.state = S_V1;
+// KJS: Investigate doing this, also investigate more return codes from rejected
+// input:
+//			-1  opr error
+//			-2  verb/noun pressed
+//			-3  ENTR pressed without any input (skip entry)
+//				prev_verb = Agc.dsky.verb;		// KJS testing
+//				prev_noun = Agc.dsky.noun;		// KJS testing
+//				Agc.dsky.verb = 0xAA;		// KJS testing
+//				Agc.dsky.blink |= BLINKF_KEYREL;		// KJS testing
 				break;
 
 			case S_IE:
