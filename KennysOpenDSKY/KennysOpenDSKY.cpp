@@ -4833,6 +4833,9 @@ ISR(TIMER1_COMPA_vect)
 static
 void setup()
 {
+	delay(100);			// give hardware time to startup, this is attempt to fix power up
+						// issues where display was corrupted.
+
 	Serial.begin(9600);
 
 	Wire.begin();
