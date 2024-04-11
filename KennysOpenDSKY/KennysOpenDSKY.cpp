@@ -3735,7 +3735,9 @@ void agc_execute_cpu(uint8_t c)
 		Wire.beginTransmission(RTC_ADDR);
 		Wire.write(cpu->regs[2] & 0xff);		// RTC address in C
 		Wire.endTransmission(true);
-		cpu->regs[0] = Wire.read();
+		Wire.requestFrom(RTC_ADDR, 1, true);
+		op = Wire.read();						// read byte
+		cpu->regs[0] = op;
 		break;
 
 	case RTC_A_MEM_CINDIRECT:
