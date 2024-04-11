@@ -30,6 +30,8 @@ Kenny's Open DSKY Software
     + [Nouns](#nouns)
     + [Verb-Nouns](#verb-nouns)
     + [Programs](#programs)
+    + [Read Persistent Memory (V01N02)](#read-persistent-memory-v01n02)
+    + [Write Persistent Memory (V21N02)](#write-persistent-memory-v21n02)
   + [Using the Assembler](#using-the-assembler)
   + [Assembly Language](#assembly-language)
     + [Virtual Machine Architecture](#virtual-machine-architecture)
