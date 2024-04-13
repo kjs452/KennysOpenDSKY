@@ -83,7 +83,7 @@ Open DSKY hardware. However, I derived many ideas and code from these sources:
         the **Apollo 50th Anniversary** project which came pre-installed with the Open DSKY kit.
     (Apollo Education Experience Program, Cumming Georgia).
     Thank you **Bill Walker** for an incredible software creation and user manual.
-    **Github:** <https://github.com/ApolloExperience/OpenDSKY/tree/master>.
+    **Github:** <https://github.com/ApolloExperience/OpenDSKY>.
     **Website 1:** <http://apolloexperience.com>.
     **Website 2:** <https://www.gofundme.com/apollo-education-experience-project>.
 
