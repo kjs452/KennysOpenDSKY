@@ -61,32 +61,32 @@ enum ASM_SYMBOLS {
 	LBL_PROG_70 = 567,    // LABEL
 	LBL_PROG_42 = 572,    // LABEL
 	LBL_PROG_06 = 662,    // LABEL
-	LBL_VERB_06 = 830,    // LABEL
-	LBL_VERB_16 = 835,    // LABEL
-	LBL_VERB_06_16 = 841,    // LABEL
-	LBL_Query_IMU_Accel = 944,    // LABEL
-	LBL_Query_Gyro_Accel = 960,    // LABEL
-	LBL_Query_RTC_DateTimeTemp = 976,    // LABEL
-	LBL_Query_AgcInitTime = 1013,    // LABEL
-	LBL_Query_TimeFromEvent = 1059,    // LABEL
-	LBL_Query_TimeToEvent = 1059,    // LABEL
-	LBL_Query_RTC_Time = 1059,    // LABEL
-	LBL_Query_RTC_Date = 1104,    // LABEL
-	LBL_Query_GPS_Time = 1128,    // LABEL
-	LBL_Query_GPS_Date = 1128,    // LABEL
-	LBL_Query_GPS_Coord = 1128,    // LABEL
-	LBL_Query_Orbital_Params = 1128,    // LABEL
-	LBL_Query_MET = 1128,    // LABEL
-	LBL_Query_Major_Mode = 1128,    // LABEL
-	LBL_Query_IMU_1202 = 1128,    // LABEL
-	LBL_Query_AudioClipPlaying = 1175,    // LABEL
-	LBL_VERB_09 = 1201,    // LABEL
-	LBL_VERB_10 = 1276,    // LABEL
-	LBL_VERB_21 = 1355,    // LABEL
-	LBL_VERB_21_N02 = 1408,    // LABEL
-	LBL_VERB_22 = 1456,    // LABEL
-	LBL_VERB_25 = 1503,    // LABEL
-	LBL_ASM_END = 1735,    // LABEL
+	LBL_VERB_06 = 834,    // LABEL
+	LBL_VERB_16 = 839,    // LABEL
+	LBL_VERB_06_16 = 845,    // LABEL
+	LBL_Query_IMU_Accel = 948,    // LABEL
+	LBL_Query_Gyro_Accel = 964,    // LABEL
+	LBL_Query_RTC_DateTimeTemp = 980,    // LABEL
+	LBL_Query_AgcInitTime = 1017,    // LABEL
+	LBL_Query_TimeFromEvent = 1063,    // LABEL
+	LBL_Query_TimeToEvent = 1063,    // LABEL
+	LBL_Query_RTC_Time = 1063,    // LABEL
+	LBL_Query_RTC_Date = 1108,    // LABEL
+	LBL_Query_GPS_Time = 1132,    // LABEL
+	LBL_Query_GPS_Date = 1132,    // LABEL
+	LBL_Query_GPS_Coord = 1132,    // LABEL
+	LBL_Query_Orbital_Params = 1132,    // LABEL
+	LBL_Query_MET = 1132,    // LABEL
+	LBL_Query_Major_Mode = 1132,    // LABEL
+	LBL_Query_IMU_1202 = 1132,    // LABEL
+	LBL_Query_AudioClipPlaying = 1179,    // LABEL
+	LBL_VERB_09 = 1205,    // LABEL
+	LBL_VERB_10 = 1280,    // LABEL
+	LBL_VERB_21 = 1359,    // LABEL
+	LBL_VERB_21_N02 = 1412,    // LABEL
+	LBL_VERB_22 = 1460,    // LABEL
+	LBL_VERB_25 = 1507,    // LABEL
+	LBL_ASM_END = 1739,    // LABEL
 };
 
 static const uint8_t Program[] PROGMEM = {
@@ -521,7 +521,7 @@ static const uint8_t Program[] PROGMEM = {
         LD_A_IMM16, 0x03, 0x00 /* MAIN_CPU1=3 */, 
         RUN_MINOR_A, 
     // again:
-        CALL, 0xB0, 0x03 /* Query_IMU_Accel=944 */, 
+        CALL, 0xB4, 0x03 /* Query_IMU_Accel=948 */, 
         BRANCH, 0xFB /* again=-5 */, 
     // }
     // P61 playback JFK i believe
@@ -676,6 +676,9 @@ static const uint8_t Program[] PROGMEM = {
         MOV_A_VERB, 
         LD_A_IMM8, 0x25, 
         MOV_A_NOUN, 
+        BLINK_VERB, 0x00, 
+        BLINK_NOUN, 0x00, 
+    // for all three fields.
         BLINK_VERB, 0x01, 
         BLINK_NOUN, 0x01, 
         BLINK_PROG, 0x01, 
@@ -692,7 +695,7 @@ static const uint8_t Program[] PROGMEM = {
         LT_STBY, 0x01, 
         WAIT3, 
         WAIT3, 
-        CALL, 0x2C, 0x03 /* clr=812 */, 
+        CALL, 0x30, 0x03 /* clr=816 */, 
         INPUT_REQ_PROCEED, 
         LT_STBY, 0x00, 
         WAIT4, 
@@ -749,7 +752,7 @@ static const uint8_t Program[] PROGMEM = {
         COMPACTY_PROB_IMM8, 0x64, 
         BRANCH, 0x05 /* forever=+5 */, 
     // cancel:
-        CALL, 0x2C, 0x03 /* clr=812 */, 
+        CALL, 0x30, 0x03 /* clr=816 */, 
         BRANCH, 0x00 /* forever=+0 */, 
     // forever:
         BRANCH, 0xFE /* forever=-2 */, 
@@ -810,7 +813,7 @@ static const uint8_t Program[] PROGMEM = {
         COMPACTY_PROB_IMM8, 0x0A, 
         MOV_NOUN_A, 
         MOV_A_B, 
-        LD_C_IMM16, 0x6A, 0x03 /* NounTable=874 */, 
+        LD_C_IMM16, 0x6E, 0x03 /* NounTable=878 */, 
     // Next:
         PROG8_A_CINDIRECT, 
         BRANCH_A_EQ_IMM8, 0xFF, 0x53 /* NotFound=+83 */, 
@@ -823,37 +826,37 @@ static const uint8_t Program[] PROGMEM = {
         BRANCH, 0xEC /* Next=-20 */, 
     // NounTable:
         0x17, 
-        0xB0, 0x03 /* Query_IMU_Accel=944 */, 
+        0xB4, 0x03 /* Query_IMU_Accel=948 */, 
         0x18, 
-        0xC0, 0x03 /* Query_Gyro_Accel=960 */, 
+        0xC4, 0x03 /* Query_Gyro_Accel=964 */, 
         0x19, 
-        0xD0, 0x03 /* Query_RTC_DateTimeTemp=976 */, 
+        0xD4, 0x03 /* Query_RTC_DateTimeTemp=980 */, 
         0x31, 
-        0xF5, 0x03 /* Query_AgcInitTime=1013 */, 
+        0xF9, 0x03 /* Query_AgcInitTime=1017 */, 
         0x34, 
-        0x23, 0x04 /* Query_TimeFromEvent=1059 */, 
+        0x27, 0x04 /* Query_TimeFromEvent=1063 */, 
         0x35, 
-        0x23, 0x04 /* Query_TimeToEvent=1059 */, 
+        0x27, 0x04 /* Query_TimeToEvent=1063 */, 
         0x36, 
-        0x23, 0x04 /* Query_RTC_Time=1059 */, 
+        0x27, 0x04 /* Query_RTC_Time=1063 */, 
         0x37, 
-        0x50, 0x04 /* Query_RTC_Date=1104 */, 
+        0x54, 0x04 /* Query_RTC_Date=1108 */, 
         0x38, 
-        0x68, 0x04 /* Query_GPS_Time=1128 */, 
+        0x6C, 0x04 /* Query_GPS_Time=1132 */, 
         0x39, 
-        0x68, 0x04 /* Query_GPS_Date=1128 */, 
+        0x6C, 0x04 /* Query_GPS_Date=1132 */, 
         0x43, 
-        0x68, 0x04 /* Query_GPS_Coord=1128 */, 
+        0x6C, 0x04 /* Query_GPS_Coord=1132 */, 
         0x44, 
-        0x68, 0x04 /* Query_Orbital_Params=1128 */, 
+        0x6C, 0x04 /* Query_Orbital_Params=1132 */, 
         0x65, 
-        0x68, 0x04 /* Query_MET=1128 */, 
+        0x6C, 0x04 /* Query_MET=1132 */, 
         0x68, 
-        0x68, 0x04 /* Query_Major_Mode=1128 */, 
+        0x6C, 0x04 /* Query_Major_Mode=1132 */, 
         0x87, 
-        0x68, 0x04 /* Query_IMU_1202=1128 */, 
+        0x6C, 0x04 /* Query_IMU_1202=1132 */, 
         0x98, 
-        0x97, 0x04 /* Query_AudioClipPlaying=1175 */, 
+        0x9B, 0x04 /* Query_AudioClipPlaying=1179 */, 
         0xFF, 
     // Found:
         MOV_A_C, 
@@ -1025,7 +1028,7 @@ static const uint8_t Program[] PROGMEM = {
     // }
     // Query_IMU_1202:
     // {
-        CALL, 0xC0, 0x03 /* Query_Gyro_Accel=960 */, 
+        CALL, 0xC4, 0x03 /* Query_Gyro_Accel=964 */, 
         RANDOM_A, 
         BRANCH_A_GT_IMM16, 0xDC, 0x05, 0x26 /* noalrm=+38 */, 
         LD_A_IMM32, 0xAA, 0xAA, 0xAA, 0x00, 
@@ -1081,7 +1084,7 @@ static const uint8_t Program[] PROGMEM = {
         BRANCH_A_GT_IMM8, 0x04, 0x36 /* error=+54 */, 
         DEC_A, 
         LSHIFT_A_IMM8, 0x01, 
-        LD_B_IMM16, 0xF4, 0x04 /* Add=1268 */, 
+        LD_B_IMM16, 0xF8, 0x04 /* Add=1272 */, 
         ADD_A_B, 
         ST_A_DIRECT, TMP3, 
         BLINK_R1, 0x01, 
@@ -1215,7 +1218,7 @@ static const uint8_t Program[] PROGMEM = {
         ST_A_DIRECT, SELCLIP, 
         LD_A_IMM8, 0x16, 
         MOV_A_VERB, 
-        GOTO, 0x43, 0x03 /* VERB_16=835 */, 
+        GOTO, 0x47, 0x03 /* VERB_16=839 */, 
     // error:
         BLINK_OPRERR, 0x01, 
     // x:
@@ -1287,7 +1290,7 @@ static const uint8_t Program[] PROGMEM = {
         ST_A_DIRECT, ADJFACT, 
         LD_A_IMM8, 0x16, 
         MOV_A_VERB, 
-        GOTO, 0x43, 0x03 /* VERB_16=835 */, 
+        GOTO, 0x47, 0x03 /* VERB_16=839 */, 
     // error:
         BLINK_OPRERR, 0x01, 
     // x:
@@ -1307,10 +1310,10 @@ static const uint8_t Program[] PROGMEM = {
         BRANCH_A_EQ_IMM8, 0x37, 0x07 /* pdate=+7 */, 
         BRANCH, 0x54 /* error=+84 */, 
     // ptime:
-        CALL, 0x74, 0x06 /* PopulateTime=1652 */, 
+        CALL, 0x78, 0x06 /* PopulateTime=1656 */, 
         BRANCH, 0x03 /* over=+3 */, 
     // pdate:
-        CALL, 0x8A, 0x06 /* PopulateDate=1674 */, 
+        CALL, 0x8E, 0x06 /* PopulateDate=1678 */, 
     // over:
         BLINK_R1, 0x01, 
         INPUT_R1, 
@@ -1352,11 +1355,11 @@ static const uint8_t Program[] PROGMEM = {
         BRANCH_A_EQ_IMM8, 0x36, 0x03 /* stime=+3 */, 
         BRANCH_A_EQ_IMM8, 0x37, 0x06 /* sdate=+6 */, 
     // stime:
-        CALL, 0xB0, 0x06 /* SetTime=1712 */, 
-        GOTO, 0xC0, 0x06 /* success=1728 */, 
+        CALL, 0xB4, 0x06 /* SetTime=1716 */, 
+        GOTO, 0xC4, 0x06 /* success=1732 */, 
     // sdate:
-        CALL, 0xA0, 0x06 /* SetDate=1696 */, 
-        GOTO, 0xC0, 0x06 /* success=1728 */, 
+        CALL, 0xA4, 0x06 /* SetDate=1700 */, 
+        GOTO, 0xC4, 0x06 /* success=1732 */, 
     // error:
         BLINK_OPRERR, 0x01, 
     // x:
@@ -1372,7 +1375,7 @@ static const uint8_t Program[] PROGMEM = {
     // CheckSS:
         BRANCH_B_LT_IMM8, 0x00, 0xE9 /* error=-23 */, 
         BRANCH_B_GT_IMM8, 0x3B, 0xE6 /* error=-26 */, 
-        GOTO, 0x29, 0x06 /* set=1577 */, 
+        GOTO, 0x2D, 0x06 /* set=1581 */, 
     // CheckYYYY:
         BRANCH_B_LT_IMM16, 0xD0, 0x07, 0xDF /* error=-33 */, 
         BRANCH_B_GT_IMM16, 0x33, 0x08, 0xDB /* error=-37 */, 
@@ -1384,7 +1387,7 @@ static const uint8_t Program[] PROGMEM = {
     // CheckDAY:
         BRANCH_B_LT_IMM8, 0x01, 0xCE /* error=-50 */, 
         BRANCH_B_GT_IMM8, 0x1F, 0xCB /* error=-53 */, 
-        GOTO, 0x29, 0x06 /* set=1577 */, 
+        GOTO, 0x2D, 0x06 /* set=1581 */, 
     // PopulateTime:
         RTC_HH_A, 
         OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
@@ -1442,7 +1445,7 @@ static const uint8_t Program[] PROGMEM = {
         EMPTY_STACK, 
         LD_A_IMM8, 0x16, 
         MOV_A_VERB, 
-        GOTO, 0x43, 0x03 /* VERB_16=835 */, 
+        GOTO, 0x47, 0x03 /* VERB_16=839 */, 
     // }
     // ASM_END:
 };

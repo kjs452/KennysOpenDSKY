@@ -650,6 +650,11 @@ PROG_06:
 		MOV_A_VERB
 		LD_A_IMM8	0x25
 		MOV_A_NOUN
+
+		BLINK_VERB		0		// verb/noun are already blinking at this point
+		BLINK_NOUN		0		// so turn off first. this is needed to syncronize blinking
+								// for all three fields.
+
 		BLINK_VERB		1
 		BLINK_NOUN		1
 		BLINK_PROG		1
