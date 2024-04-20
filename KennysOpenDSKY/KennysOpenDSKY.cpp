@@ -43,11 +43,12 @@
 //	SECTION 14: DSKY redraw routines (arduino and curses)
 //	SECTION 15: Keyboard reading (arduino and curses)
 //	SECTION 16: IMU Reading routine
-//	SECTION 17: Apollo Guidance Computer routines
-//	SECTION 18: Signal/ISR for Timing control (arduino and curses)
-//	SECTION 19: Sketch setup() routine
-//	SECTION 20: Sketch loop() routine
-//	SECTION 21: MAIN() - calls setup() and loop()
+//	SECTION 17: GPS Reading routine
+//	SECTION 18: Apollo Guidance Computer routines
+//	SECTION 19: Signal/ISR for Timing control (arduino and curses)
+//	SECTION 20: Sketch setup() routine
+//	SECTION 21: Sketch loop() routine
+//	SECTION 22: MAIN() - calls setup() and loop()
 //
 // NOTES:
 //	* When adding/removing VM instructions there are 4 places to edit:
@@ -606,14 +607,7 @@ enum AGC_INSTRUCTION
 	LT_ALL,				// 0|1	turn all lights on or off
 	UPLINK_PROB_IMM8,	// <val8>		set UPLINK ACTY random blink probability with immediate byte
 	COMPACTY_PROB_IMM8,	// <val8>		set COMP ACTY random blink probability with immediate byte
-	GPS_LAT_A,
-	GPS_LON_A,
-	GPS_YEAR_A,
-	GPS_MON_A,
-	GPS_DAY_A,
-	GPS_HH_A,
-	GPS_MM_A,
-	GPS_SS_A,
+	GPS_READ_DIRECT,	// <addr>		store GPS data in <addr+0> ... <addr+7>
 	BRANCH_TIMESTAMP_LT,	// <addr1> <addr2>  branch if timestamp1 less than timestamp2
 	TIMESTAMP_DIFF_A,		// <addr1> <addr2>	diff timestamp1 in addr1 and timestamp2 in addr2 => A
 	RTC_TIMESTAMP_DIRECT,	// <addr>	store RTC timestamp to addr+0 and addr+1
@@ -831,14 +825,7 @@ static const char *Mnemonics[] = {
 	"LT_ALL",			// 0|1	turn all lights on or off
 	"UPLINK_PROB_IMM8",
 	"COMPACTY_PROB_IMM8",
-	"GPS_LAT_A",
-	"GPS_LON_A",
-	"GPS_YEAR_A",
-	"GPS_MON_A",
-	"GPS_DAY_A",
-	"GPS_HH_A",
-	"GPS_MM_A",
-	"GPS_SS_A",
+	"GPS_READ_DIRECT",
 	"BRANCH_TIMESTAMP_LT",
 	"TIMESTAMP_DIFF_A",
 	"RTC_TIMESTAMP_DIRECT",
@@ -978,6 +965,7 @@ static uint8_t analogRead(uint8_t pin)
 #define A2 2
 #define A7 7
 #define LOW 0
+#define HIGH 0
 
 void pinMode(uint8_t pin, uint8_t mode)
 {
@@ -991,6 +979,10 @@ void digitalWrite(uint8_t pin, uint8_t sig)
 // Mock delay() routine
 //
 static void delay(uint16_t ms)
+{
+}
+
+static void delayMicroseconds(uint16_t ms)
 {
 }
 
@@ -1421,14 +1413,72 @@ uint8_t TwoWire::month_duration[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 
 class Stream
 {
 public:
+	Stream()
+		: pos(0)
+	{
+	}
+
 	void begin(uint16_t baud)
 	{
+		pos = 0;
 	}
 
 	void write(uint8_t *buf, uint8_t len)
 	{
 	}
+
+	int available()
+	{
+		int len = strlen(data+pos);
+		if( len == 0 ) {
+			pos = 0;
+			return 0;
+		}
+		return len;
+	}
+
+	int8_t read()
+	{
+		if( data[pos] == '\0' ) {
+			pos = 0;
+			return -1;
+		}
+		return data[pos++];
+	}
+
+	void print(const char *str)
+	{
+		fprintf(logfp, "Stream::print(): '%s'\n", str);
+	}
+
+	void println(const char *str)
+	{
+		fprintf(logfp, "Stream::println(): '%s'\n", str);
+	}
+
+	void println(int val)
+	{
+		fprintf(logfp, "Stream::println(): '%d'\n", val);
+	}
+private:
+	int pos;
+	static char data[];
 };
+
+char Stream::data[] =
+			"$GPGGA,160810.095,,,,,0,0,,,M,,M,,*4A $GPGSA,A,1,,,,,,,,,,,,,,,*1E $GPG\r\n"
+			"$GPGGA,160810.095,,,,,0,0,,,M,,M,,*4A $GPGSA,A,1,,,,,,,,,,,,,,,*1E $GPG\r\n"
+			"$GPXXRMC,075747.000,A,2232.8990,N,11405.3368,E,3.9,357.8,260210,,,A*6A\r\n"
+			"$GPRMC,075747.000,A,2232.8990,N,11405.3368,E,3.9,357.8,260210,,,A*6A\r\n"		// <<< GOOD 1
+//			"$GPRMC,0,A,,,,,3.9,357.8,,,,A*6A\r\n"   										// <<< zeros/empty
+//			"$ZPRMC,075747.000,A,2232.8990,N,11405.3368,E,3.9,357.8,260210,,,A*6A\r\n"		// <<< BAD
+//			"$GPRMC,075747.000,A,2232.8990,S,11405.3368,W,3.9,357.8,260210,,,A*6A\r\n"		// <<< Negative
+//			"$GPRMC,075747.000,A,2299.9999,S,09077.9999,E,3.9,357.8,260210,,,A*6A\r\n"		// <<< GOOD 2
+//			"$GPRMC,020824,A,4400.000,N,07143.125,W,000.0,360.0,161201,016.6,W*7C\r\n"		// <<< GOOD 3
+//			"$GPRMC,185710.000,A,4047.0455,N,07356.9908,W,0.00,302.82,190424,,,A*7E\r\n"	// <<< GOOD 5
+			"$GPYYRMC,075747.000,A,2232.8990,N,11405.3368,E,3.9,357.8,260210,,,A*6A\r\n"
+			"$GPGGA,160810.095,,,,,0,0,,,M,,M,,*4A $GPGSA,A,1,,,,,,,,,,,,,,,*1E $GPG\r\n"
+			"$GPXX,160810.095,,,,,0,0,,,M,,M,,*4A $GPGSA,A,1,,,,,,,,,,,,,,,*1E $GPG\r\n" ;
 
 static Stream Serial;		// Mock Serial object
 static TwoWire Wire;		// Mock Wire object
@@ -1597,6 +1647,7 @@ static const DISPATCH_ENTRY Verbs[] PROGMEM = {
 	{ 0x21, LBL_VERB_21 },
 	{ 0x22, LBL_VERB_22 },
 	{ 0x25, LBL_VERB_25 },
+	{ 0x26, LBL_VERB_26 },
 	{ 0x35, LBL_VERB_35 },
 	{ 0x36, LBL_VERB_36 },
 	{ 0x37, LBL_VERB_37 },
@@ -2783,7 +2834,275 @@ void readIMU(uint8_t addr)
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 17: Apollo Guidance Computer routines
+// SECTION 17: GPS Reading routine
+//
+
+//
+// Read GPS data.
+// Store results into RAM variables: addr+0, addr+1, addr+2, ..., addr+7
+//
+//	addr+0	Latitude Degrees	BCD encoded		-90 ... +90		0xB90
+//	addr+1	Latitude Minutes	BCD encoded		00 ... 59		0x59
+//	addr+2	Latitude Seconds	BCD encoded		00 ... 5999		0x5999
+//
+//	addr+3	Longitude Degrees	BCD encoded		-180 ... +180	0xC180
+//	addr+4	Longitude Minutes	BCD encoded		00 ... 59		0x59
+//	addr+5	Longitude Seconds	BCD encoded		00 ... 5999		0x5999
+//
+//	addr+6	Date				BCD encoded		DDMMYY			0xddmmyy
+//	addr+7	Time				BCD encoded		HHMMSS			0xhhmmss
+//
+// These variables will be mostly 0 when no GPS is avalable.
+//
+// This code is derived from from https://github.com/rondiamond/OpenDSKY "actionReadGPS()"
+//
+// Conversion Formulas:
+//
+//	R1 contains degrees					ddd
+//	R2 contains minutes					mm
+//	R3 contains hundreds of seconds		ssss
+//
+//	convert to decimal degrees (dd.dddddd):
+//		If degrees are positive use:	+ddd + mm/60 + ssss/360000
+//		If degrees are negative use:	-ddd - mm/60 - ssss/360000
+//
+//	convert to degrees-decimal minutes (dddmm.mmmm):
+//		If degrees are positive use:	+ddd*100 + mm + ssss/6000
+//		If degrees are negative use:	-ddd*100 - mm - ssss/6000
+//
+//	convert from decimal degrees:
+//		given: ddd.dddddd		Ie.   -71.123456
+//
+//		Degrees = ddd
+//		Minutes = round(dddddd/1000000 * 60)
+//		Hundreds of seconds = round( (dddddd/1000000 * 60 - Minutes) * 6000 )
+//
+//
+static
+void readGPS(uint16_t addr)
+{
+	static const char GPS_PREFIX[] PROGMEM = "$GPRMC,";
+
+	//
+	// Look for the the "$GPRMC" lines.
+	// Parse this record format:
+	// $GPRMC,075747.000,A,2232.8990,N,11405.3368,E,3.9,357.8,260210,,,A*6A
+	// $GPRMC,hhmmss.ddd,A,ddmm.mmmm,N,dddmm.mmmm,E,3.9,357.8,ddmmyy,,,A*6A
+	//
+	// Message ID $GPRMC RMC protocol header
+	// field 0 = UTS Position 075747.000 hhmmss.sss
+	// field 1 = Status A A=data valid or V=data not valid
+	// field 2 = Latitude 2232.8990 ddmm.mmmm
+	// field 3 = N/S Indicator N N=north or S=south
+	// field 4 = Longitude 11405.3368 dddmm.mmmm
+	// field 5 = E/W Indicator E E=east or W=west
+	// field 6 = Speed Over Ground 3.9 Knots
+	// field 7 = Course Over Ground 357.8 Degrees True Course
+	// field 8 = Date(UTC) 260210 ddmmyy
+	// field 9 = Magnetic variation <Null> Degrees Null fields when it is not Used
+	// field 10 = Magnetic Variation Direction <Null> E=east or W=west (Null fields when it is not Used)
+	// field 11 = Fix Mode A A=autonomous, N = No fix, D=DGPS, E=DR (and checksum)
+	// EOL <CR> <LF> End of message termination
+
+	enum {
+		GST_START,				// start state;
+		GST_GOT_PREFIX,			// got the prefix header "$GPRMC,"
+	};
+
+	uint8_t index;
+	uint8_t fld;
+	uint8_t cnt;				// how many chars have been read
+	char x;
+	char y;
+	uint8_t state;
+	float seconds;
+	int16_t iseconds;
+
+	int32_t *flatitude_degrees;		// alias pointers into Agc.RAM[addr+x]
+	int32_t *flatitude_minutes;
+	int32_t *flatitude_seconds;
+	int32_t *flongitude_degrees;
+	int32_t *flongitude_minutes;
+	int32_t *flongitude_seconds;
+	int32_t *fdate;
+	int32_t *ftime;
+
+	flatitude_degrees = &Agc.RAM[addr+0];
+	flatitude_minutes = &Agc.RAM[addr+1];
+	flatitude_seconds = &Agc.RAM[addr+2];
+	flongitude_degrees = &Agc.RAM[addr+3];
+	flongitude_minutes = &Agc.RAM[addr+4];
+	flongitude_seconds = &Agc.RAM[addr+5];
+	fdate = &Agc.RAM[addr+6];
+	ftime = &Agc.RAM[addr+7];
+
+	*flatitude_degrees = 0xA00;
+	*flatitude_minutes = 0;
+	*flatitude_seconds = 0;
+
+	*flongitude_degrees = 0xA000;
+	*flongitude_minutes = 0;
+	*flongitude_seconds = 0;
+
+	*fdate = 0;
+	*ftime = 0;
+
+	digitalWrite(GPS_SW, HIGH);		// turn on relay to connect GPS to serial
+	delay(20);
+
+#if 0
+	static char data[600];		// KJS Debugging
+	uint16_t i = 0;				// KJS deugging
+#endif
+
+	state = GST_START;
+	index = 0;
+	cnt = 0;
+	while( cnt < 600 ) {
+		x = Serial.read();
+		if( x < 0 )
+			continue;
+		cnt++;
+//		data[i++] = x;		// KJS debugging
+
+		switch(state) {
+		case GST_START:	
+			y = pgm_read_byte_near(GPS_PREFIX + index);
+			if( x == y ) {
+				index++;
+				y = pgm_read_byte_near(GPS_PREFIX + index);
+				if( y == '\0' ) {
+					state = GST_GOT_PREFIX;
+					index = 0;
+					fld = 0;
+				}
+			} else {
+				index = 0;
+			}
+			break;
+
+		case GST_GOT_PREFIX:
+			if( x == ',' ) {
+				fld++;
+				index = 0;
+				if( fld >= 11 ) {
+					goto done;
+				}
+			} else {
+				switch(fld) {
+				case 0:					// UTS Position (GPS Time) hhmmss.sss
+					if( index < 6 ) {
+						*ftime <<= 4;
+						*ftime |= (x - '0');
+					}
+					break;
+
+				case 1:					// Status 'A' = data valid, 'V' = data not valid
+					break;
+
+				case 2:					// Latitude		ddmm.mmmm
+					if( index < 2 ) {
+						*flatitude_degrees <<= 4;
+						*flatitude_degrees |= (x - '0');
+					} else if( index < 4 ) {
+						*flatitude_minutes <<= 4;
+						*flatitude_minutes |= (x - '0');
+					} else if( index < 5 ) {
+						seconds = 0.00;
+					} else {
+						seconds *= 10.0;
+						seconds += (x - '0');
+					}
+					break;
+
+				case 3:					// N/S indicator
+					if( x == 'S' ) {
+						*flatitude_degrees |= 0xC00;	// (-) sign
+					} else {
+						*flatitude_degrees |= 0xB00;	// (+) sign
+					}
+					iseconds = 6000.0 * (seconds / 10000.0);
+					*flatitude_seconds = (iseconds / 1000) << 12;
+					iseconds %= 1000;
+					*flatitude_seconds |= (iseconds / 100) << 8;
+					iseconds %= 100;
+					*flatitude_seconds |= (iseconds / 10) << 4;
+					iseconds %= 10;
+					*flatitude_seconds |= iseconds;
+					break;
+
+				case 4:					// Longitude	dddmm.mmmm
+					if( index < 3 ) {
+						*flongitude_degrees <<= 4;
+						*flongitude_degrees |= (x - '0');
+					} else if( index < 5 ) {
+						*flongitude_minutes <<= 4;
+						*flongitude_minutes |= (x - '0');
+					} else if( index < 6 ) {
+						seconds = 0.00;
+					} else {
+						seconds *= 10.0;
+						seconds += (x - '0');
+					}
+					break;
+
+				case 5:					// E/W indicator
+					if( x == 'W' ) {
+						*flongitude_degrees |= 0xC000;	// (-) sign
+					} else {
+						*flongitude_degrees |= 0xB000;	// (+) sign
+					}
+					iseconds = 6000.0 * (seconds / 10000.0);
+					*flongitude_seconds = (iseconds / 1000) << 12;
+					iseconds %= 1000;
+					*flongitude_seconds |= (iseconds / 100) << 8;
+					iseconds %= 100;
+					*flongitude_seconds |= (iseconds / 10) << 4;
+					iseconds %= 10;
+					*flongitude_seconds |= iseconds;
+					break;
+
+				case 6:					// Speed over ground
+					break;
+
+				case 7:					// Course over ground
+					break;
+
+				case 8:					// Date (UTC)	ddmmyy
+					*fdate <<= 4;
+					*fdate |= (x - '0');
+					break;
+
+				case 9:					// Magnetic variation degrees
+					break;
+
+				case 10:				// Magnetic variation direction
+					break;
+
+				case 11:				// Fix Mode: A, N, D, E (and checksum)
+					break;
+				}
+				index++;
+			}
+			break;
+		}
+	}
+
+done:
+	digitalWrite(GPS_SW, LOW);			// turn off GPS relay
+
+#if 0
+	Serial.println("Data: ");		// KJS debugging
+	data[i] = '\0';
+	Serial.println(data);
+#endif
+
+}
+// **********************************************************************
+
+//////////////////////////////////////////////////////////////////////
+//
+// SECTION 18: Apollo Guidance Computer routines
 //
 static
 void agc_cpu_init(int c, CPU *cpu)
@@ -3652,28 +3971,8 @@ void agc_execute_cpu(uint8_t c)
 		Agc.compacty_prob = ProgramAccU8(cpu->PC++);
 		break;
 
-	case GPS_LAT_A:
-		break;
-
-	case GPS_LON_A:
-		break;
-
-	case GPS_YEAR_A:
-		break;
-
-	case GPS_MON_A:
-		break;
-
-	case GPS_DAY_A:
-		break;
-
-	case GPS_HH_A:
-		break;
-
-	case GPS_MM_A:
-		break;
-
-	case GPS_SS_A:
+	case GPS_READ_DIRECT:
+		readGPS( ProgramAccU8(cpu->PC++) );
 		break;
 
 	case BRANCH_TIMESTAMP_LT:
@@ -3695,7 +3994,7 @@ void agc_execute_cpu(uint8_t c)
 		break;
 
 	case RTC_TIMESTAMP_DIRECT:
-		op = ProgramAcc8(cpu->PC++);
+		op = ProgramAccU8(cpu->PC++);
 
 		Wire.beginTransmission(RTC_ADDR);
 		Wire.write(0x00);
@@ -4358,6 +4657,7 @@ void apollo_guidance_computer()
 				} else {
 					Agc.dsky.verb = prev_verb;
 					Agc.dsky.noun = prev_noun;
+					Agc.dsky.blink |= BLINKF_OPRERR;
 				}
 				Agc.state = S_ST;
 				break;
@@ -4712,7 +5012,7 @@ void apollo_guidance_computer()
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 18: Signal/ISR for Timing control (arduino and curses)
+// SECTION 19: Signal/ISR for Timing control (arduino and curses)
 //
 // signal handler 100ms
 //	Set the CPU_TIMERx flag for both cpu's
@@ -4828,7 +5128,7 @@ ISR(TIMER1_COMPA_vect)
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 19: Sketch setup() routine
+// SECTION 20: Sketch setup() routine
 //
 static
 void setup()
@@ -4895,7 +5195,7 @@ void setup()
 
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 20: Sketch loop() routine
+// SECTION 21: Sketch loop() routine
 //
 static
 void loop()
@@ -4909,7 +5209,7 @@ void loop()
 #ifdef CURSES_SIMULATOR
 //////////////////////////////////////////////////////////////////////
 //
-// SECTION 21: MAIN() - calls setup() and loop()
+// SECTION 22: MAIN() - calls setup() and loop()
 //
 // This is only used in the linux/macos/windows CURSES SIMULATOR version.
 //

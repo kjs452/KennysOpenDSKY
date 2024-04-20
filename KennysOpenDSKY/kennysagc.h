@@ -36,6 +36,16 @@ enum ASM_SYMBOLS {
 	ImuAccY = 23,    // DEFINE
 	ImuAccZ = 24,    // DEFINE
 	ImuTemp = 25,    // DEFINE
+	GpsBuf = 26,    // DEFINE
+	GpsBufLatDeg = 26,    // DEFINE
+	GpsBufLatMin = 27,    // DEFINE
+	GpsBufLatSec = 28,    // DEFINE
+	GpsBufLonDeg = 29,    // DEFINE
+	GpsBufLonMin = 30,    // DEFINE
+	GpsBufLonSec = 31,    // DEFINE
+	GpsBufDate = 32,    // DEFINE
+	GpsBufTime = 33,    // DEFINE
+	GpsCoordFlag = 34,    // DEFINE
 	LBL_MAIN_CPU0 = 0,    // LABEL
 	LBL_MAIN_CPU1 = 3,    // LABEL
 	LBL_Init = 6,    // LABEL
@@ -73,31 +83,37 @@ enum ASM_SYMBOLS {
 	LBL_Query_RTC_Time = 1063,    // LABEL
 	LBL_Query_RTC_Date = 1108,    // LABEL
 	LBL_Query_GPS_Time = 1132,    // LABEL
-	LBL_Query_GPS_Date = 1132,    // LABEL
-	LBL_Query_GPS_Coord = 1132,    // LABEL
-	LBL_Query_Orbital_Params = 1132,    // LABEL
-	LBL_Query_MET = 1132,    // LABEL
-	LBL_Query_Major_Mode = 1132,    // LABEL
-	LBL_Query_IMU_1202 = 1132,    // LABEL
-	LBL_Query_AudioClipPlaying = 1179,    // LABEL
-	LBL_VERB_09 = 1205,    // LABEL
-	LBL_VERB_10 = 1280,    // LABEL
-	LBL_VERB_21 = 1359,    // LABEL
-	LBL_VERB_21_N02 = 1412,    // LABEL
-	LBL_VERB_22 = 1460,    // LABEL
-	LBL_VERB_25 = 1507,    // LABEL
-	LBL_ASM_END = 1739,    // LABEL
+	LBL_Query_GPS_Time_NoWait = 1137,    // LABEL
+	LBL_Query_GPS_Date = 1176,    // LABEL
+	LBL_Query_GPS_Date_NoWait = 1184,    // LABEL
+	LBL_Query_GPS_Coord = 1227,    // LABEL
+	LBL_Query_Orbital_Params = 1342,    // LABEL
+	LBL_Query_MET = 1342,    // LABEL
+	LBL_Query_Major_Mode = 1342,    // LABEL
+	LBL_Query_IMU_1202 = 1342,    // LABEL
+	LBL_Query_AudioClipPlaying = 1389,    // LABEL
+	LBL_VERB_09 = 1415,    // LABEL
+	LBL_VERB_10 = 1490,    // LABEL
+	LBL_VERB_21 = 1569,    // LABEL
+	LBL_VERB_21_N02 = 1622,    // LABEL
+	LBL_VERB_22 = 1670,    // LABEL
+	LBL_VERB_25 = 1717,    // LABEL
+	LBL_VERB_26 = 1949,    // LABEL
+	LBL_ASM_END = 2067,    // LABEL
 };
 
 static const uint8_t Program[] PROGMEM = {
     // general variables for minor mode
+    //
+    // Buffer for storing GPS data
+    //
     // idle loop for for cpu 0
     // MAIN_CPU0:
     // {
         CALL, 0x06, 0x00 /* Init=6 */, 
     // NOTE: this falls thru to MAIN_CPU1
     // }
-    // idle loop for cpu 1	(cpu 0 comes here on VERB_36)
+    // idle loop for cpu 1	(cpu 0 can come here too, for example VERB_36)
     // MAIN_CPU1:
     // {
         EMPTY_STACK, 
@@ -844,19 +860,19 @@ static const uint8_t Program[] PROGMEM = {
         0x38, 
         0x6C, 0x04 /* Query_GPS_Time=1132 */, 
         0x39, 
-        0x6C, 0x04 /* Query_GPS_Date=1132 */, 
+        0x98, 0x04 /* Query_GPS_Date=1176 */, 
         0x43, 
-        0x6C, 0x04 /* Query_GPS_Coord=1132 */, 
+        0xCB, 0x04 /* Query_GPS_Coord=1227 */, 
         0x44, 
-        0x6C, 0x04 /* Query_Orbital_Params=1132 */, 
+        0x3E, 0x05 /* Query_Orbital_Params=1342 */, 
         0x65, 
-        0x6C, 0x04 /* Query_MET=1132 */, 
+        0x3E, 0x05 /* Query_MET=1342 */, 
         0x68, 
-        0x6C, 0x04 /* Query_Major_Mode=1132 */, 
+        0x3E, 0x05 /* Query_Major_Mode=1342 */, 
         0x87, 
-        0x6C, 0x04 /* Query_IMU_1202=1132 */, 
+        0x3E, 0x05 /* Query_IMU_1202=1342 */, 
         0x98, 
-        0x9B, 0x04 /* Query_AudioClipPlaying=1179 */, 
+        0x6D, 0x05 /* Query_AudioClipPlaying=1389 */, 
         0xFF, 
     // Found:
         MOV_A_C, 
@@ -1010,12 +1026,136 @@ static const uint8_t Program[] PROGMEM = {
     // }
     // Query_GPS_Time:
     // {
+        CALL, 0x71, 0x04 /* Query_GPS_Time_NoWait=1137 */, 
+        WAIT4, 
+        RET, 
+    // }
+    // Query_GPS_Time_NoWait:
+    // {
+        GPS_READ_DIRECT, GpsBuf, 
+        LD_A_DIRECT, GpsBufTime, 
+        RSHIFT_A_IMM8, 0x10, 
+        OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
+        MOV_A_R1, 
+        LD_A_DIRECT, GpsBufTime, 
+        RSHIFT_A_IMM8, 0x08, 
+        LD_B_IMM16, 0xFF, 0x00, 
+        AND_A_B, 
+        OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
+        MOV_A_R2, 
+        LD_A_DIRECT, GpsBufTime, 
+        LD_B_IMM16, 0xFF, 0x00, 
+        AND_A_B, 
+        OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
+        MOV_A_R3, 
+        RET, 
     // }
     // Query_GPS_Date:
     // {
+        CALL, 0xA0, 0x04 /* Query_GPS_Date_NoWait=1184 */, 
+        WAIT5, 
+        WAIT5, 
+        WAIT5, 
+        WAIT5, 
+        RET, 
+    // }
+    // Query_GPS_Date_NoWait:
+    // {
+        GPS_READ_DIRECT, GpsBuf, 
+        LD_A_DIRECT, GpsBufDate, 
+        LD_B_IMM16, 0xFF, 0x00, 
+        AND_A_B, 
+        OR_A_IMM32, 0x00, 0x20, 0xB0, 0x00, 
+        MOV_A_R1, 
+        LD_A_DIRECT, GpsBufDate, 
+        RSHIFT_A_IMM8, 0x08, 
+        LD_B_IMM16, 0xFF, 0x00, 
+        AND_A_B, 
+        OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
+        MOV_A_R2, 
+        LD_A_DIRECT, GpsBufDate, 
+        RSHIFT_A_IMM8, 0x10, 
+        LD_B_IMM16, 0xFF, 0x00, 
+        AND_A_B, 
+        OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
+        MOV_A_R3, 
+        RET, 
     // }
     // Query_GPS_Coord:
     // {
+        LD_A_IMM16, 0x03, 0x00 /* MAIN_CPU1=3 */, 
+        RUN_PROG_A, 
+        BLINK_VERB, 0x01, 
+        BLINK_NOUN, 0x01, 
+        BLINK_PROG, 0x01, 
+        GPS_READ_DIRECT, GpsBuf, 
+        LD_A_IMM32, 0xAA, 0xAA, 0xAA, 0x00, 
+        MOV_A_R1, 
+        MOV_A_R2, 
+        MOV_A_R3, 
+        LD_A_DIRECT, GpsCoordFlag, 
+        BRANCH_A_EQ_IMM8, 0x00, 0x28 /* doLatitude=+40 */, 
+    // doLongitude:
+        CLR_A, 
+        ST_A_DIRECT, GpsCoordFlag, 
+        LD_A_IMM8, 0x25, 
+        MOV_A_PROG, 
+        LD_A_DIRECT, GpsBufLonDeg, 
+        RSHIFT_A_IMM8, 0x0C, 
+        LSHIFT_A_IMM8, 0x14, 
+        MOV_A_C, 
+        LD_A_DIRECT, GpsBufLonDeg, 
+        LD_B_IMM16, 0xFF, 0x0F, 
+        AND_A_B, 
+        MOV_C_B, 
+        OR_A_B, 
+        MOV_A_R1, 
+        LD_A_DIRECT, GpsBufLonMin, 
+        LD_B_IMM8, 0x0B, 
+        LSHIFT_B_IMM8, 0x14, 
+        OR_A_B, 
+        MOV_A_R2, 
+        LD_A_DIRECT, GpsBufLonSec, 
+        LD_B_IMM8, 0x0B, 
+        LSHIFT_B_IMM8, 0x14, 
+        OR_A_B, 
+        MOV_A_R3, 
+        BRANCH, 0x26 /* skip=+38 */, 
+    // doLatitude:
+        INC_A, 
+        ST_A_DIRECT, GpsCoordFlag, 
+        LD_A_IMM8, 0x24, 
+        MOV_A_PROG, 
+        LD_A_DIRECT, GpsBufLatDeg, 
+        RSHIFT_A_IMM8, 0x08, 
+        LSHIFT_A_IMM8, 0x14, 
+        MOV_A_C, 
+        LD_A_DIRECT, GpsBufLatDeg, 
+        LD_B_IMM16, 0xFF, 0x00, 
+        AND_A_B, 
+        MOV_C_B, 
+        OR_A_B, 
+        MOV_A_R1, 
+        LD_A_DIRECT, GpsBufLatMin, 
+        LD_B_IMM8, 0x0B, 
+        LSHIFT_B_IMM8, 0x14, 
+        OR_A_B, 
+        MOV_A_R2, 
+        LD_A_DIRECT, GpsBufLatSec, 
+        LD_B_IMM8, 0x0B, 
+        LSHIFT_B_IMM8, 0x14, 
+        OR_A_B, 
+        MOV_A_R3, 
+    // skip:
+        WAIT5, 
+        WAIT5, 
+        BLINK_VERB, 0x00, 
+        BLINK_NOUN, 0x00, 
+        BLINK_PROG, 0x00, 
+        WAIT5, 
+        WAIT5, 
+        WAIT5, 
+        RET, 
     // }
     // Query_Orbital_Params:
     // {
@@ -1084,7 +1224,7 @@ static const uint8_t Program[] PROGMEM = {
         BRANCH_A_GT_IMM8, 0x04, 0x36 /* error=+54 */, 
         DEC_A, 
         LSHIFT_A_IMM8, 0x01, 
-        LD_B_IMM16, 0xF8, 0x04 /* Add=1272 */, 
+        LD_B_IMM16, 0xCA, 0x05 /* Add=1482 */, 
         ADD_A_B, 
         ST_A_DIRECT, TMP3, 
         BLINK_R1, 0x01, 
@@ -1310,10 +1450,10 @@ static const uint8_t Program[] PROGMEM = {
         BRANCH_A_EQ_IMM8, 0x37, 0x07 /* pdate=+7 */, 
         BRANCH, 0x54 /* error=+84 */, 
     // ptime:
-        CALL, 0x78, 0x06 /* PopulateTime=1656 */, 
+        CALL, 0x4A, 0x07 /* PopulateTime=1866 */, 
         BRANCH, 0x03 /* over=+3 */, 
     // pdate:
-        CALL, 0x8E, 0x06 /* PopulateDate=1678 */, 
+        CALL, 0x60, 0x07 /* PopulateDate=1888 */, 
     // over:
         BLINK_R1, 0x01, 
         INPUT_R1, 
@@ -1355,11 +1495,11 @@ static const uint8_t Program[] PROGMEM = {
         BRANCH_A_EQ_IMM8, 0x36, 0x03 /* stime=+3 */, 
         BRANCH_A_EQ_IMM8, 0x37, 0x06 /* sdate=+6 */, 
     // stime:
-        CALL, 0xB4, 0x06 /* SetTime=1716 */, 
-        GOTO, 0xC4, 0x06 /* success=1732 */, 
+        CALL, 0x86, 0x07 /* SetTime=1926 */, 
+        GOTO, 0x96, 0x07 /* success=1942 */, 
     // sdate:
-        CALL, 0xA4, 0x06 /* SetDate=1700 */, 
-        GOTO, 0xC4, 0x06 /* success=1732 */, 
+        CALL, 0x76, 0x07 /* SetDate=1910 */, 
+        GOTO, 0x96, 0x07 /* success=1942 */, 
     // error:
         BLINK_OPRERR, 0x01, 
     // x:
@@ -1375,7 +1515,7 @@ static const uint8_t Program[] PROGMEM = {
     // CheckSS:
         BRANCH_B_LT_IMM8, 0x00, 0xE9 /* error=-23 */, 
         BRANCH_B_GT_IMM8, 0x3B, 0xE6 /* error=-26 */, 
-        GOTO, 0x2D, 0x06 /* set=1581 */, 
+        GOTO, 0xFF, 0x06 /* set=1791 */, 
     // CheckYYYY:
         BRANCH_B_LT_IMM16, 0xD0, 0x07, 0xDF /* error=-33 */, 
         BRANCH_B_GT_IMM16, 0x33, 0x08, 0xDB /* error=-37 */, 
@@ -1387,7 +1527,7 @@ static const uint8_t Program[] PROGMEM = {
     // CheckDAY:
         BRANCH_B_LT_IMM8, 0x01, 0xCE /* error=-50 */, 
         BRANCH_B_GT_IMM8, 0x1F, 0xCB /* error=-53 */, 
-        GOTO, 0x2D, 0x06 /* set=1581 */, 
+        GOTO, 0xFF, 0x06 /* set=1791 */, 
     // PopulateTime:
         RTC_HH_A, 
         OR_A_IMM32, 0x00, 0x00, 0xB0, 0x00, 
@@ -1446,6 +1586,91 @@ static const uint8_t Program[] PROGMEM = {
         LD_A_IMM8, 0x16, 
         MOV_A_VERB, 
         GOTO, 0x47, 0x03 /* VERB_16=839 */, 
+    // }
+    //
+    // V26 N36	Set RTC Time from GPS Time
+    // V26 N37	Set RTC Date from GPS Date
+    //
+    // VERB_26:
+    // {
+        EMPTY_STACK, 
+        MOV_NOUN_A, 
+        ST_A_DIRECT, TMP1, 
+        GPS_READ_DIRECT, GpsBuf, 
+        LD_A_IMM8, 0x50, 
+        MOV_A_VERB, 
+        LD_A_IMM8, 0x25, 
+        MOV_A_NOUN, 
+        BLINK_VERB, 0x01, 
+        BLINK_NOUN, 0x01, 
+        LD_A_DIRECT, TMP1, 
+        BRANCH_A_EQ_IMM8, 0x36, 0x05 /* doTime=+5 */, 
+        BRANCH_A_EQ_IMM8, 0x37, 0x07 /* doDate=+7 */, 
+        BRANCH, 0x50 /* error=+80 */, 
+    // doTime:
+        CALL, 0x71, 0x04 /* Query_GPS_Time_NoWait=1137 */, 
+        BRANCH, 0x03 /* done=+3 */, 
+    // doDate:
+        CALL, 0xA0, 0x04 /* Query_GPS_Date_NoWait=1184 */, 
+    // done:
+        INPUT_PROCEED, 
+        BLINK_VERB, 0x00, 
+        BLINK_NOUN, 0x00, 
+        BRANCH_A_LT_IMM8, 0x00, 0x42 /* cancel=+66 */, 
+        LD_A_IMM8, 0x16, 
+        MOV_A_VERB, 
+        LD_A_DIRECT, TMP1, 
+        MOV_A_NOUN, 
+        BRANCH_A_EQ_IMM8, 0x36, 0x18 /* setTime=+24 */, 
+    // setDate:
+        LD_C_IMM8, 0x04, 
+        LD_A_DIRECT, GpsBufDate, 
+        RSHIFT_A_IMM8, 0x10, 
+        RTC_A_MEM_CINDIRECT, 
+        INC_C, 
+        LD_A_DIRECT, GpsBufDate, 
+        RSHIFT_A_IMM8, 0x08, 
+        LD_B_IMM16, 0xFF, 0x00, 
+        AND_A_B, 
+        RTC_A_MEM_CINDIRECT, 
+        INC_C, 
+        LD_A_DIRECT, GpsBufDate, 
+        AND_A_B, 
+        RTC_A_MEM_CINDIRECT, 
+        BRANCH, 0x1C /* over=+28 */, 
+    // setTime:
+    // RTC time addresses: 2=hours 1=minutes 0=seconds
+    // clear seconds to avoid incrementing minutes
+    // in the middle of the set operation
+        CLR_C, 
+        CLR_A, 
+        RTC_A_MEM_CINDIRECT, 
+        LD_A_DIRECT, GpsBufTime, 
+        RSHIFT_A_IMM8, 0x10, 
+        LD_C_IMM8, 0x02, 
+        RTC_A_MEM_CINDIRECT, 
+        DEC_C, 
+        LD_A_DIRECT, GpsBufTime, 
+        RSHIFT_A_IMM8, 0x08, 
+        LD_B_IMM16, 0xFF, 0x00, 
+        AND_A_B, 
+        RTC_A_MEM_CINDIRECT, 
+        DEC_C, 
+        LD_A_DIRECT, GpsBufTime, 
+        LD_B_IMM16, 0xFF, 0x00, 
+        AND_A_B, 
+        RTC_A_MEM_CINDIRECT, 
+    // over:
+        GOTO, 0x47, 0x03 /* VERB_16=839 */, 
+    // error:
+        BLINK_OPRERR, 0x01, 
+    // cancel:
+        LD_A_IMM32, 0xAA, 0xAA, 0xAA, 0x00, 
+        MOV_A_R1, 
+        MOV_A_R2, 
+        MOV_A_R3, 
+    // x:
+        BRANCH, 0xFE /* x=-2 */, 
     // }
     // ASM_END:
 };

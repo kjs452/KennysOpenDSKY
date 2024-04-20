@@ -137,8 +137,7 @@ The current build uses the following memory on the Arduino:
 
 ```text
 $ make sketch
-/M/kjs/ARDUINO/bin/arduino-cli compile -e --fqbn arduino:avr:nano KennysOpenDSKY
-Sketch uses 25080 bytes (81%) of program storage space. Maximum is 30720 bytes.
+Sketch uses 26440 bytes (86%) of program storage space. Maximum is 30720 bytes.
 Global variables use 1115 bytes (54%) of dynamic memory, leaving 933 bytes for local variables.
 Maximum is 2048 bytes.
 
@@ -390,9 +389,9 @@ The footnote **[1]** indicates items which have not been implemented yet.
 | N35  | Timer count to Event (HH, MM, SS.01)[^1]                          |
 | N36  | RTC Time (HH, MM, SS.01)                                          |
 | N37  | RTC Date (YYYY, MM, DD)                                           |
-| N38  | GPS Time (HH, MM, SS.01)[^1]                                      |
-| N39  | GPS Date (YYYY, MM, SS.01)[^1]                                    |
-| N43  | GPS Longitude, Latutude (DD, MM  SS.01)[^1]                       |
+| N38  | GPS Time (HH, MM, SS.01)                                          |
+| N39  | GPS Date (YYYY, MM, SS.01)                                        |
+| N43  | GPS Longitude, Latutude (DD, MM  SS.01)                           |
 | N44  | Orbital Parameters (Apocenter, Pericenter, time to free fall)[^1] |
 | N65  | MET (HH, MM, SS.01)[^1]                                           |
 | N68  | Lunar Powered Decent[^1]                                          |
@@ -408,12 +407,13 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |V06 N18    | Display IMU gyro accel values                                |
 |V06 N19    | Display RTC Date/Time and IMU temp                           |
 |V06 N31    | Display time from AGC Init                                   |
-|V06 N32    | display time to perigee[^1]                                  |
+|V06 N32    | Display time to perigee[^1]                                  |
 |V06 N36    | Display RTC time                                             |
-|V06 N37    | display RTC date                                             |
-|V06 N65    | display met[^1]                                              |
-|V06 N38    | Display GPS time[^1]                                         |
-|V06 N39    | Display GPS date[^1]                                         |
+|V06 N37    | Display RTC date                                             |
+|V06 N43    | Display GPS coordinates (press ENTR to switch coordinate)    |
+|V06 N65    | Display met[^1]                                              |
+|V06 N38    | Display GPS time                                             |
+|V06 N39    | Display GPS date                                             |
 |           |                                                              |
 |V09 N01    | Add stellar zeta angles. R3 = R1+R2                          |
 |V09 N02    | Multiply Einstein gravitational cofactors. R3 = R1*R2        |
@@ -431,9 +431,9 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |V16 N35    | Monitor/Stop timer count to event[^1]                        |
 |V16 N36    | Monitor RTC Time                                             |
 |V16 N37    | Monitor RTC Date                                             |
-|V16 N38    | Monitor GPS time[^1]                                         |
-|V16 N39    | Monitor GPS date[^1]                                         |
-|V16 N43    | Monitor GPS coordinates[^1]                                  |
+|V16 N38    | Monitor GPS time                                             |
+|V16 N39    | Monitor GPS date                                             |
+|V16 N43    | Monitor GPS coordinates                                      |
 |V16 N44    | Monitor Orbital Parameters[^1]                               |
 |V16 N65    | Monitor MET[^1]                                              |
 |V16 N68    | A11 Lunar Landing simulation[^1]                             |
@@ -450,8 +450,8 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |V25 N36    | Set RTC Clock Manually                                       |
 |V25 N37    | Set RTC Date Manually                                        |
 |           |                                                              |
-|V26 N36    | Set RTC Clock from GPS[^1]                                   |
-|V26 N37    | Set RTC Date from GPS[^1]                                    |
+|V26 N36    | Set RTC Clock from GPS                                       |
+|V26 N37    | Set RTC Date from GPS                                        |
 |           |                                                              |
 |V35        | Lamp test                                                    |
 |           |                                                              |
@@ -480,7 +480,7 @@ I.e. To run program P61 you would enter: `VERB 3 7 ENTR 6 1 ENTR`
 | PROG | Description                                                        |
 |------|--------------------------------------------------------------------|
 | P00  | Poo                                                                |
-| P01  | Apollo 11 Launch Simulation                                        |
+| P01  | Apollo 11 Launch Simulation[^1]                                    |
 | P06  | Simulate putting AGC into standby mode                             |
 | P11  | Display IMU linear acceleration values (same as V16 N18)           |
 | P42  | "blinky" - randomly illuminate caution and warning lights          |
@@ -500,6 +500,45 @@ Enter octal address in R3. Then enter a byte value (0-377 octal) in R1.
 The byte value for the address will be written to the memory area.
 The 2K EEPROM memory area is accessed using the address range 0000 - 3777 (octal).
 The 56 byte RTC RAM area is accessed using the address range 4000 - 4067.
+
+### GPS Coordinates (V16N43)
+**V16 N43** will query the GPS device and report the Latitude and Longitude.
+**R1** will contains the degrees. **R2** will contain minutes. **R3** will contain
+hundred of seconds.
+
+Conversion Formulas:
+```text
+    R1 contains degrees                 ddd
+    R2 contains minutes                 mm
+    R3 contains hundreds of seconds     ssss
+
+    Convert to decimal degrees (ddd.dddddd):
+        If degrees are positive use:    +ddd + mm/60 + ssss/360000
+        If degrees are negative use:    -ddd - mm/60 - ssss/360000
+
+    Convert to degrees-decimal minutes (dddmm.mmmm):
+        If degrees are positive use:    +ddd*100 + mm + ssss/6000
+        If degrees are negative use:    -ddd*100 - mm - ssss/6000
+
+    Convert from decimal degrees:
+        given: ddd.dddddd       Ie.   -071.123456
+
+        DEGREES = ddd
+        MINUTES = round(dddddd/1000000 * 60)
+        HUNDREDS_OF_SECONDS = round( (dddddd/1000000 * 60 - MINUTES) * 6000 )
+```
+
+### Setting RTC Time from GPS Time (V25N36)
+This function will display the GPS Time. The VERB/NOUN fields will blink **50 25**.
+Pressing **PRO** will cause the showing values (assuming they are not 0) to be
+used to set the RTC Time. To cancel changes enter a different verb/noun.
+After pressing **PRO** the DSKY will show **V16 N36**.
+
+### Setting RTC Date from GPS Date (V25N37)
+This function will display the GPS Date. The VERB/NOUN fields will blink **50 25**.
+Pressing **PRO** will cause the showing values (assuming they are not 0) to be
+used to set the RTC Time. To cancel changes enter a different verb/noun.
+After pressing **PRO** the DSKY will show **V16 N37**.
 
 ## Using the Assembler
 The program ``assembler.py`` is a simple one pass assembler written in python.
@@ -864,14 +903,7 @@ Here are all the assembly instructions:
 | LT_ALL             | imm8      | 1 or 0. turn on/turn off ALL status lights                           |
 | UPLINK_PROB_IMM8   | imm8 | set UPLINK ACTY random blink probability to imm8 0=off, 255=always on     |
 | COMPACTY_PROB_IMM8 | imm8 | set COMP ACTY random blink probability to imm8 0=off, 255=always on       |
-| GPS_LAT_A          |           | Read GPS unit and place Latitude into A                              |
-| GPS_LON_A          |           | Read GPS unit and place Longtitude into A                            |
-| GPS_YEAR_A         |           | Read GPS unit and place Year into A                                  |
-| GPS_MON_A          |           | Read GPS unit and place Month into A                                 |
-| GPS_DAY_A          |           | Read GPS unit and place Day into A                                   |
-| GPS_HH_A           |           | Read GPS unit and place Hours into A                                 |
-| GPS_MM_A           |           | Read GPS unit and place Minutes into A                               |
-| GPS_SS_A           |           | Read GPS unit and place Seconds into A                               |
+| GPS_READ_DIRECT    | addr      | Read GPS data into addr+0 ... addr+7                                 |
 | BRANCH_TIMESTAMP_LT| addr1 addr2 offset | branch if timestamp1 less than timestamp2                   |
 | TIMESTAMP_DIFF_A   | addr1 addr2 | diff timestamp1 in addr1 and timestamp2 in addr2 put result into A |
 | RTC_TIMESTAMP_DIRECT | addr    | store entire RTC timestamp to addr+0 and addr+1                      |

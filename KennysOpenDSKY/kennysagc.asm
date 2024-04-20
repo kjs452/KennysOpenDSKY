@@ -31,6 +31,21 @@ DEFINE	ImuAccY = 23
 DEFINE	ImuAccZ = 24
 DEFINE	ImuTemp = 25
 
+//
+// Buffer for storing GPS data
+//
+DEFINE	GpsBuf			= 26			// GpsBuf = RAM[26] - RAM[33]
+DEFINE	GpsBufLatDeg	= 26
+DEFINE	GpsBufLatMin	= 27
+DEFINE	GpsBufLatSec	= 28
+DEFINE	GpsBufLonDeg	= 29
+DEFINE	GpsBufLonMin	= 30
+DEFINE	GpsBufLonSec	= 31
+DEFINE	GpsBufDate		= 32
+DEFINE	GpsBufTime		= 33
+
+DEFINE	GpsCoordFlag	= 34			// RAM[34] 0=Show latitude, 1=show Longitude
+
 // idle loop for for cpu 0
 MAIN_CPU0:
 {
@@ -38,7 +53,7 @@ MAIN_CPU0:
 	// NOTE: this falls thru to MAIN_CPU1
 }
 
-// idle loop for cpu 1	(cpu 0 comes here on VERB_36)
+// idle loop for cpu 1	(cpu 0 can come here too, for example VERB_36)
 MAIN_CPU1:
 {
 	EMPTY_STACK
@@ -1061,14 +1076,161 @@ Query_RTC_Date:
 
 Query_GPS_Time:
 {
+	CALL	Query_GPS_Time_NoWait
+	WAIT4
+	RET
+}
+
+Query_GPS_Time_NoWait:
+{
+	GPS_READ_DIRECT		GpsBuf
+	LD_A_DIRECT			GpsBufTime		// hhmmss
+	RSHIFT_A_IMM8		16
+	OR_A_IMM32			0xB00000
+	MOV_A_R1
+
+	LD_A_DIRECT			GpsBufTime		// hhmmss
+	RSHIFT_A_IMM8		8
+	LD_B_IMM16			0xFF
+	AND_A_B
+	OR_A_IMM32			0xB00000
+	MOV_A_R2
+
+	LD_A_DIRECT			GpsBufTime		// hhmmss
+	LD_B_IMM16			0xFF
+	AND_A_B
+	OR_A_IMM32			0xB00000
+	MOV_A_R3
+
+	RET
 }
 
 Query_GPS_Date:
 {
+	CALL	Query_GPS_Date_NoWait
+	WAIT5
+	WAIT5
+	WAIT5
+	WAIT5
+	RET
+}
+
+Query_GPS_Date_NoWait:
+{
+	GPS_READ_DIRECT		GpsBuf
+	LD_A_DIRECT			GpsBufDate		// DDMMYY
+	LD_B_IMM16			0xFF
+	AND_A_B
+	OR_A_IMM32			0xB02000
+	MOV_A_R1
+
+	LD_A_DIRECT			GpsBufDate		// DDMMYY
+	RSHIFT_A_IMM8		8
+	LD_B_IMM16			0xFF
+	AND_A_B
+	OR_A_IMM32			0xB00000
+	MOV_A_R2
+
+	LD_A_DIRECT			GpsBufDate		// DDMMYY
+	RSHIFT_A_IMM8		16
+	LD_B_IMM16			0xFF
+	AND_A_B
+	OR_A_IMM32			0xB00000
+	MOV_A_R3
+
+	RET
 }
 
 Query_GPS_Coord:
 {
+	LD_A_IMM16			MAIN_CPU1				// cancel any running program, put cpu0 into idle
+	RUN_PROG_A
+	BLINK_VERB			1
+	BLINK_NOUN			1
+	BLINK_PROG			1
+
+	GPS_READ_DIRECT		GpsBuf
+
+	LD_A_IMM32			0xAAAAAA
+	MOV_A_R1
+	MOV_A_R2
+	MOV_A_R3
+
+	LD_A_DIRECT			GpsCoordFlag			// 0=Latitude, 1=Longitude
+	BRANCH_A_EQ_IMM8	0		doLatitude
+
+doLongitude:
+	CLR_A
+	ST_A_DIRECT			GpsCoordFlag
+	LD_A_IMM8			0x25
+	MOV_A_PROG
+
+	LD_A_DIRECT			GpsBufLonDeg
+	RSHIFT_A_IMM8		12
+	LSHIFT_A_IMM8		20			// s0 00 00		(s=sign)
+	MOV_A_C
+
+	LD_A_DIRECT			GpsBufLonDeg
+	LD_B_IMM16			0xFFF
+	AND_A_B							// 00 0d dd		(d==degrees latitude)
+	MOV_C_B
+	OR_A_B							// s0 0d dd
+	MOV_A_R1
+
+	LD_A_DIRECT			GpsBufLonMin
+	LD_B_IMM8			0xB
+	LSHIFT_B_IMM8		20
+	OR_A_B							// B0 00 mm		(m==minutes latitude)
+	MOV_A_R2
+
+	LD_A_DIRECT			GpsBufLonSec
+	LD_B_IMM8			0xB
+	LSHIFT_B_IMM8		20
+	OR_A_B							// B0 ss ss		(m==minutes latitude)
+	MOV_A_R3
+
+	BRANCH				skip
+
+doLatitude:
+	INC_A
+	ST_A_DIRECT			GpsCoordFlag
+	LD_A_IMM8			0x24
+	MOV_A_PROG
+
+	LD_A_DIRECT			GpsBufLatDeg
+	RSHIFT_A_IMM8		8
+	LSHIFT_A_IMM8		20			// s0 00 00		(s=sign)
+	MOV_A_C
+
+	LD_A_DIRECT			GpsBufLatDeg
+	LD_B_IMM16			0xFF
+	AND_A_B							// 00 00 dd		(d==degrees latitude)
+	MOV_C_B
+	OR_A_B							// s0 00 dd
+	MOV_A_R1
+
+	LD_A_DIRECT			GpsBufLatMin
+	LD_B_IMM8			0xB
+	LSHIFT_B_IMM8		20
+	OR_A_B							// B0 00 mm		(m==minutes latitude)
+	MOV_A_R2
+
+	LD_A_DIRECT			GpsBufLatSec
+	LD_B_IMM8			0xB
+	LSHIFT_B_IMM8		20
+	OR_A_B							// B0 ss ss		(m==minutes latitude)
+	MOV_A_R3
+
+skip:
+	WAIT5
+	WAIT5
+	BLINK_VERB			0
+	BLINK_NOUN			0
+	BLINK_PROG			0
+	WAIT5
+	WAIT5
+	WAIT5
+	RET
 }
 
 Query_Orbital_Params:
@@ -1555,6 +1717,113 @@ success:
 		LD_A_IMM8		0x16
 		MOV_A_VERB
 		GOTO			VERB_16
+}
+
+//
+// V26 N36	Set RTC Time from GPS Time
+// V26 N37	Set RTC Date from GPS Date
+//
+VERB_26:
+{
+	EMPTY_STACK
+	MOV_NOUN_A
+	ST_A_DIRECT			TMP1		// save noun in TMP1
+
+	GPS_READ_DIRECT		GpsBuf
+
+	LD_A_IMM8		0x50
+	MOV_A_VERB
+	LD_A_IMM8		0x25
+	MOV_A_NOUN
+
+	BLINK_VERB		1
+	BLINK_NOUN		1
+
+	LD_A_DIRECT		TMP1
+
+	BRANCH_A_EQ_IMM8	0x36	doTime
+	BRANCH_A_EQ_IMM8	0x37	doDate
+	BRANCH				error
+
+doTime:
+	CALL			Query_GPS_Time_NoWait
+	BRANCH			done
+
+doDate:
+	CALL			Query_GPS_Date_NoWait
+
+done:
+	INPUT_PROCEED
+	BLINK_VERB			0
+	BLINK_NOUN			0
+	BRANCH_A_LT_IMM8	0	cancel
+
+	LD_A_IMM8		0x16
+	MOV_A_VERB
+	LD_A_DIRECT		TMP1
+	MOV_A_NOUN
+
+	BRANCH_A_EQ_IMM8	0x36	setTime
+
+setDate:
+	LD_C_IMM8			4		// 4=day 5=month 6=year
+	LD_A_DIRECT			GpsBufDate
+	RSHIFT_A_IMM8		16
+	RTC_A_MEM_CINDIRECT
+	INC_C
+
+	LD_A_DIRECT			GpsBufDate
+	RSHIFT_A_IMM8		8
+	LD_B_IMM16			0xFF
+	AND_A_B
+	RTC_A_MEM_CINDIRECT
+	INC_C
+
+	LD_A_DIRECT			GpsBufDate
+	AND_A_B
+	RTC_A_MEM_CINDIRECT
+
+	BRANCH			over
+
+setTime:
+	// RTC time addresses: 2=hours 1=minutes 0=seconds
+
+	// clear seconds to avoid incrementing minutes
+	// in the middle of the set operation
+	CLR_C
+	CLR_A
+	RTC_A_MEM_CINDIRECT				// set seconds to 0
+
+	LD_A_DIRECT			GpsBufTime
+	RSHIFT_A_IMM8		16
+	LD_C_IMM8			2			// 2=hours 1=minutes 0=seconds
+	RTC_A_MEM_CINDIRECT				// set hours
+	DEC_C
+
+	LD_A_DIRECT			GpsBufTime
+	RSHIFT_A_IMM8		8
+	LD_B_IMM16			0xFF
+	AND_A_B
+	RTC_A_MEM_CINDIRECT				// set minutes
+	DEC_C
+
+	LD_A_DIRECT			GpsBufTime
+	LD_B_IMM16			0xFF
+	AND_A_B
+	RTC_A_MEM_CINDIRECT				// set seconds
+
+over:
+	GOTO			VERB_16
+
+error:
+	BLINK_OPRERR	1
+
+cancel:
+	LD_A_IMM32		0xAAAAAA
+	MOV_A_R1
+	MOV_A_R2
+	MOV_A_R3
+x:	BRANCH			x
 }
 
 ASM_END:
