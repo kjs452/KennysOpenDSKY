@@ -506,14 +506,14 @@ The 56 byte RTC RAM area is accessed using the address range 4000 - 4067.
 **R1** will contains the degrees. **R2** will contain minutes. **R3** will contain
 hundred of seconds. Any running PROG will be terminated. The PROG field be used to
 indicate which coordinate is showing (latitude or longitude).
-When PROG read **24** that latitude is showing. After 5 seconds longitude
+When PROG reads **24** that latitude is showing. After 5 seconds longitude
 will be shown and PROG will read **25**.
 
 Conversion Formulas:
 ```text
-    R1 contains degrees                 ddd
-    R2 contains minutes                 mm
-    R3 contains hundreds of seconds     ssss
+    R1 contains degrees                 ddd    (latitude: -90 ... +90, longitude: -180 ... +180)
+    R2 contains minutes                 mm     (0 ... 59)
+    R3 contains hundreds of seconds     ssss   (0 ... 5999)
 
     Convert to decimal degrees (ddd.dddddd):
         If degrees are positive use:    +ddd + mm/60 + ssss/360000
