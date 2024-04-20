@@ -373,7 +373,7 @@ The footnote **[1]** indicates items which have not been implemented yet.
 | V21  | Enter value (R1 only)                              |
 | V22  | Enter value (R2 only)                              |
 | V25  | Enter values (R1 + R2 + R3)                        |
-| V26  | Load values from external source[^1]               |
+| V26  | Load values from external source                   |
 | V35  | LAMP TEST                                          |
 | V36  | Fresh Start                                        |
 | V37  | Execute Major PROGRAM                              |
