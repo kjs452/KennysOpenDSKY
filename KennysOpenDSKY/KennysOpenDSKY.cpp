@@ -2952,7 +2952,7 @@ void readGPS(uint16_t addr)
 
 #if 0
 	static char data[600];		// KJS Debugging
-	uint16_t i = 0;				// KJS deugging
+	uint16_t i = 0;				// KJS debugging
 #endif
 
 	state = GST_START;
@@ -2963,7 +2963,9 @@ void readGPS(uint16_t addr)
 		if( x < 0 )
 			continue;
 		cnt++;
-//		data[i++] = x;		// KJS debugging
+#if 0
+		data[i++] = x;		// KJS debugging
+#endif
 
 		switch(state) {
 		case GST_START:	
@@ -3096,9 +3098,7 @@ done:
 	data[i] = '\0';
 	Serial.println(data);
 #endif
-
 }
-// **********************************************************************
 
 //////////////////////////////////////////////////////////////////////
 //

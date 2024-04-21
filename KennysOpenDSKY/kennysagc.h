@@ -99,7 +99,7 @@ enum ASM_SYMBOLS {
 	LBL_VERB_22 = 1670,    // LABEL
 	LBL_VERB_25 = 1717,    // LABEL
 	LBL_VERB_26 = 1949,    // LABEL
-	LBL_ASM_END = 2067,    // LABEL
+	LBL_ASM_END = 2063,    // LABEL
 };
 
 static const uint8_t Program[] PROGMEM = {
@@ -1596,23 +1596,21 @@ static const uint8_t Program[] PROGMEM = {
         EMPTY_STACK, 
         MOV_NOUN_A, 
         ST_A_DIRECT, TMP1, 
-        GPS_READ_DIRECT, GpsBuf, 
-        LD_A_IMM8, 0x50, 
-        MOV_A_VERB, 
-        LD_A_IMM8, 0x25, 
-        MOV_A_NOUN, 
-        BLINK_VERB, 0x01, 
-        BLINK_NOUN, 0x01, 
-        LD_A_DIRECT, TMP1, 
         BRANCH_A_EQ_IMM8, 0x36, 0x05 /* doTime=+5 */, 
         BRANCH_A_EQ_IMM8, 0x37, 0x07 /* doDate=+7 */, 
-        BRANCH, 0x50 /* error=+80 */, 
+        BRANCH, 0x5A /* error=+90 */, 
     // doTime:
         CALL, 0x71, 0x04 /* Query_GPS_Time_NoWait=1137 */, 
         BRANCH, 0x03 /* done=+3 */, 
     // doDate:
         CALL, 0xA0, 0x04 /* Query_GPS_Date_NoWait=1184 */, 
     // done:
+        LD_A_IMM8, 0x50, 
+        MOV_A_VERB, 
+        LD_A_IMM8, 0x25, 
+        MOV_A_NOUN, 
+        BLINK_VERB, 0x01, 
+        BLINK_NOUN, 0x01, 
         INPUT_PROCEED, 
         BLINK_VERB, 0x00, 
         BLINK_NOUN, 0x00, 

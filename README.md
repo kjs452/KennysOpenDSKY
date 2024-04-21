@@ -353,7 +353,7 @@ what I wish to implement eventually. These items come from the
 **Apollo 50th Anniversary** project. I will update this section as
 I finish items.
 
-The footnote **[1]** indicates items which have not been implemented yet.
+The footnote **[1]** indicates items which have **not** been implemented yet.
 
 [^1]: Not implemented yet.
 
@@ -413,10 +413,10 @@ The footnote **[1]** indicates items which have not been implemented yet.
 |V06 N32    | Display time to perigee[^1]                                  |
 |V06 N36    | Display RTC time                                             |
 |V06 N37    | Display RTC date                                             |
-|V06 N43    | Display GPS coordinates (press ENTR to switch coordinate)    |
-|V06 N65    | Display met[^1]                                              |
 |V06 N38    | Display GPS time                                             |
 |V06 N39    | Display GPS date                                             |
+|V06 N43    | Display GPS coordinates (press ENTR to switch coordinate)    |
+|V06 N65    | Display met[^1]                                              |
 |           |                                                              |
 |V09 N01    | Add stellar zeta angles. R3 = R1+R2                          |
 |V09 N02    | Multiply Einstein gravitational cofactors. R3 = R1*R2        |
@@ -941,7 +941,7 @@ Here are all the assembly instructions:
 | INPUT_R2_OCT       |  | Read an octal value into R2. A=value good. A=-1 Bad                           |
 | INPUT_R3_OCT       |  | Read an octal value into R3. A=value good. A=-1 Bad                           |
 | INPUT_PROCEED      |  | Wait for PRO key (Proceed) to be pressed. A=0 PRO pressed. A=-1 Cancelled     |
-| INPUT_REQ_PROCEED  |  | Wait for PRO key (Proceed) to be pressed. A=0 PRO pressed.                    |
+| INPUT_REQ_PROCEED  |  | Wait for PRO key (Proceed) to be pressed. A=0 PRO pressed. (Required)         |
 | PROG8_A_CINDIRECT  |           | A = Program[C] read byte from program memory                         |
 | PROG16_A_CINDIRECT |           | A = Program[C] read 16-bit word from program memory C, C+1           |
 | PROG32_A_CINDIRECT |           | A = Program[C] read 32-bit word from program memory C, C+1, C+2, C+3 |
