@@ -1971,9 +1971,9 @@ void curses_window_start()
 			"|    .    |   VEL   |                    |",	// 15
 			"+---------+---------+--------------------+",	// 16
 			"|                                        |",	// 17
-			"|   NOUN  +  7  8  9   CLR   ENTR        |",	// 18
+			"|   VERB  +  7  8  9   CLR   ENTR        |",	// 18
 			"|         -  4  5  6   PRO               |",	// 19
-			"|   VERB  0  1  2  3  KEYREL RSET        |",	// 20
+			"|   NOUN  0  1  2  3  KEYREL RSET        |",	// 20
 			"|                                    QUIT|",	// 21
 			"+----------------------------------------+",	// 22
 			"                                         ",	// 23
@@ -2017,8 +2017,8 @@ void curses_key_pos(int8_t key, int *y, int *x)
 	case '+':	*y = 18; *x = 10; break;
 	case '-':	*y = 19; *x = 10; break;
 	case 'k':	*y = 20; *x = 22; break;	// KEY REL
-	case 'n':	*y = 18; *x = 4; break;		// NOUN
-	case 'v':	*y = 20; *x = 4; break;		// VERB
+	case 'n':	*y = 20; *x = 4; break;		// NOUN
+	case 'v':	*y = 18; *x = 4; break;		// VERB
 	case 'p':	*y = 19; *x = 23; break;	// PRO
 	case 'c':	*y = 18; *x = 23; break;	// CLR
 	case 'r':	*y = 20; *x = 29; break;	// RSET

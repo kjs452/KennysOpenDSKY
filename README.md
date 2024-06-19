@@ -16,9 +16,9 @@ Kenny's Open DSKY Software
     + [Linux](#linux)
   + [Compiling for Arduino Nano](#compiling-for-arduino-nano)
   + [Compiling for Linux](#compiling-for-linux)
-    + [Running the Curses Sumulator](#running-the-curses-sumulator)
+    + [Running the Curses Simulator](#running-the-curses-simulator)
   + [Compiling for Windows/MacOS](#compiling-for-windowsmacos)
-  + [Running the Curses Simulator](#running-the-curses-simulator)
+  + [Running the Curses Simulator](#running-the-curses-simulator-1)
     + [Keys](#keys)
     + [Log File](#log-file)
     + [Persistent Data](#persistent-data)
@@ -58,6 +58,7 @@ Kenny's Open DSKY Software
     + [Sticker 2](#sticker-2)
     + [Mini-DSKY](#mini-dsky)
   + [Author](#author)
+
 
 ## Description
 This project contains C/C++ source code for the Arduino nano which
@@ -243,7 +244,7 @@ The provided simple Makefile builds both executables with this command:
     $ make
 ```
 
-### Running the Curses Sumulator
+### Running the Curses Simulator
 To run the executable simply run it as follows (no command line arguments are needed):
 ```
     $ ./dsky
@@ -276,7 +277,7 @@ Run with this command,
     $ ./dsky
 ```
 
-![alt text](images/ncurses2.jpg "")
+![alt text](images/ncurses3.jpg "")
 
 ### Keys
 The keys map to your keyboard thusly. Only lower case keys are accepted.
