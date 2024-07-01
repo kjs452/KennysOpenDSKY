@@ -49,6 +49,7 @@ Kenny's Open DSKY Software
     + [Example](#example)
   + [Code Walk Through](#code-walk-through)
     + [Display Refresh](#display-refresh)
+    + [BCD Encoding](#bcd-encoding)
     + [Add New Instructions](#add-new-instructions)
     + [Adding a new VERB](#adding-a-new-verb)
     + [Adding a new PROGRAM](#adding-a-new-program)
@@ -58,7 +59,6 @@ Kenny's Open DSKY Software
     + [Sticker 2](#sticker-2)
     + [Mini-DSKY](#mini-dsky)
   + [Author](#author)
-
 
 ## Description
 This project contains C/C++ source code for the Arduino nano which
@@ -753,10 +753,10 @@ Here are all the assembly instructions:
 | MOV_A_R1          |            | Move the BCD encoded contents of register A into DSKY register R1    |
 | MOV_A_R2          |            | Move the BCD encoded contents of register A into DSKY register R2    |
 | MOV_A_R3          |            | Move the BCD encoded contents of register A into DSKY register R3    |
-| DECODE_A_FROM_OCT |            | Convert BCD encoding of octal value in A into a INT                  |
-| DECODE_A_FROM_DEC |            | Convert BCD encoding of decimal into a INT                           |
-| ENCODE_A_TO_OCT   |            | Encode A contents as BCD encoded octal                               |
-| ENCODE_A_TO_DEC   |            | Encode A contents as BCD encoded decimal (plus/minus sign)           |
+| DECODE_A_FROM_OCT |            | Convert BCD encoding of octal value in A into a INTEGER              |
+| DECODE_A_FROM_DEC |            | Convert BCD encoding of decimal into a INTEGER                       |
+| ENCODE_A_TO_OCT   |            | Encode A INTEGER contents as BCD encoded octal                       |
+| ENCODE_A_TO_DEC   |            | Encode A INTEGER contents as BCD encoded decimal (plus/minus sign)   |
 | ENCODE_A_TO_UDEC  |            | Encode Positive decimal value (No plus sign) into BCD                |
 | MOV_A_B           |            | Move contents of A into B                                            |
 | MOV_A_C           |            | Move contents of A into C                                            |
@@ -1097,6 +1097,74 @@ are executed to see what parts of the DSKY has changed.
 
 The last step of `dsky_redraw()` is to assign the current DSKY state to
 the previous DSKY state.
+
+### BCD Encoding
+Binary Coded Decimal (BCD) is used to show numbers on the DSKY display. BCD
+encoding is a number encoding format that differs from normal binary encoding
+of integers. Binary Coded Decimal uses 4-bit fields to encode each digit.
+The ten digits **0** through **9** are encoded into the 4-bit field.
+Since 4-bits can encode 16 unqique values there are additional values that are
+not mapped to digits. For the DSKY I extended the BCD encoding to include three more
+symbols: **SPACE**, **PLUS**, **MINUS**
+
+| Bit Pattern | Hex  | Dec | DSKY Symbol       |
+|-------------|------|-----|-------------------|
+| 0000        | 0x00 |   0 | zero   '0'        |
+| 0001        | 0x01 |   1 | one    '1'        |
+| 0010        | 0x02 |   2 | two    '2'        |
+| 0011        | 0x03 |   3 | three  '3'        |
+| 0100        | 0x04 |   4 | four   '4'        |
+| 0101        | 0x05 |   5 | five   '5'        |
+| 0110        | 0x06 |   6 | six    '6'        |
+| 0111        | 0x07 |   7 | seven  '7'        |
+| 1000        | 0x08 |   8 | eight  '8'        |
+| 1001        | 0x09 |   9 | nine   '9'        |
+| 1010        | 0x0A |  10 | SPACE  ' '        |
+| 1011        | 0x0B |  11 | plus   '+'        |
+| 1100        | 0x0C |  12 | minus  '-'        |
+| 1101        | 0x0D |  13 | not used          |
+| 1110        | 0x0E |  14 | not used          |
+| 1111        | 0x0F |  15 | not used          |
+
+A useful aspect of this encoding is the fact that HEX literals are also BCD literals.
+In other words, to represent 12345 for display on the DSKY the following hex
+literal can be used: 0x12345. This is a nice feature because it means BCD encoded
+literals are easy to read when they appear in the code.
+
+| Desired DSKY display | Hex Literal      |
+|----------------------|------------------|
+| " 06 22"             | 0xA06A22         |
+| "+05930"             | 0xB05930         |
+| "16"                 | 0x16             |
+| "-00451"             | 0xC00451         |
+| "    23"             | 0xAAAA23         |
+| "      "             | 0xAAAAAA         |
+
+The BCD symbols "+" (0xB) and "-" (0xC) are only allowed for the most signifigant digits of the R1, R2 and R3
+DSKY fields. **NOTE:** Technically, the "-" symbol could be rendered for all DSKY digits but the code currently
+does not allow this.
+
+This code reads the contents of DSKY register R1 and converts it to binary (two's compliment):
+
+```
+    MOV_R1_A              // move the 6 BCD encoded digits into the A register
+    DECODE_A_FROM_DEC     // convert BCD encoding to two's compliment
+```
+
+This code writes the contents of the A register into the DSKY register R3:
+
+```
+    LD_A_IMM16        -451         // load A with the binary value '-451'
+    ENCODE_A_TO_DEC                // convert A to BCD encoding: 0xC00451
+    MOV_A_R3                       // display -00451 in the DSKY display register R3
+```
+
+Octal conversion is also supported. When octal encoding/decoding is used only these
+BCD symbols are used: ' ', '0', '1', '2', '3', '4', '5', '6', '7'. These are the octal encoding/decoding
+instructions: DECODE_A_FROM_OCT, ENCODE_A_TO_OCT.
+
+Using these instructions plus the bit masking and bit shifting instructions it is possible to craft
+various BCD encoded bit patterns for displaying numbers on the DSKY.
 
 ### Add New Instructions
 To add a new instruction to the virtual machine:
