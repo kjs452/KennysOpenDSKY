@@ -1133,12 +1133,12 @@ literals are easy to read when they appear in the code.
 
 | Desired DSKY display | Hex Literal      |
 |----------------------|------------------|
-| "&nbsp;06&nbsp;22"   | 0xA06A22         |
+| "&ensp;06&ensp;22"   | 0xA06A22         |
 | "+05930"             | 0xB05930         |
 | "16"                 | 0x16             |
 | "-00451"             | 0xC00451         |
-| "&nbsp;&nbsp;&nbsp;&nbsp;23"           | 0xAAAA23         |
-| "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" | 0xAAAAAA         |
+| "&ensp;&ensp;&ensp;&ensp;23"           | 0xAAAA23         |
+| "&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;" | 0xAAAAAA         |
 
 The BCD symbols "+" (0xB) and "-" (0xC) are only allowed for the most signifigant digits of the R1, R2 and R3
 DSKY fields. **NOTE:** Technically, the "-" symbol could be rendered for all DSKY digits but the code currently
