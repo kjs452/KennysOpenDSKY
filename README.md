@@ -1102,8 +1102,8 @@ the previous DSKY state.
 Binary Coded Decimal (BCD) is used to show numbers on the DSKY display. BCD
 encoding is a number encoding format that differs from normal binary encoding
 of integers. Binary Coded Decimal uses 4-bit fields to encode each digit.
-The ten digits **0** through **9** are encoded into the 4-bit field.
-Since 4-bits can encode 16 unqique values there are additional values that are
+The ten digits **0** through **9** are encoded into 4-bit fields.
+Since 4-bits can encode 16 unique values there are additional values that are
 not mapped to digits. For the DSKY I extended the BCD encoding to include three more
 symbols: **SPACE**, **PLUS**, **MINUS**
 
@@ -1133,12 +1133,12 @@ literals are easy to read when they appear in the code.
 
 | Desired DSKY display | Hex Literal      |
 |----------------------|------------------|
-| " 06 22"             | 0xA06A22         |
+| "&nbsp;06&nbsp;22"   | 0xA06A22         |
 | "+05930"             | 0xB05930         |
 | "16"                 | 0x16             |
 | "-00451"             | 0xC00451         |
-| "    23"             | 0xAAAA23         |
-| "      "             | 0xAAAAAA         |
+| "&nbsp;&nbsp;&nbsp;&nbsp;23"           | 0xAAAA23         |
+| "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" | 0xAAAAAA         |
 
 The BCD symbols "+" (0xB) and "-" (0xC) are only allowed for the most signifigant digits of the R1, R2 and R3
 DSKY fields. **NOTE:** Technically, the "-" symbol could be rendered for all DSKY digits but the code currently
