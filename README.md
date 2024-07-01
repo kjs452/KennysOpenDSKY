@@ -407,6 +407,14 @@ The footnote **[1]** indicates items which have **not** been implemented yet.
 |-----------|--------------------------------------------------------------|
 |V01 N02    | View memory (R3=Address 0000-4067, R1=Value 000-377) octal   |
 |           |                                                              |
+|V02 Nxx    | test verb. enter R2 in decimal                               |
+|           |                                                              |
+|V03 Nxx    | test verb. enter R3 in octal                                 |
+|           |                                                              |
+|V04 Nxx    | test verb. incrementing/decrementing values                  |
+|           |                                                              |
+|V05 Nxx    | clears DSKY, end verb, cleans stack                          |
+|           |                                                              |
 |V06 N17    | Display IMU linear accel values                              |
 |V06 N18    | Display IMU gyro accel values                                |
 |V06 N19    | Display RTC Date/Time and IMU temp                           |
